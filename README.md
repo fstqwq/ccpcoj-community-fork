@@ -2,6 +2,10 @@
 
 An independent, experimental community adaptation of CCPCOJ 2 implementing the September 14, 2026 version of the CCPC ranking rules. The web application, judge, database baseline, and deployment templates were recovered from the `csgrandeur/ccpcoj-web2` and `csgrandeur/ccpcoj-judge2` version 2.0.40 Docker Hub images. The project retains the ThinkPHP administration interface, existing ranking themes, live scoreboard, balloon management, and conventional ICPC mode.
 
+## License
+
+Original code and modifications contributed by this community fork are licensed under the **GNU General Public License, version 3 (GPL-3.0-only)**. See [LICENSE](LICENSE) for the complete terms. The license text is reproduced unchanged from [CSGrandeur/CCPCOJ](https://github.com/CSGrandeur/CCPCOJ/blob/master/LICENSE).
+
 ## Disclaimer
 
 **This project is an unofficial community implementation. It is not an official CCPC product, reference implementation, rule publication, or certification of compliance.**
