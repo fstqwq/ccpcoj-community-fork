@@ -58,3 +58,16 @@ docker compose -f compose.yaml -f compose.workers.yaml --profile judge up -d
 附加的两个实例使用各自独立的工作卷，共用原有判题账号和原有队列排序。三个实例共享宿主机 CPU/内存；这会提高同时处理能力，但不增加物理资源。此配置已在上述 2c2g 测试机运行。
 
 并发限制：实机观察到两个实例可能同时领取同一提交。原 `getpending` 的查询与状态更新不是原子操作；本次按用户要求保留队列代码，没有修复这一领取竞争。三个实例的启动和完成评测验证不能替代并发可靠性验收。
+
+
+### Isolated fresh-install verification
+
+The default FAQ/toolchain changes were also deployed as a separate Compose project with a fresh database, separate volumes, separate image tags and a separate HTTP port. The existing contest instance was excluded from these subsequent changes.
+
+- Build-time and runtime version checks: Ubuntu 24.04.5 LTS, GCC/G++ 14.2.0, Python 3.12.3, OpenJDK/javac 21.0.12.1.
+- Fresh judge configuration: C23 / C++23, both with O2.
+- Actual C23, C++23, Java and Python submissions: all AC.
+- Actual AC / WA / CE / TLE smoke cases: all expected verdicts.
+- Both FAQ languages load without a pre-populated FAQ article.
+
+The C23 probe uses a language feature and checks that `__STDC_VERSION__` is newer than C17; GCC 14 reports a draft C23 macro value, so requiring the final `202311L` value would incorrectly reject this compiler.

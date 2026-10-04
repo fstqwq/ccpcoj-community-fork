@@ -7,23 +7,28 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'judge' / 'core'))
-from lang.lang_c import LanguageC
-from lang.lang_cpp import LanguageCpp
-from lang.lang_java import LanguageJava
-from lang.lang_python import LanguagePython
+def main():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'judge' / 'core'))
+    from lang.lang_c import LanguageC
+    from lang.lang_cpp import LanguageCpp
+    from lang.lang_java import LanguageJava
+    from lang.lang_python import LanguagePython
+    
+    cases = json.loads(Path(sys.argv[1]).read_text())
+    for case in cases:
+        for label, cls, extension in [('C', LanguageC, 'c'), ('C++', LanguageCpp, 'cpp'),
+                                       ('Java', LanguageJava, 'java'), ('Python', LanguagePython, 'py')]:
+            handler = cls.__new__(cls)
+            handler.config = case['config']
+            handler.work_dir = '/tmp'
+            handler.get_source_path_for_compile = lambda filename: filename
+            actual = handler.get_compile_command('Main.' + extension, 'Main')
+            key = label if label in ('C', 'C++') else label + ' compile'
+            assert actual == case['commands'][key], (key, actual, case['commands'][key])
+            if label in ('Java', 'Python'):
+                assert handler.get_run_command('Main' if label == 'Java' else 'Main.py', memory_limit=1) == case['commands'][label + ' run']
+    print('PASS: FAQ and judge commands agree for default and customized settings')
 
-cases = json.loads(Path(sys.argv[1]).read_text())
-for case in cases:
-    for label, cls, extension in [('C', LanguageC, 'c'), ('C++', LanguageCpp, 'cpp'),
-                                   ('Java', LanguageJava, 'java'), ('Python', LanguagePython, 'py')]:
-        handler = cls.__new__(cls)
-        handler.config = case['config']
-        handler.work_dir = '/tmp'
-        handler.get_source_path_for_compile = lambda filename: filename
-        actual = handler.get_compile_command('Main.' + extension, 'Main')
-        key = label if label in ('C', 'C++') else label + ' compile'
-        assert actual == case['commands'][key], (key, actual, case['commands'][key])
-        if label in ('Java', 'Python'):
-            assert handler.get_run_command('Main' if label == 'Java' else 'Main.py', memory_limit=1) == case['commands'][label + ' run']
-print('PASS: FAQ and judge commands agree for default and customized settings')
+
+if __name__ == "__main__":
+    main()

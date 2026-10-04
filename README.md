@@ -30,7 +30,7 @@ docker compose ps
 
 The default URL is `http://127.0.0.1:20080/cpcsys/contest`. Initial database setup creates the `admin` and `judger` accounts using the passwords in the generated `.env` file. Existing accounts are not overwritten. Select **CCPC 2026** on the contest editing page to enable the new ranking mode.
 
-The default installation includes a bilingual FAQ at `/csgoj/faqs` and `/cpcsys/faqs`, even when no FAQ article has been entered in the database. Compiler commands are rendered from the same active configuration used by the judge. New installations default to **C23 / C++23 with O2**.
+The default installation includes a bilingual FAQ at `/cpcsys/faqs` (`/csgoj/faqs` in online mode), even when no FAQ article has been entered in the database. Compiler commands are rendered from the same active configuration used by the judge. New installations default to **C23 / C++23 with O2**.
 
 The judge image installs the toolchain documented by the [reference FAQ](https://cpc.csgrandeur.cn/csgoj/faqs): **Ubuntu 24.04.5 LTS, GCC 14.2.0, Python 3.12.3, and OpenJDK 21.0.12.1**. Versions and Ubuntu package revisions are recorded in `ojweb/config/judge_environment.json`. The Docker build installs the specified JDK and verifies the actual binaries against that manifest; it fails rather than silently substituting a different version. Existing custom judge configurations are preserved during upgrades; change their language standards explicitly in the administration interface when desired.
 
