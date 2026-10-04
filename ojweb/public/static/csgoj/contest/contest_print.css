@@ -1,0 +1,732 @@
+/**
+ * 比赛题册（contest2print）：版心样式全部在 `#contest_print_scope` 内；`.cp-print-stack` / `.cp-sheet`，打印见 `@media print`。
+ * 说明：docs/guide/18.比赛题册contest2print.md
+ */
+
+#contest_print_scope .contest-print-native-host {
+    --cp-a4-w: 210mm;
+    --cp-a4-h: 297mm;
+}
+
+#contest_print_scope .admin-page-header--contest-print .admin-page-header-right .contest-print-tool-btn .cn-text,
+#contest_print_scope .admin-page-header--contest-print .admin-page-header-right .contest-print-tool-btn .en-text {
+    display: inline;
+}
+
+#contest_print_scope .contest-print-lang-select {
+    min-width: 11rem;
+    max-width: 18rem;
+}
+
+#contest_print_scope .contest-print-iconbtn {
+    width: 2rem;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#contest_print_scope .contest-print-page-indicator {
+    min-width: 4rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+#contest_print_scope #contest_print_main {
+    padding: 0 1rem 1rem;
+    position: relative;
+}
+
+#contest_print_scope #contest_print_viewport_wrap {
+    position: relative;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    min-height: 60vh;
+}
+
+/*
+ * 集成到 contest layout 后，页面顶部包含：站点 header(~60px) + 顶部赛事横幅(可选) + contest header(~180px)
+ * + 本页 admin-page-header(~60px) + 主区域 padding。给 viewport 一个相对容器高度，整体留给 contest 页头/导航。
+ * 全屏模式由 :fullscreen 规则单独覆写为 100vh。
+ */
+#contest_print_scope .contest-print-viewport {
+    height: clamp(480px, calc(100vh - 22rem), 1400px);
+    /*
+     * 纵向 auto，横向 hidden：A4 sheet（210mm ≈ 794px）固定宽，
+     * 当外层容器/视口比 794px 窄时不应让页面级出现横向滚动条 / 撑大父布局。
+     */
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1.25rem 0;
+    scroll-behavior: smooth;
+    background: #f1f5f9;
+    min-width: 0;
+}
+
+#contest_print_scope #contest_print_viewport_wrap,
+#contest_print_scope #contest_print_main {
+    min-width: 0;
+}
+
+#contest_print_scope .contest-print-loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(241, 245, 249, 0.85);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+#contest_print_scope .contest-print-loading[hidden] {
+    display: none !important;
+}
+
+#contest_print_scope .contest-print-loading-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+}
+
+/* 自研分页：A4 卡片竖叠，屏幕预览整体缩放 */
+#contest_print_scope #contest_print_viewport .cp-print-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    transform: scale(var(--cp-preview-scale, 1));
+    transform-origin: top center;
+}
+
+#contest_print_scope #contest_print_viewport .cp-sheet {
+    width: var(--cp-a4-w, 210mm);
+    min-height: var(--cp-a4-h, 297mm);
+    box-sizing: border-box;
+    padding: 14mm 12mm 18mm;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    transform-origin: top center;
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+ * 内容横向不允许超过版心宽度。
+ */
+#contest_print_scope #contest_print_viewport .cp-section-content table,
+#contest_print_scope #contest_print_viewport .cp-section-content img,
+#contest_print_scope #contest_print_viewport .cp-section-content video,
+#contest_print_scope #contest_print_viewport .cp-section-content svg {
+    max-width: 100%;
+    height: auto;
+}
+
+#contest_print_scope #contest_print_viewport .cp-section-content pre,
+#contest_print_scope #contest_print_viewport .cp-section-content code {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* 全屏模式下：让 viewport 占满屏幕、单页居中 */
+#contest_print_scope .contest-print-viewport:fullscreen {
+    background: #0f172a;
+    height: 100vh;
+    padding: 1rem 0;
+}
+
+#contest_print_scope .contest-print-viewport:-webkit-full-screen {
+    background: #0f172a;
+    height: 100vh;
+    padding: 1rem 0;
+}
+
+/* ===== 排版内容样式（被 paged.js 应用到每页内） ===== */
+
+/* 整体字号与行距 */
+#contest_print_scope .contest-print-native-host .cp-doc {
+    font-size: 11.5pt;
+    line-height: 1.55;
+    color: #0f172a;
+    font-family: "等线", "Source Han Sans CN", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+}
+
+#contest_print_scope .contest-print-native-host .cp-doc h1,
+#contest_print_scope .contest-print-native-host .cp-doc h2,
+#contest_print_scope .contest-print-native-host .cp-doc h3 {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/*
+ * 排版页内中英双语：默认上下结构会被强制改回"左右结构"。
+ * 站点 bilingual.css 默认会把 .en-text 渲染为下方副行（display: block, italic, opacity 0.7 等），
+ * 在 A4 排版里这样会把"题数：Problems 12"这种短行拆成两行，极不美观，因此整体覆盖。
+ * 选择器锚定 .cp-cover / .cp-toc / .cp-problem 三个 class，原因是 paged.js 在分页时
+ * 不保证外层 .cp-doc 还在，但这三个"页根 class"始终会跟随其内容被切到对应页内。
+ *
+ * 视图里所有"中英并排"的位置都已经在 HTML 中显式插入了 <span class="cp-bilingual-sep"> / </span>，
+ * 所以 CSS 不再通过 ::before 自动追加分隔符。
+ */
+#contest_print_scope .contest-print-native-host .cp-cover .cn-text,
+#contest_print_scope .contest-print-native-host .cp-cover .en-text,
+#contest_print_scope .contest-print-native-host .cp-toc .cn-text,
+#contest_print_scope .contest-print-native-host .cp-toc .en-text,
+#contest_print_scope .contest-print-native-host .cp-problem .cn-text,
+#contest_print_scope .contest-print-native-host .cp-problem .en-text {
+    display: inline !important;
+    font-style: normal !important;
+    opacity: 1 !important;
+    line-height: inherit !important;
+    margin: 0 !important;
+}
+#contest_print_scope .contest-print-native-host .cp-cover .en-text,
+#contest_print_scope .contest-print-native-host .cp-toc .en-text,
+#contest_print_scope .contest-print-native-host .cp-problem .en-text {
+    font-size: 0.85em !important;
+    color: #64748b;
+    font-weight: 500;
+}
+#contest_print_scope .contest-print-native-host .cp-cover .cn-text + .en-text::before,
+#contest_print_scope .contest-print-native-host .cp-toc .cn-text + .en-text::before,
+#contest_print_scope .contest-print-native-host .cp-problem .cn-text + .en-text::before {
+    content: "";
+}
+#contest_print_scope .contest-print-native-host .cp-bilingual-sep {
+    color: #94a3b8;
+    font-weight: 400;
+    margin: 0 0.15em;
+    user-select: none;
+}
+
+/* 数字 + 单位整体不换行的工具类（meta 行常用：1s / 256MB / 5h 等） */
+#contest_print_scope .contest-print-native-host .csg-no-break,
+#contest_print_scope .contest-print-native-host .cp-doc .csg-no-break {
+    white-space: nowrap;
+}
+
+/* 封面页 */
+#contest_print_scope .contest-print-native-host .cp-cover {
+    page: cover;
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding-top: 22mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-title {
+    font-size: 32pt;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-subtitle {
+    font-size: 22pt;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 6mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-logo-wrap {
+    margin-top: 18mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-logo-wrap img {
+    max-width: 110mm;
+    max-height: 80mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-meta {
+    margin-top: 14mm;
+    font-size: 14pt;
+    color: #1e293b;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-meta .cp-cover-meta-row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.4em;
+    margin-top: 6mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-meta .cp-cover-meta-row .key {
+    /* key 内已显式包了 cn / sep / en，颜色由各 span 自己决定（cn 主色、sep 灰、en 0.85em 灰） */
+    display: inline-flex;
+    align-items: baseline;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-meta-colon {
+    color: #64748b;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover-bottom {
+    margin-top: 20mm;
+    color: #475569;
+    font-size: 12pt;
+}
+
+/* ===== 目录页 ===== */
+#contest_print_scope .contest-print-native-host .cp-toc {
+    page: toc;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-title {
+    text-align: center;
+    margin: 0 0 8mm;
+    font-size: 22pt;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-item {
+    padding: 1.4mm 0;
+    font-size: 12pt;
+}
+
+/*
+ * 目录链接结构：题号 + 标题(可省略) + 引导线(填满) + 页码
+ * 页码由 contest_print.js 在 paged.js 排版完成后写入 .cp-toc-page；
+ * 选用 JS 而非 CSS target-counter() 是因为后者在某些 paged.js 版本下会触发
+ * "Cannot read properties of null" 异常，且 JS 写入的文本可被 IDB 缓存的 innerHTML 序列化。
+ */
+#contest_print_scope .contest-print-native-host .cp-toc-link {
+    display: flex;
+    align-items: baseline;
+    text-decoration: none;
+    color: inherit;
+    gap: 0.5em;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-page {
+    font-variant-numeric: tabular-nums;
+    color: #1e293b;
+    flex: 0 0 auto;
+    margin-left: 0.4em;
+    min-width: 1.6em;
+    text-align: right;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-apid {
+    flex: 0 0 7mm;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-title-text {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#contest_print_scope .contest-print-native-host .cp-toc-pdf-flag {
+    font-size: 9pt;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+    border-radius: 3px;
+    padding: 0 4px;
+    margin-left: 2mm;
+    flex: 0 0 auto;
+}
+
+/*
+ * 引导线：flex 内自动填满中间剩余宽度并以点状下边框模拟传统目录"......"。
+ * transform 把视觉中心对齐 baseline，避免与文字底部重合。
+ */
+#contest_print_scope .contest-print-native-host .cp-toc-leader {
+    flex: 1 1 auto;
+    border-bottom: 1px dotted #94a3b8;
+    margin: 0 0.4em 0 0.2em;
+    transform: translateY(-0.25em);
+    height: 0;
+    min-width: 1em;
+}
+
+/*
+ * 分页：每张 `<article class="cp-sheet">` 对应屏幕上一张 A4 卡片、打印时一页；版心内
+ * `.cp-cover` / `.cp-toc` / `.cp-problem` 不再单独设 break-before（避免 sheet 内再拆页）。
+ */
+#contest_print_scope .contest-print-native-host .cp-cover,
+#contest_print_scope .contest-print-native-host .cp-toc,
+#contest_print_scope .contest-print-native-host .cp-problem {
+    break-before: auto;
+}
+
+#contest_print_scope .contest-print-native-host .cp-problem--pdf {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#contest_print_scope .contest-print-native-host .cp-problem h2.cp-problem-title {
+    margin: 0 0 3mm;
+    font-size: 18pt;
+}
+
+/*
+ * 题号标题下面的元信息：评测类型 chip + 时限 + 内存。整行不允许换行（white-space: nowrap），
+ * 用 inline-flex 把单元格 baseline 对齐；A4 内 chip 与数字一定容得下。
+ */
+#contest_print_scope .contest-print-native-host .cp-problem .cp-problem-meta {
+    color: #475569;
+    font-size: 10.5pt;
+    margin: 0 0 6mm;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 1.2em;
+    white-space: nowrap;
+}
+
+#contest_print_scope .contest-print-native-host .cp-meta-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+}
+
+#contest_print_scope .contest-print-native-host .cp-meta-item .cp-meta-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+}
+
+#contest_print_scope .contest-print-native-host .cp-meta-colon {
+    color: #64748b;
+    margin: 0 0.15em 0 0;
+}
+
+/*
+ * 评测类型 chip：与 oj_problem.js 的 spj 配色映射保持一致：
+ *   0 标准评测 -> primary 蓝
+ *   1 特判评测 -> warning 黄
+ *   2 交互评测 -> success 绿
+ */
+#contest_print_scope .contest-print-native-host .cp-judge-chip {
+    display: inline-flex;
+    align-items: baseline;
+    padding: 1pt 8pt;
+    border-radius: 999px;
+    font-size: 9.5pt;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+#contest_print_scope .contest-print-native-host .cp-judge-chip--standard { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+#contest_print_scope .contest-print-native-host .cp-judge-chip--special { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+#contest_print_scope .contest-print-native-host .cp-judge-chip--interactive { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+
+/* ===== 内容大标题（题目描述/输入/输出/样例/提示）：左右结构 + 蓝色，不挤占行高 ===== */
+#contest_print_scope .contest-print-native-host .cp-section {
+    margin-top: 5mm;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section h3.cp-section-title {
+    font-size: 13pt;
+    color: #1d4ed8;
+    margin: 0 0 2.5mm;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 0.1em;
+}
+
+/*
+ * 正文：取消 justify（长 token 会被拉散）；CJK 自然换行，长 URL/英文单词在任意位置换行；英文 hyphens auto。
+ * 数字 + 单位若需保持整体，请用 .csg-no-break（HTML 层显式包裹），CSS 不靠 white-space: nowrap 来反推。
+ */
+#contest_print_scope .contest-print-native-host .cp-section .cp-section-content {
+    font-size: 11.5pt;
+    line-height: 1.55;
+    text-align: left;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-family: "Cascadia Mono", "Consolas", "Source Han Mono SC", "Noto Sans Mono CJK SC", monospace;
+    font-size: 10.5pt;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/*
+ * Pandoc 题面包在 .marked_math_div（与 MathRender 选择器一致）。
+ * 本页**不**加载整站 oj_problem.css，故在此补全版心内标题层级，且选择器一律锚在 #contest_print_scope .contest-print-native-host 下，避免污染侧栏/页头。
+ */
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h1,
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h2,
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h3,
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h4 {
+    color: #1e293b;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0.6em 0 0.35em;
+}
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h1 { font-size: 1.35em; }
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h2 { font-size: 1.22em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.2em; }
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h3 { font-size: 1.1em; }
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div h4 { font-size: 1.05em; }
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div > :first-child {
+    margin-top: 0;
+}
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div blockquote {
+    margin: 0.5em 0;
+    padding: 0.35em 0.75em;
+    border-left: 3px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+}
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div ul,
+#contest_print_scope .contest-print-native-host .cp-section-content.marked_math_div ol {
+    margin: 0.35em 0;
+    padding-left: 1.35em;
+}
+
+/*
+ * ===== 样例卡片（复用 oj_problem.js 的 ProblemSampleHtml 输出） =====
+ * 复用站点同款渲染，但打印场景下隐藏复制 / 拖拽等交互按钮，且把 bootstrap card 样式改为
+ * 适合 A4 的紧凑外观（去阴影、降字号、行高紧凑）。
+ */
+#contest_print_scope .contest-print-native-host .cp-section .sample-item {
+    margin: 0 0 4mm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .card {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .card-header,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-section-header {
+    background: #f1f5f9 !important;
+    padding: 3pt 6pt !important;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-section-header h4 {
+    margin: 0 !important;
+    font-size: 11pt !important;
+    font-weight: 600;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-content {
+    padding: 4pt 6pt !important;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sampledata,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item pre.sampledata {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 10pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-controls,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-dnd-handle,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample_copy,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .card-header-with-dnd,
+#contest_print_scope .contest-print-native-host .cp-section .sample-item .sample-index {
+    display: none !important;
+}
+
+/* 样例容器内的"输入/输出"标题用站点 oj_problem.css 的颜色，需配合本视图把 .en-text 强制内联（已在前面处理）。 */
+
+/*
+ * PDF 题面 / 自定义封面：同源 iframe，与 MD 题面同一打印文档（浏览器对 iframe 打印行为依实现而定）。
+ */
+#contest_print_scope .contest-print-native-host .cp-pdf-frame-wrap {
+    width: 100%;
+    margin-top: 4mm;
+    flex: 1 1 auto;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+#contest_print_scope .contest-print-native-host .cp-pdf-frame,
+#contest_print_scope .contest-print-native-host .cp-cover-pdf-iframe {
+    display: block;
+    width: 100%;
+    min-height: 240mm;
+    border: 0;
+    background: #fff;
+}
+
+#contest_print_scope .contest-print-native-host .cp-cover--external-pdf {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/*
+ * ----- 打印（矢量）：仅打 `#contest_print_scope` 内版心；站点侧栏/导航由 visibility 隔离隐藏 -----
+ * 页脚页码：`preparePrintAttributes` 写入 `--cp-print-total` 与 `data-cp-print-pageno`。
+ */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 14mm 12mm 18mm 12mm;
+    }
+
+    @page cover {
+        margin: 0;
+    }
+
+    body:has(#contest_print_scope) * {
+        visibility: hidden !important;
+    }
+
+    body:has(#contest_print_scope) #contest_print_scope,
+    body:has(#contest_print_scope) #contest_print_scope * {
+        visibility: visible !important;
+    }
+
+    /* 不依赖 :has()：由「打印 PDF」按钮在打印前后挂类，避免部分浏览器打印时 :has 与 visibility 组合异常 */
+    body.csg-contest-print-active * {
+        visibility: hidden !important;
+    }
+
+    body.csg-contest-print-active #contest_print_scope,
+    body.csg-contest-print-active #contest_print_scope * {
+        visibility: visible !important;
+    }
+
+    #contest_print_scope .admin-page-header--contest-print {
+        display: none !important;
+    }
+
+    #contest_print_scope #contest_print_main {
+        padding: 0 !important;
+    }
+
+    #contest_print_scope #contest_print_viewport_wrap {
+        border: 0 !important;
+        background: transparent !important;
+        min-height: 0 !important;
+    }
+
+    #contest_print_scope .contest-print-viewport {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    #contest_print_scope #contest_print_viewport .cp-print-stack {
+        transform: none !important;
+        gap: 0 !important;
+    }
+
+    #contest_print_scope #contest_print_viewport .cp-sheet {
+        box-shadow: none !important;
+        break-after: page;
+        page-break-after: always;
+        box-sizing: border-box;
+        position: relative;
+        width: 100% !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+    }
+
+    #contest_print_scope #contest_print_viewport .cp-sheet:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    /*
+     * 页码：只对非封面类 sheet 累加；`.cp-page-cover` 由 preparePrintAttributes() 写入。
+     */
+    #contest_print_scope[data-cp-print-pageno="1"] #contest_print_viewport .cp-print-stack {
+        counter-reset: cp-print-num 0;
+    }
+
+    #contest_print_scope[data-cp-print-pageno="1"] #contest_print_viewport .cp-sheet:not(.cp-page-cover) {
+        counter-increment: cp-print-num;
+    }
+
+    #contest_print_scope[data-cp-print-pageno="1"] #contest_print_viewport .cp-sheet:not(.cp-page-cover)::after {
+        content: counter(cp-print-num) " / " var(--cp-print-total);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 5mm;
+        z-index: 2;
+        text-align: center;
+        font-size: 9pt;
+        color: #64748b;
+        font-variant-numeric: tabular-nums;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    #contest_print_scope[data-cp-print-pageno="1"] #contest_print_viewport .cp-sheet.cp-page-cover::after {
+        content: none !important;
+    }
+
+}
+
+/* 资产预览（设置 modal 内） */
+#contest_print_scope .contest-print-asset-preview {
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 0.75rem;
+    background: #f8fafc;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+#contest_print_scope .contest-print-asset-preview img {
+    max-width: 100%;
+    max-height: 12rem;
+}
+
+#contest_print_scope .contest-print-asset-preview--pdf a {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#contest_print_scope .contest-print-asset-preview--pdf .bi-file-earmark-pdf {
+    color: #b91c1c;
+    font-size: 1.5rem;
+}

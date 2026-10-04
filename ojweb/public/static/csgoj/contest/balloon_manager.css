@@ -1,0 +1,1396 @@
+/* ==========================================
+   气球管理系统样式 - 最小定制，主要使用Bootstrap 5
+   ========================================== */
+
+/* 头部区域 - 使用 Bootstrap 标准样式 */
+.balloon-header-section {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 0;
+}
+
+.balloon-header-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* 紧凑型标题（使用bilingual.css和Bootstrap标准样式） */
+.balloon-title-compact {
+    flex-shrink: 0;
+}
+
+.balloon-title-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    /* 确保 .en-text 在标题中上下显示，字号比中文小 */
+}
+
+/* 确保标题中的英文文本是上下结构，字号比中文小 */
+.balloon-title-text en-text,
+.balloon-title-text .en-text {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-top: 1px !important;
+    font-size: 0.7em !important;
+    color: inherit;
+    font-style: italic;
+    opacity: 0.8;
+    line-height: 1.0em;
+    font-weight: normal;
+}
+
+/* 控制组 - 使用 Bootstrap 标准样式 */
+.balloon-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.balloon-refresh-countdown {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 12px;
+    background: #0d6efd;
+    color: #ffffff;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 气球队列「小票功能」：与筛选条同套灰底圆角 + 紧凑标签（仅 .balloon-queue-print-panel） */
+.balloon-ticket-toolbar.balloon-queue-print-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e9ecef;
+    border-radius: 0.35rem;
+    background: #f1f3f5;
+}
+
+/* 小票条：总开关与配置同一条 flex 带，不换行以免开关单独落上一行；极窄时横向滚动 */
+.balloon-queue-print-panel .balloon-ticket-toolbar__main {
+    padding: 0.38rem 0.45rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.balloon-queue-print-panel .balloon-ticket-toolbar__strip {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0.35rem 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.balloon-queue-print-panel .balloon-ticket-toolbar__strip > .balloon-ticket-feature-stack > .csg-switch {
+    flex: 0 0 auto;
+}
+
+.balloon-queue-print-panel .balloon-ticket-feature-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    gap: 0.12rem;
+    min-width: 0;
+}
+
+.balloon-queue-print-panel .balloon-ticket-feature-countdown {
+    width: 100%;
+    max-width: 6.5rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.balloon-queue-print-panel #balloon-ticket-config {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    align-items: stretch;
+    box-sizing: border-box;
+    border-left: 1px solid #ced4da;
+    padding-left: 0.45rem;
+    margin-left: 0.12rem;
+}
+
+/*
+ * 配置行加 .balloon-filter-row，与下方筛选条同构；#balloon-ticket-config 与总开关同 strip，不再用 display:contents。
+ */
+.balloon-queue-print-panel #balloon-ticket-config .balloon-ticket-config__row.balloon-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.35rem 0.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.balloon-queue-print-panel #balloon-ticket-config .balloon-ticket-config__row.balloon-filter-row > .balloon-filter-group {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.balloon-queue-print-panel .balloon-ticket-config__row > .balloon-filter-group.balloon-ticket-paper-dims {
+    flex: 1 1 18rem;
+    min-width: min(100%, 14rem);
+    max-width: min(100%, 40rem);
+}
+
+.balloon-queue-print-panel .balloon-ticket-mm-field.balloon-filter-group {
+    flex: 0 0 auto;
+    min-width: 3.25rem !important;
+    max-width: 5.5rem !important;
+    width: auto;
+}
+
+.balloon-queue-print-panel .balloon-ticket-preset-field.balloon-filter-group {
+    flex: 1 1 5.5rem;
+    min-width: 5.25rem !important;
+    max-width: 11.5rem !important;
+}
+
+.balloon-queue-print-panel .balloon-ticket-field-label-with-help {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.06rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.balloon-queue-print-panel .balloon-ticket-field-label-with-help .balloon-filter-label {
+    flex: 0 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+.balloon-queue-print-panel .balloon-ticket-field-label-with-help .balloon-ticket-help-icon {
+    font-size: 0.88rem;
+    line-height: 1;
+    margin-top: 0.08rem;
+    cursor: help;
+    flex-shrink: 0;
+    opacity: 1;
+}
+
+.balloon-queue-print-panel .balloon-ticket-field-label-with-help .balloon-ticket-help-icon:hover,
+.balloon-queue-print-panel .balloon-ticket-field-label-with-help .balloon-ticket-help-icon:focus-visible {
+    opacity: 0.88;
+    filter: brightness(1.08);
+}
+
+.balloon-queue-print-panel .balloon-ticket-paper-dims__controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0.25rem 0.4rem;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.balloon-queue-print-panel .balloon-ticket-toolbar-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.balloon-queue-print-panel .balloon-print-paper-swap {
+    flex: 0 0 auto;
+    align-self: flex-end;
+    margin-bottom: 0.2rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1;
+    user-select: none;
+    border: none;
+    --bs-btn-color: var(--bs-info);
+    --bs-btn-hover-color: #055160;
+}
+
+.balloon-queue-print-panel .balloon-print-paper-swap:focus-visible {
+    outline: 2px solid rgba(13, 202, 240, 0.85);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.balloon-queue-print-panel #balloon-print-countdown-text {
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+#balloon-countdown-text {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* 全局统计信息样式 - 使用Bootstrap card样式 */
+.balloon-global-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.balloon-stat-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    max-width: 180px;
+    box-sizing: border-box;
+}
+
+.balloon-stat-item:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: translateY(-2px);
+}
+
+.balloon-stat-item[data-status="0"] {
+    border: 2px solid #dc3545;
+}
+
+.balloon-stat-item[data-status="10"] {
+    border: 2px solid #ffc107;
+}
+
+.balloon-stat-item[data-status="20"] {
+    border: 2px solid #0dcaf0;
+}
+
+.balloon-stat-item[data-status="30"] {
+    border: 2px solid #198754;
+}
+
+/* 选中状态的统计项 - 更粗的边框 */
+.balloon-stat-item.stat-selected {
+    border-width: 4px !important;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+    background-color: rgba(13, 110, 253, 0.05);
+    font-weight: 700;
+}
+
+.balloon-stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.balloon-stat-label en-text,
+.balloon-stat-label .en-text {
+    font-size: 11px;
+    font-weight: 400;
+    color: #6c757d;
+    opacity: 0.8;
+}
+
+.balloon-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #212529;
+    white-space: nowrap;
+}
+
+/* 气球状态边框样式 - 使用outline不占DOM空间，更粗的边框 */
+.problem-item.balloon-status-0 {
+    /* 未发气球 - 红色 */
+    outline: 6px solid #dc3545 !important;
+    outline-offset: -6px !important;
+}
+
+.problem-item.balloon-status-10 {
+    /* 已通知 - 黄色 */
+    outline: 6px solid #ffc107 !important;
+    outline-offset: -6px !important;
+}
+
+.problem-item.balloon-status-20 {
+    /* 已分配 - 青色 */
+    outline: 6px solid #0dcaf0 !important;
+    outline-offset: -6px !important;
+}
+
+.problem-item.balloon-status-30 {
+    /* 已发放 - 绿色 */
+    outline: 6px solid #198754 !important;
+    outline-offset: -6px !important;
+}
+
+/* 确保outline不影响布局 */
+.problem-item[class*="balloon-status-"] {
+    box-sizing: border-box;
+}
+
+/* 气球管理：题目列背景色半透明，让边框更显著 - 仅对balloon-manager-system生效 */
+.balloon-manager-system .problem-item {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.balloon-manager-system .problem-item.pro-ac {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+}
+
+.balloon-manager-system .problem-item.pro-wa {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.balloon-manager-system .problem-item.pro-pending {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+}
+
+/* 气球管理：题目内容只显示time-brief，居中 */
+.balloon-problem-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.balloon-problem-content .pro-submit-cnt,
+.balloon-problem-content .problem-separator,
+.balloon-problem-content .time-full {
+    display: none !important;
+}
+
+.balloon-problem-content .time-brief {
+    display: inline-block !important;
+    text-align: center;
+    width: 100%;
+}
+
+/* 统计值点击样式 */
+.balloon-stats-clickable {
+    transition: all 0.2s ease;
+}
+
+.balloon-stats-clickable:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 4px;
+    transform: scale(1.1);
+}
+
+.problem-header-stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.problem-header-stats {
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 响应式布局 - 窄屏时统计值变成 2x2 布局 */
+@media (max-width: 768px) {
+    .balloon-header-row {
+        gap: 1rem;
+    }
+    
+    .balloon-title-text {
+        font-size: 1.25rem;
+    }
+    
+    .balloon-global-stats {
+        grid-template-columns: repeat(2, 1fr);
+        width: 100%;
+    }
+    
+    .balloon-stat-item {
+        padding: 0.375rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .balloon-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .balloon-title-text {
+        font-size: 1.125rem;
+    }
+    
+    .balloon-controls-group {
+        width: 100%;
+    }
+    
+    .balloon-global-stats {
+        width: 100%;
+    }
+}
+
+/* 队伍信息模板样式 - 水平布局：label在左，内容在右，每条一行 */
+.team-info-template {
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: #212529;
+}
+
+.team-info-template .team-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+
+.team-info-template .team-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.team-info-template .team-info-item i {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.team-info-template .team-info-item .label-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.team-info-template .team-info-item .main-text {
+    font-weight: 500;
+    color: #212529;
+    word-break: break-word;
+    line-height: 1.5;
+    flex: 1;
+    min-width: 0;
+}
+
+.team-info-template .team-info-item .sub-text {
+    font-size: 0.813rem;
+    color: #6c757d;
+    font-weight: 400;
+}
+
+.team-info-template .team-info-item.team-info-highlight {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+    padding: 0.625rem 0.875rem;
+    margin: 0.5rem 0;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 3px rgba(13, 110, 253, 0.1);
+}
+
+/* 筛选条：独占整行；每组内「标签在上、控件在下」 */
+.balloon-queue-toolbar-row {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.balloon-filter-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.balloon-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.35rem 0.5rem;
+    padding: 0.38rem 0.45rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: #f1f3f5;
+    border-radius: 0.35rem;
+    border: 1px solid #e9ecef;
+}
+
+.balloon-filter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.12rem;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* 空选项时 multipleSelect 父级勿塌成一条缝：组与控件均设下限宽度 */
+.balloon-filter-group:not(.balloon-filter-group--search):not(.balloon-filter-group--actions) {
+    flex: 0 0 auto;
+    min-width: 8.25rem;
+    max-width: 11.5rem;
+}
+
+.balloon-filter-group--search {
+    flex: 1 1 14rem;
+    min-width: 9rem;
+    max-width: 100%;
+}
+
+.balloon-filter-group--actions {
+    flex: 0 0 auto;
+    align-self: flex-end;
+    min-width: 0;
+    max-width: none;
+}
+
+.balloon-filter-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    line-height: 1.15;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.balloon-filter-label .en-text {
+    font-size: 0.58rem;
+    font-weight: 500;
+    color: #6c757d;
+    font-style: normal;
+    opacity: 0.9;
+}
+
+.balloon-filter-input {
+    width: 100%;
+    max-width: 22rem;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.balloon-filter-group select.multiple-select {
+    width: 100%;
+    min-width: 0;
+}
+
+.balloon-filter-group .ms-parent {
+    width: 100% !important;
+    max-width: 11.5rem;
+    min-width: 7.5rem;
+    box-sizing: border-box;
+}
+
+/* multipleSelect 展开按钮高度与 form-control-sm 接近 */
+.balloon-filter-group .ms-parent .ms-choice {
+    min-height: calc(1.5em + 0.5rem + 2px);
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    line-height: 1.25;
+    font-size: 0.8125rem;
+}
+
+/*
+ * multiple-select.min.css 中 .ms-choice > span 为 position:absolute; top:0（贴顶）。
+ * 我方抬高 min-height 后文字仍顶对齐，故在此做垂直居中（不改变库文件）。
+ */
+.balloon-filter-group .ms-parent .ms-choice > span {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 职责分区锁定：单行省略，与其它筛选项同宽同高；详情见点击弹层 */
+.balloon-filter-group--zone-locked {
+    flex: 0 0 auto;
+    min-width: 8.25rem;
+    max-width: 11.5rem;
+}
+
+.balloon-zone-lock-field {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    min-height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.2rem 0.35rem 0.2rem 0.45rem;
+    box-sizing: border-box;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    color: #495057;
+    cursor: pointer;
+    text-align: left;
+}
+
+.balloon-zone-lock-field:hover {
+    background-color: #e2e6ea;
+    border-color: #adb5bd;
+}
+
+.balloon-zone-lock-field:focus-visible {
+    outline: 0;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.balloon-zone-lock-field__count {
+    flex: 0 0 auto;
+    min-width: 1.1rem;
+    padding: 0 0.32rem;
+    border-radius: 0.2rem;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+    color: #495057;
+    text-align: center;
+}
+
+.balloon-zone-lock-field__summary {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.balloon-zone-lock-field__lock {
+    flex: 0 0 auto;
+    color: #6c757d;
+    font-size: 0.75rem;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.balloon-zone-lock-popover {
+    position: fixed;
+    z-index: 1080;
+    display: none;
+    max-width: min(20rem, calc(100vw - 1rem));
+    padding: 0.45rem 0.5rem 0.5rem;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.12);
+}
+
+.balloon-zone-lock-popover.is-open {
+    display: block;
+}
+
+.balloon-zone-lock-popover__title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.35rem;
+    line-height: 1.2;
+}
+
+.balloon-zone-lock-popover__title .en-text {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.balloon-zone-lock-popover__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.3rem;
+    max-height: 12rem;
+    overflow-y: auto;
+}
+
+.balloon-zone-lock-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 0.12rem 0.45rem;
+    border-radius: 0.2rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: #212529;
+}
+
+/* 清空按钮 */
+#balloon-filter-clear {
+    white-space: nowrap;
+    margin-top: 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+#balloon-filter-clear .en-text {
+    margin-left: 0.2rem;
+}
+
+
+.card-body .team-info-template .team-info-item.team-info-highlight {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.team-info-template .team-info-item.team-info-highlight i {
+    font-size: 1.25rem;
+    width: 24px;
+    height: 24px;
+}
+
+.team-info-template .team-info-item.team-info-highlight .main-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0d6efd;
+    letter-spacing: 0.3px;
+}
+
+.team-info-template .team-info-item.team-info-highlight .label-text {
+    font-size: 0.875rem;
+    color: #495057;
+    font-weight: 600;
+}
+.team-info-template .team-info-item.team-info-highlight .label-text, .team-info-template .team-info-item .label-text {
+    margin-right: 1em;
+    width: 60px;
+    text-align: right;
+}
+.team-info-template .team-info-item .badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    display: inline-block;
+}
+
+/* ==========================================
+   自动打印小票管理区域样式
+   ========================================== */
+
+.balloon-print-manager {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.balloon-print-manager .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+}
+
+.balloon-print-manager .card-body {
+    padding: 1rem;
+}
+
+.balloon-print-manager .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.balloon-print-manager #balloon-print-countdown {
+    font-size: 0.875rem;
+    color: #0d6efd;
+}
+
+.balloon-print-manager #balloon-print-countdown-text {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.balloon-print-manager #balloon-print-max-hint {
+    margin-left: 0.25rem;
+    white-space: nowrap;
+}
+
+.balloon-print-manager #balloon-print-max-count {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* 自定义尺寸输入组样式 */
+#balloon-print-custom-size-group,
+#balloon-print-custom-size-group2 {
+    display: none !important;
+}
+
+#balloon-print-custom-size-group.show,
+#balloon-print-custom-size-group2.show {
+    display: flex !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .balloon-print-manager .card-body .d-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .balloon-print-manager .toolbar-group {
+        width: 100%;
+    }
+}
+
+/* ==========================================
+   气球队列页头：四项统计并入 admin-page-header 右侧（紧凑）
+   ========================================== */
+
+.admin-page-header.admin-page-header--balloon-queue {
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.55rem 0.85rem;
+    padding: 0.55rem 0.85rem;
+}
+
+.admin-page-header--balloon-queue .balloon-queue-header-stats {
+    flex: 1 1 220px;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.admin-page-header--balloon-queue .balloon-queue-header-sender-actions {
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats.balloon-global-stats--in-header,
+.balloon-queue-sender-stats-row #balloon-queue-stats.balloon-global-stats--in-header {
+    display: grid;
+    /* 四格等宽（与内容无关） */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(34rem, 100%);
+    gap: 0.28rem 0.35rem;
+    margin: 0;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats .balloon-stat-item,
+.balloon-queue-sender-stats-row #balloon-queue-stats .balloon-stat-item {
+    padding: 0.22rem 0.35rem;
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+    gap: 0.28rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats .balloon-stat-item:hover,
+.balloon-queue-sender-stats-row #balloon-queue-stats .balloon-stat-item:hover {
+    transform: none;
+    background-color: rgba(13, 110, 253, 0.07);
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats .balloon-stat-label,
+.balloon-queue-sender-stats-row #balloon-queue-stats .balloon-stat-label {
+    font-size: 0.65rem;
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats .balloon-stat-label .en-text,
+.balloon-queue-sender-stats-row #balloon-queue-stats .balloon-stat-label .en-text {
+    font-size: 0.56rem;
+}
+
+.admin-page-header--balloon-queue #balloon-queue-stats .balloon-stat-value,
+.balloon-queue-sender-stats-row #balloon-queue-stats .balloon-stat-value {
+    font-size: 0.88rem;
+}
+
+@media (max-width: 992px) {
+    .admin-page-header--balloon-queue .balloon-queue-header-stats {
+        flex: 1 1 100%;
+        justify-content: stretch;
+    }
+
+    .admin-page-header--balloon-queue #balloon-queue-stats.balloon-global-stats--in-header,
+    .balloon-queue-sender-stats-row #balloon-queue-stats.balloon-global-stats--in-header {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+}
+
+/* 配送员：统计行 + 主表沉浸全屏（固定层，非 Fullscreen API，避免 body 上 toast/alerty 被挡） */
+.balloon-queue-sender-stats-row {
+    display: flex;
+    justify-content: stretch;
+}
+
+.balloon-queue-sender-stats-row #balloon-queue-stats.balloon-global-stats--in-header {
+    width: 100%;
+    max-width: none;
+}
+
+.balloon-queue-sender-fs-topbar {
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem 0.45rem;
+    padding-top: max(0.35rem, env(safe-area-inset-top, 0px));
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--bs-body-bg, #fff);
+    border-bottom: 1px solid var(--csg-ph-border, rgba(0, 0, 0, 0.08));
+}
+
+.balloon-queue-sender-work-region--fs {
+    position: fixed;
+    inset: 0;
+    z-index: 2040;
+    box-sizing: border-box;
+    background: var(--bs-body-bg, #fff);
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-left: max(0.25rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.25rem, env(safe-area-inset-right, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.balloon-queue-sender-work-region--fs .balloon-queue-sender-fs-topbar {
+    display: flex;
+}
+
+body.balloon-queue-sender-fs-active {
+    overflow: hidden !important;
+}
+
+/* 沉浸层 z-index:2040；以下保证挂在 body 的提示仍在上层可见 */
+body.balloon-queue-sender-fs-active .balloon-queue-mini-toast-host {
+    z-index: 12050;
+}
+
+body.balloon-queue-sender-fs-active #alerty-notifications {
+    z-index: 12051 !important;
+}
+
+body.balloon-queue-sender-fs-active .alerty-modal.modal {
+    z-index: 12052 !important;
+}
+
+body.balloon-queue-sender-fs-active .modal-backdrop.alerty-modal-backdrop {
+    z-index: 12051 !important;
+}
+
+body.balloon-queue-sender-fs-active .modal.show {
+    z-index: 12052 !important;
+}
+
+body.balloon-queue-sender-fs-active .modal-backdrop.show {
+    z-index: 12051 !important;
+}
+
+body.balloon-queue-sender-fs-active .tooltip {
+    z-index: 12053 !important;
+}
+
+body.balloon-queue-sender-fs-active .popover {
+    z-index: 12053 !important;
+}
+
+body.balloon-queue-sender-fs-active .balloon-queue-sender-bst-dd .dropdown-menu,
+body.balloon-queue-sender-fs-active
+    > ul.balloon-queue-sender-dd-menu.dropdown-menu[data-bq-dd-portaled="1"] {
+    z-index: 12054 !important;
+}
+
+/* ==========================================
+   气球队列表格：对齐 contest_teamgen 预览表紧凑风格
+   ========================================== */
+
+.balloon-queue-page #balloon-queue-toolbar {
+    font-size: 0.9rem;
+}
+
+/* 气球队列已不用 data-toolbar；若其它页仍用，保留 bs-bars 拉满避免窄栏 */
+.balloon-queue-page .bootstrap-table .fixed-table-toolbar .bs-bars,
+.balloon-queue-page .bootstrap-table .fixed-table-toolbar .bs-bars.float-left,
+.balloon-queue-page .bootstrap-table .fixed-table-toolbar .bs-bars.float-start {
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    clear: both;
+}
+
+.balloon-queue-page .bootstrap-table .fixed-table-toolbar {
+    margin-top: 0 !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.balloon-queue-page .bootstrap-table .fixed-table-toolbar .bs-bars {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.balloon-queue-page .balloon-queue-print-panel {
+    font-size: 0.9rem;
+}
+
+.balloon-queue-data-card .card-body {
+    border-radius: inherit;
+    overflow: visible !important;
+}
+
+.teamgen-table-wrap {
+    max-width: 100%;
+}
+
+/*
+ * 气球队列主表：纵向随页面完整展开（height 不设死）。
+ * 配送员状态下拉菜单在打开时由脚本挂到 document.body，不依赖改表体 overflow。
+ */
+.balloon-queue-page .balloon-queue-data-card .table-responsive.teamgen-table-wrap {
+    overflow-x: auto;
+    overflow-y: visible !important;
+    max-height: none !important;
+}
+
+.balloon-queue-page
+    .balloon-queue-data-card
+    .bootstrap-table
+    .fixed-table-container {
+    height: auto !important;
+}
+
+.balloon-queue-page
+    .balloon-queue-data-card
+    .bootstrap-table
+    .fixed-table-container.fixed-height {
+    height: auto !important;
+}
+
+/* 表体不设死高度，纵向随内容增高；overflow 保持 bootstrap-table 默认（横向滚动等） */
+.balloon-queue-page
+    .balloon-queue-data-card
+    .bootstrap-table
+    .fixed-table-container
+    .fixed-table-body {
+    height: auto !important;
+    max-height: none !important;
+}
+
+#balloon-queue-table.balloon-queue-compact-table {
+    font-family: "Simsun", "Microsoft Yahei Mono", "Lato", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 0.8125rem;
+    word-wrap: break-word;
+}
+
+/* bootstrap-table + BS5：td 默认背景会盖住行样式，封榜淡蓝行需继承 */
+#balloon-queue-table.balloon-queue-compact-table td {
+    background-color: inherit !important;
+    color: inherit !important;
+}
+
+#balloon-queue-table.balloon-queue-compact-table tbody td {
+    vertical-align: middle;
+}
+
+/* 状态列：单元格固定宽度，按钮铺满，各行按钮等宽（中英双行文案以最长英文为准） */
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="bst"] {
+    width: 8.5rem;
+    min-width: 8.5rem;
+    max-width: 8.5rem;
+    box-sizing: border-box;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-status-btn {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 配送员二次确认：纯色底、无渐变；中文与倒计时同一行同字号 */
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-status-btn.balloon-queue-status-btn--sender-confirm {
+    background: #ffc107;
+    border: 1px solid #997404;
+    color: #212529;
+    font-weight: 700;
+    line-height: 1.15;
+    padding: 0.32rem 0.2rem;
+    box-shadow: none;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-status-btn.balloon-queue-status-btn--sender-confirm:active {
+    filter: brightness(0.96);
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-sender-confirm-line1 {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0.2em;
+    width: 100%;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-sender-confirm-cn {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-sender-confirm-count {
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .balloon-queue-sender-confirm-en {
+    display: block !important;
+    font-size: 0.62rem !important;
+    font-weight: 600 !important;
+    opacity: 0.88;
+    margin-top: 1px;
+}
+
+#balloon-queue-table.balloon-queue-compact-table thead th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: normal !important;
+    word-break: keep-all;
+    vertical-align: bottom !important;
+    line-height: 1.12;
+    padding: 0.32rem 0.28rem !important;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .teamgen-th-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: center;
+    gap: 0.1rem;
+    min-height: 2.1rem;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .teamgen-th-cn {
+    display: block;
+    line-height: 1.1;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .teamgen-th-en {
+    display: block !important;
+    font-size: 0.62rem !important;
+    font-weight: 500 !important;
+    opacity: 0.86;
+    line-height: 1.05;
+}
+
+#balloon-queue-table.balloon-queue-compact-table thead th[data-field="school"] .teamgen-th-stack,
+#balloon-queue-table.balloon-queue-compact-table thead th[data-field="team_name"] .teamgen-th-stack,
+#balloon-queue-table.balloon-queue-compact-table thead th[data-field="room"] .teamgen-th-stack {
+    align-items: flex-start;
+    text-align: left;
+}
+
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="school"] .teamgen-hash-cell,
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="room"] .teamgen-hash-cell {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="school"] .teamgen-hash-cell--start,
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="room"] .teamgen-hash-cell--start {
+    justify-content: flex-start;
+}
+
+#balloon-queue-table.balloon-queue-compact-table tbody td[data-field="room"] .csg-hash-tag-list {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.25rem !important;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .csg-hash-tag-list {
+    gap: 0.2rem !important;
+}
+
+#balloon-queue-table.balloon-queue-compact-table .csg-hash-tag-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.18em 0.42em;
+    line-height: 1.2;
+}
+
+.balloon-queue-problem-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 1.75rem;
+    padding: 0.15em 0.42em;
+    border-radius: 0.35rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.15;
+    box-sizing: border-box;
+}
+
+/* 配送员气球队列：减少双击缩放；表格手势交给浏览器优化 */
+.balloon-queue-page--sender-touch #balloon-queue-table.balloon-queue-compact-table {
+    touch-action: manipulation;
+}
+
+/* 配送员：页头四项统计为只读展示（原点击改筛选对配送员不生效，易误触） */
+.balloon-queue-stats--sender-readonly .balloon-stat-item {
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+}
+
+.balloon-queue-stats--sender-readonly .balloon-stat-item:hover {
+    background-color: inherit;
+}
+
+/* 配送员标签：窄屏均分 */
+.balloon-sender-tabs.nav-tabs .nav-link {
+    text-align: center;
+    padding: 0.45rem 0.35rem;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 576px) {
+    .balloon-sender-tabs.nav-tabs .nav-link {
+        font-size: 0.82rem;
+        padding: 0.42rem 0.25rem;
+    }
+}
+
+.balloon-queue-sender-bst-dd .dropdown-menu,
+body > ul.balloon-queue-sender-dd-menu.dropdown-menu[data-bq-dd-portaled="1"] {
+    min-width: 11rem;
+    font-size: 0.85rem;
+    z-index: 1065;
+}
+
+.balloon-queue-sender-dd-toggle::after {
+    margin-left: 0.2rem;
+}
+
+/* 配送员底部轻提示（固定不占文档流高度） */
+.balloon-queue-mini-toast-host {
+    position: fixed;
+    left: 50%;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%) translateY(120%);
+    z-index: 1085;
+    max-width: min(92vw, 22rem);
+    padding: 0.45rem 0.65rem;
+    border-radius: 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: #fff;
+    background: rgba(33, 37, 41, 0.92);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.balloon-queue-mini-toast-host.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.balloon-queue-mini-toast-host--ok {
+    background: rgba(25, 135, 84, 0.94);
+}
+
+.balloon-queue-mini-toast-host--err {
+    background: rgba(220, 53, 69, 0.94);
+}
+
+.balloon-queue-mini-toast-host--info {
+    background: rgba(33, 37, 41, 0.92);
+}
+
+.balloon-queue-mini-toast__cn {
+    font-weight: 600;
+}
+
+.balloon-queue-mini-toast__en {
+    font-size: 0.72rem;
+    opacity: 0.92;
+    margin-top: 0.12rem;
+}
+

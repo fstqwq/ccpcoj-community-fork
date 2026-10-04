@@ -1,0 +1,305 @@
+.webdraw-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 150px);
+    min-height: 600px;
+}
+
+.webdraw-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+    padding: 0.25rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem 0.375rem 0 0;
+    align-items: center;
+}
+
+.webdraw-toolbar .btn {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    min-height: auto;
+    height: auto;
+}
+
+.webdraw-toolbar .btn i {
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+.webdraw-toolbar .btn-group {
+    display: flex;
+    gap: 0;
+}
+
+.webdraw-toolbar .btn-group .btn {
+    padding: 0.2rem 0.35rem;
+}
+
+.webdraw-toolbar .input-group {
+    min-width: 200px;
+}
+
+.webdraw-toolbar .input-group .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.875rem;
+}
+
+.webdraw-toolbar .form-select {
+    font-size: 0.875rem;
+    padding: 0.2rem 0.4rem;
+    min-height: auto;
+    height: auto;
+}
+
+.webdraw-toolbar .btn {
+    white-space: nowrap;
+}
+
+.webdraw-toolbar .dropdown-menu {
+    font-size: 0.875rem;
+    padding: 0.25rem 0;
+    min-width: auto;
+}
+
+.webdraw-toolbar .dropdown-item {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.webdraw-toolbar .btn .en-text {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .webdraw-toolbar .btn .en-text {
+        display: inline;
+        margin-left: 0.15rem;
+    }
+}
+
+/* 箭头设置按钮组样式 */
+#line-arrow-settings .btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* 选中连接线时，箭头设置按钮组醒目样式 */
+#line-arrow-settings.connector-selected .btn {
+    background-color: #ffc107 !important; /* 未激活：亮黄色，更醒目 */
+    color: #333 !important;
+    border-color: #ffc107 !important;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.5);
+    animation: pulse-arrow-button 2s ease-in-out infinite;
+}
+
+#line-arrow-settings.connector-selected .btn.active {
+    background-color: #dc3545 !important; /* 激活：深红色，与未激活形成强烈对比 */
+    color: white !important;
+    border-color: #dc3545 !important;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.7);
+}
+
+@keyframes pulse-arrow-button {
+    0%, 100% {
+        box-shadow: 0 2px 4px rgba(255, 193, 7, 0.5);
+    }
+    50% {
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.8);
+    }
+}
+
+.webdraw-canvas-container {
+    flex: 1;
+    position: relative;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    overflow: hidden;
+    background: #ffffff;
+    background-image: 
+        linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.webdraw-svg {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    display: block;
+}
+
+.webdraw-svg .shape-group {
+    cursor: move;
+}
+
+.webdraw-svg .shape-group[data-type="circle"] .shape {
+    cursor: default;
+}
+
+.webdraw-svg .shape-group[data-type="circle"].selected .shape {
+    cursor: move;
+}
+
+.webdraw-svg .shape {
+    stroke: #333;
+    stroke-width: 3;
+    fill: #ffffff;
+    fill-opacity: 0.9;
+}
+
+/* 自由绘制路径不使用通用的 stroke-width，使用内联样式 */
+/* 确保自由绘制路径不受选中状态影响 */
+.webdraw-svg .shape-group.selected .freedraw-path {
+    stroke: #0d6efd;
+    stroke-dasharray: none !important;
+}
+
+.webdraw-svg .shape-group.selected .shape {
+    stroke: #0d6efd;
+    stroke-width: 4;
+    stroke-dasharray: 5,5;
+}
+
+/* 自由绘制路径选中时保持原有粗细，只改变颜色 */
+.webdraw-svg .shape-group.selected .freedraw-path {
+    stroke: #0d6efd;
+    stroke-width: inherit !important;
+    stroke-dasharray: none !important;
+}
+
+.webdraw-svg .shape-group:hover .shape {
+    stroke: #0d6efd;
+}
+
+/* 统一文本样式：形状内文字和自由文字使用相同的字体大小 */
+.webdraw-svg .shape-text {
+    pointer-events: none;
+    user-select: none;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    fill: #333;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.webdraw-svg .freetext-text {
+    pointer-events: all;
+    cursor: move;
+    font-size: 24px; /* 与形状内文字一致 */
+    text-anchor: start;
+    dominant-baseline: hanging;
+}
+
+.webdraw-svg .freetext-group.selected .freetext-text {
+    fill: #0d6efd;
+}
+
+.freetext-input {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.webdraw-svg .connector-line {
+    stroke: #333;
+    stroke-width: 2.5;
+    fill: none;
+    cursor: pointer;
+}
+
+.webdraw-svg .connector-line.selected {
+    stroke: #0d6efd;
+    stroke-width: 3.5;
+}
+
+.webdraw-svg .connector-line:hover {
+    stroke: #0d6efd;
+}
+
+.webdraw-svg .connection-point {
+    fill: #0d6efd;
+    stroke: #fff;
+    stroke-width: 2;
+    r: 6;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.webdraw-svg .shape:hover ~ .connection-point,
+.webdraw-svg .shape.selected ~ .connection-point {
+    opacity: 1;
+}
+
+.webdraw-svg .resize-handle {
+    fill: #0d6efd;
+    stroke: #fff;
+    stroke-width: 2;
+    r: 6;
+    cursor: nwse-resize;
+    opacity: 0;
+}
+
+.webdraw-svg .shape.selected ~ .resize-handle {
+    opacity: 1;
+}
+
+.webdraw-svg .arrow-marker {
+    fill: #333;
+}
+
+.webdraw-svg .selection-box {
+    pointer-events: none;
+}
+
+.webdraw-svg .connector-endpoint-handle {
+    pointer-events: all;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s, r 0.2s;
+}
+
+.webdraw-svg .connector-endpoint-handle:hover {
+    opacity: 1;
+    r: 8;
+}
+
+/* 文本编辑器（在图形内） */
+.text-editor-foreign {
+    pointer-events: all;
+}
+
+.shape-text-input {
+    pointer-events: all;
+}
+
+/* 帮助 Modal 样式 */
+.help-content section {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.help-content section:last-child {
+    border-bottom: none;
+}
+
+.help-content kbd {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.875em;
+    font-family: monospace;
+    color: #212529;
+    font-weight: 500;
+}
+

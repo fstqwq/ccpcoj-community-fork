@@ -1,0 +1,452 @@
+/**
+ * Contest Header CSS样式文件
+ * 包含比赛头部、导航菜单、信息显示等样式
+ */
+
+/* 拖拽浮动面板时关闭 transition/animation，避免队列插值跟不上指针（ContestFloatingPanel 加类） */
+.contest-float-panel-dragging {
+    transition: none !important;
+    animation: none !important;
+}
+
+.contest-top-banner-outer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.contest-top-banner {
+    width: 100%;
+    max-width: 1600px;
+}
+
+.contest-top-banner__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 3.6;
+    min-height: 112px;
+    max-height: min(360px, 26vw);
+    overflow: hidden;
+}
+
+.contest-top-banner__media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center center;
+}
+
+@media (max-width: 768px) {
+    .contest-top-banner__frame {
+        aspect-ratio: 16 / 5;
+        min-height: 90px;
+        max-height: min(220px, 42vw);
+    }
+}
+
+/* Contest Header：近白顶栏 + 底部分割，与下方主内容区顺滑衔接（非投屏/大屏强调） */
+.contest-header-container {
+    background: #ffffff;
+    border-radius: 0 0 6px 6px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    /* 外层不再统一 padding，避免右上角功能区“离边框太远”；
+       具体内容区 padding 下沉到 .contest-header-main */
+    padding: 0;
+    margin-bottom: 1rem;
+    /* 让右上角 actions（绝对定位）以 header 容器为参照，保持各模块一致 */
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    /* 右上角功能区应与 header 顶部对齐（避免在不同比赛类型/面板内容下出现垂直偏移） */
+    align-items: flex-start;
+}
+
+.contest-header-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 1rem;
+}
+
+/* 右上角功能区：统一与 header 右上角对齐 */
+.contest-header-actions-container {
+    /* 不依赖 tinfo_panel.css 是否被加载：始终贴到 header 右上角 */
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    /*
+     * 与榜单 rank.css 同一套 --rank-z-index-base（未加载 rank 时用回退 500）。
+     * 须高于 .controls-time-container / .rank-header-row（约 base ~ base+10），否则内部
+     * position:fixed 的队伍面板仍整棵被压在「后渲染的榜单子树」之下。
+     * 须低于榜单内弹层抬升 .rank-modal-stacks-above-toolbar（base+30），避免挡管理弹窗。
+     */
+    z-index: calc(var(--rank-z-index-base, 500) + 25);
+}
+
+.contest-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.contest-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    /* 避免遮挡右上角的操作按钮，预留足够空间 */
+    max-width: calc(100% - 110px);
+    /* 自动折行，允许单词破开换行 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    /* 单词折行时添加连字符 */
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    /* 确保文本可以正常换行（包括中文等非单词内容） */
+    white-space: normal;
+    /* 对于中文等非空格分隔的语言，确保可以正常折行 */
+    line-break: auto;
+}
+
+/* ---------- 比赛元信息：左标签（中英上下）| 右内容；无滚动条；flex 优先单行，窄屏再折行 ---------- */
+/*
+ * 外层不再做「白底卡片」：与顶栏白底再叠一层会显得边框层次过多。
+ * 视觉锚点交给 .contest-info__cell；此处仅作布局容器（去掉原 form-text 语义，避免 Bootstrap 辅助字样式干扰）。
+ */
+.contest-info {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0.85rem;
+    overflow: visible;
+}
+
+.contest-info__strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.4rem 0.45rem;
+    overflow: visible;
+}
+
+.contest-info .badge {
+    margin-right: 0.5rem;
+    font-size: 0.75em;
+}
+
+.contest-info .text-danger,
+.contest-info .text-info,
+.contest-info .text-success {
+    font-weight: 500;
+}
+
+.contest-info__cell {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.38rem;
+    box-sizing: border-box;
+    /* 宽度随内容，不拉满整行；过长时仍可收缩并换行 */
+    flex: 0 1 auto;
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.3rem 0.38rem;
+    border-radius: 6px;
+    /* 顶栏近白底时，用极淡灰片区分元信息块 */
+    background: rgba(241, 245, 249, 0.95);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.contest-info__label {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.12rem;
+    text-align: left;
+}
+
+.contest-info__label-cn {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.contest-info__label-en {
+    font-size: 0.62rem;
+    line-height: 1.15;
+    opacity: 0.78;
+    display: block !important;
+    margin: 0 !important;
+}
+
+.contest-info__body {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    font-size: 0.82rem;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+/* 时钟：日期一行；时刻 + 小号时区 tag 同一行（总宽约对齐日期行） */
+.contest-info__body--clock {
+    gap: 0.1rem;
+}
+
+.contest-info__body--clock .csg-time-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+}
+
+.contest-info__body--clock .csg-time-hms-line {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    gap: 0.28rem;
+    max-width: 100%;
+    line-height: 1.25;
+}
+
+.contest-info__body--clock .csg-time-hms {
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
+.contest-info__body--clock .csg-tz-tag--clock {
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 0.52rem;
+    font-weight: 600;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    padding: 0.1em 0.32em;
+    /* 小圆角 chip，避免 pill（9999px）过圆；非 Bootstrap 依赖 */
+    border-radius: 0.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.65);
+    background: rgba(241, 245, 249, 0.92);
+    color: #475569;
+    vertical-align: baseline;
+}
+
+.contest-info__body--status {
+    font-size: 0.78rem;
+}
+
+.contest-info__body--status > span {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.contest-info__body--status .en-text {
+    font-size: 0.68em;
+    opacity: 0.85;
+    margin-top: 0.06rem;
+}
+
+.contest-info__body--type {
+    font-size: 0.78rem;
+}
+
+/* 导航标签美化 - 简化版 */
+#contest_menu {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 0;
+}
+
+#contest_menu .nav-item .nav-link {
+    border: none;
+    border-radius: 6px 6px 0 0;
+    margin-right: 0.15rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    font-size: 0.9em;
+    min-width: 60px;
+    text-align: center;
+}
+
+#contest_menu .nav-item .nav-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+#contest_menu .nav-item .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+#contest_menu .nav-item .nav-link.active .en-text {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#contest_menu .nav-item .nav-link i {
+    margin-right: 0.25rem;
+    font-size: 0.8em;
+}
+
+/* 双语文本优化 - 简化版 */
+#contest_menu .nav-item .nav-link .en-text {
+    font-size: 0.6em;
+    opacity: 0.8;
+}
+
+/* 下拉项：中英仍上下叠放，小三角与整块标签横向排列（避免 .en-text 为 block 时三角落到第三行） */
+#contest_menu .nav-item .nav-link.dropdown-toggle {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    overflow: visible;
+}
+
+#contest_menu .nav-item .nav-link.dropdown-toggle .contest-nav-dropdown-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+}
+
+#contest_menu .nav-item .nav-link.dropdown-toggle .contest-nav-dropdown-cn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+#contest_menu .nav-item .nav-link.dropdown-toggle::after {
+    margin-left: 0;
+    flex-shrink: 0;
+    align-self: center;
+    vertical-align: middle;
+}
+
+/* 自定义紫色样式 */
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+.contest-info .badge .en-text {
+    font-size: 0.7em;
+    margin-left: 0.25rem;
+    opacity: 0.9;
+}
+
+.contest-info strong .en-text {
+    font-size: 0.7em;
+    margin-left: 0.25rem;
+    opacity: 0.9;
+}
+
+/* 状态 / 类型：内层小色块（外层已无盒子） */
+.contest-info .contest-info__body .text-info {
+    background: rgba(13, 202, 240, 0.12);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body .text-primary {
+    background: rgba(13, 110, 253, 0.12);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body .text-success {
+    background: rgba(25, 135, 84, 0.12);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body .text-secondary {
+    background: rgba(108, 117, 125, 0.12);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body .text-warning {
+    background: rgba(255, 193, 7, 0.18);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body .text-purple {
+    background: rgba(111, 66, 193, 0.12);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.contest-info .contest-info__body--type .text-info,
+.contest-info .contest-info__body--type .text-primary,
+.contest-info .contest-info__body--type .text-success,
+.contest-info .contest-info__body--type .text-warning {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .contest-info__cell {
+        flex: 0 1 auto;
+        width: max-content;
+        max-width: 100%;
+        min-width: 0;
+        padding: 0.15rem 0.35rem;
+    }
+
+    .contest-info__body {
+        font-size: 0.8rem;
+    }
+    
+    #contest_menu .nav-item .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9em;
+    }
+    
+    #contest_menu .nav-item .nav-link i {
+        margin-right: 0.25rem;
+        font-size: 0.8em;
+    }
+}

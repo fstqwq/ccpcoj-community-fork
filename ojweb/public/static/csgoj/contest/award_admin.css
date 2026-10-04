@@ -1,0 +1,2917 @@
+/* 管理端 · 获奖名单页（award.php）— 与 teamgen 分组列风格对齐的可复用片段 */
+
+/* 页头 CSV / Excel / 规则：统一高度与内边距 */
+.admin-page-header-actions--award-tools .award-header-tool-btn {
+    min-height: 2.125rem;
+    padding: 0.3rem 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    font-size: 0.8125rem;
+}
+
+.admin-page-header-actions--award-tools .award-header-tool-btn .cn-text,
+.admin-page-header-actions--award-tools .award-header-tool-btn .en-text {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* 页头「规则」折叠说明：与 teamgen / team_image 帮助块同系（去 alert 蓝底，卡片阴影） */
+#award_rules_help.award-rules-help {
+    border: 0;
+    border-radius: 0.75rem;
+    color: var(--bs-body-color);
+    background: var(--bs-body-bg);
+    box-shadow: 0 0.4rem 1.2rem rgba(15, 23, 42, 0.08);
+    padding: 1rem 1.15rem;
+}
+
+.award-rules-help__lead {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: #475569;
+}
+
+#award_rules_help.award-rules-help h5.bilingual-inline {
+    margin-top: 0;
+    margin-bottom: 0.55rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #1e293b;
+}
+
+#award_rules_help.award-rules-help h5.bilingual-inline ~ h5.bilingual-inline {
+    margin-top: 1.1rem;
+}
+
+#award_rules_help.award-rules-help p {
+    margin-bottom: 0.65rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+}
+
+#award_rules_help.award-rules-help p:last-child {
+    margin-bottom: 0;
+}
+
+.award-rules-help__list {
+    margin: 0;
+    padding-left: 1.15rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+}
+
+.award-rules-help__list > li + li {
+    margin-top: 0.55rem;
+}
+
+#award_rules_help.award-rules-help code {
+    font-size: 0.875em;
+    color: #334155;
+    background: #f1f5f9;
+    border-radius: 0.35rem;
+    padding: 0.08rem 0.32rem;
+}
+
+.csg-award-hash-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 2rem;
+}
+.csg-award-hash-cell--center {
+    justify-content: center;
+}
+
+/* 导出 CSV / Excel：alerty 确认弹窗正文 */
+.award-export-confirm {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: #1e293b;
+}
+
+.award-export-confirm__lead {
+    font-weight: 600;
+    color: #475569;
+    letter-spacing: 0.02em;
+}
+
+.award-export-confirm__checks {
+    margin: 0;
+    padding: 0;
+}
+
+.award-export-confirm__checks > li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.award-export-confirm__checks > li:last-child {
+    margin-bottom: 0;
+}
+
+.award-export-confirm__num {
+    flex-shrink: 0;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #fff;
+    background: #c82333;
+    box-shadow: 0 1px 3px rgba(176, 42, 55, 0.35);
+    line-height: 1;
+}
+
+.award-export-confirm__body {
+    flex: 1;
+    min-width: 0;
+    padding-top: 0.05rem;
+}
+
+/* csg-bilingual-stack 为 flex 列；中文须包 .cn-text，否则会与 strong 等同为独立 flex 项而逐段断行 */
+.award-export-confirm .csg-bilingual-stack > .cn-text,
+#award_rules_help .csg-bilingual-stack > .cn-text {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.award-export-confirm__foot {
+    margin-top: 1rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 10px;
+    background: rgba(255, 193, 7, 0.12);
+    border: 1px solid rgba(217, 164, 6, 0.35);
+    font-weight: 600;
+    color: #664d03;
+}
+
+.alerty-modal .modal-footer .btn-primary#alerty-confirm-btn {
+    min-width: 7.5rem;
+    font-weight: 700;
+}
+
+.award-admin-toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.45rem 0.55rem;
+    min-width: 0;
+    width: 100%;
+}
+
+/* 赛事归属：嵌入 Bootstrap Table 工具栏，与开关、表格搜索同一行 */
+.award-group-ms-host {
+    flex: 1 1 6rem;
+    min-width: 0;
+    max-width: min(20rem, 46vw);
+}
+
+.award-group-ms-control {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Bootstrap Table：自定义 #award_toolbar + 搜索框同一行、取消 float */
+#award_table_div.bootstrap-table .fixed-table-toolbar,
+#award_table_div .bootstrap-table .fixed-table-toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem 0.65rem;
+    width: 100%;
+    padding: 0.2rem 0 0.35rem;
+    clear: both;
+}
+
+#award_table_div .fixed-table-toolbar .bs-bars,
+#award_table_div .fixed-table-toolbar .bs-bars.pull-left,
+#award_table_div .fixed-table-toolbar .bs-bars.float-start {
+    float: none !important;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#award_table_div .fixed-table-toolbar .search {
+    float: none !important;
+    flex: 0 0 auto;
+    margin: 0 !important;
+    width: auto;
+    max-width: 12.5rem;
+}
+
+#award_table_div .fixed-table-toolbar .search .form-control,
+#award_table_div .fixed-table-toolbar .search input {
+    min-height: 32px;
+    font-size: 0.8125rem;
+}
+
+/* 赛事归属切换条：单行 chips，避免撑高工具栏 */
+#award_table_div .award-group-ms-host .csg-ms-summary {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+#award_table_div .award-group-ms-host .csg-ms-chip {
+    max-width: 5.5rem;
+    padding: 1px 6px;
+    font-size: 11px;
+}
+
+@media (max-width: 576px) {
+    #award_table_div .fixed-table-toolbar {
+        flex-wrap: wrap;
+    }
+
+    #award_table_div .fixed-table-toolbar .search {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    #award_table_div .award-admin-toolbar {
+        flex-wrap: wrap;
+    }
+}
+
+.award-tag-wrap--lux {
+    justify-content: center;
+    gap: 5px;
+}
+
+.award-tag--compact {
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.award-grp-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    text-align: left;
+    min-width: 0;
+}
+
+.award-grp-block {
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #f4f6f9;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.award-grp-block__hd {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #3d4a5c;
+    background: rgba(13, 110, 253, 0.06);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.award-grp-block__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0d6efd;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.award-grp-block__nm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.award-grp-block__bd {
+    padding: 6px 8px 7px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+#award_table_div .award-col-award {
+    min-width: 140px;
+    max-width: 320px;
+}
+
+/* 多赛事归属：排名列圆点（各赛事归属内金银铜），title 为赛事归属名 + 奖牌 */
+.award-rank-cell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 2.6rem;
+}
+
+.award-rank-num {
+    display: block;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #1e293b;
+    line-height: 1.2;
+}
+
+.award-rank-dots {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+}
+
+.award-rank-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    box-sizing: border-box;
+}
+
+.award-rank-dot--gold {
+    background: #e6a800;
+    border-color: rgba(180, 130, 0, 0.45);
+}
+
+.award-rank-dot--silver {
+    background: #cbd5e1;
+    border-color: rgba(100, 116, 139, 0.35);
+}
+
+.award-rank-dot--bronze {
+    background: #b8734a;
+    border-color: rgba(140, 80, 40, 0.4);
+}
+
+.award-rank-dot--none {
+    background: #f1f5f9;
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+/* 最快解题奖：题号行可折行，与榜单气球同色 */
+.award-tag-fb-merged {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.4rem;
+    max-width: 100%;
+}
+
+.award-tag-fb-label {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.award-tag-fb-letters {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0.35rem;
+    min-width: 0;
+}
+
+.award-problem-id {
+    font-weight: 900;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* ========== 颁奖编排 award_deck（与获奖名单页头工具条对齐） ========== */
+
+.admin-page-header--award-deck .admin-page-header-title-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.15rem;
+}
+
+#award_deck_page.award-deck-page {
+    max-width: 1680px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#award_deck_page .award-deck-workbench {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 0;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#award_deck_page .award-deck-workbench-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.4rem 0.65rem;
+    background: #f1f5f9;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+#award_deck_page #award_bundle_warn:empty {
+    display: none;
+}
+
+#award_deck_page #award_bundle_warn:not(:empty) {
+    padding: 0.45rem 0.85rem;
+    border-bottom: 1px solid rgba(234, 179, 8, 0.28);
+    background: rgba(250, 204, 21, 0.07);
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+}
+
+#award_deck_page .award-deck-split--paired {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: min(620px, calc(100vh - 13rem));
+}
+
+@media (max-width: 991.98px) {
+    #award_deck_page .award-deck-split--paired {
+        min-height: min(480px, calc(100vh - 15rem));
+    }
+}
+
+#award_deck_page .award-deck-paired-heads {
+    display: grid;
+    grid-template-columns: minmax(220px, 36%) 1fr;
+    flex: 0 0 auto;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    background: #fff;
+}
+
+#award_deck_page .award-deck-col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.55rem 0.85rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0f172a;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    background: #f8fafc;
+}
+
+#award_deck_page .award-deck-col-head--paired {
+    padding: 0.38rem 0.55rem;
+    font-size: 0.9375rem;
+    border-bottom: none;
+}
+
+#award_deck_page .award-deck-paired-heads .award-deck-col-head--paired:first-child {
+    border-right: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    #award_deck_page .award-deck-paired-heads {
+        grid-template-columns: 1fr;
+    }
+
+    #award_deck_page .award-deck-paired-heads .award-deck-col-head--paired:first-child {
+        border-right: none;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+}
+
+#award_deck_page .award-deck-col-head__en {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+#award_deck_page .award-deck-paired-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding: 0.4rem 0.45rem;
+    background: #eef2f7;
+}
+
+#award_deck_page .deck-pair-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+#award_deck_page .deck-pair-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 36%) 1fr;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+@media (max-width: 991.98px) {
+    #award_deck_page .deck-pair-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+#award_deck_page .deck-pair-cell--left {
+    background: #f8fafc;
+    border-right: 1px solid rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+@media (max-width: 991.98px) {
+    #award_deck_page .deck-pair-cell--left {
+        border-right: none;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+}
+
+#award_deck_page .deck-pair-cell--left > .deck-award-block {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+}
+
+/* 右侧预览页更高时，左侧候选区垂直铺满行高，便于与对侧对齐 */
+#award_deck_page .deck-pair-cell--left > .deck-award-block::after {
+    content: "";
+    flex: 1 1 auto;
+    min-height: 0;
+    pointer-events: none;
+}
+
+#award_deck_page .deck-pair-cell--right {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 5px;
+    min-width: 0;
+}
+
+#award_deck_page .deck-pair-empty {
+    padding: 0.5rem 0.65rem;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px dashed rgba(15, 23, 42, 0.12);
+}
+
+#award_deck_page .deck-award-block {
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 6px;
+    margin-bottom: 0;
+    background: #fff;
+}
+
+#award_deck_page .deck-award-title {
+    font-weight: 700;
+    padding: 5px 8px;
+    border-bottom: 1px solid #eceef1;
+    background: #f1f5f9;
+}
+
+#award_deck_page .deck-team-item {
+    border-bottom: 1px dashed #e2e8f0;
+    padding: 5px 8px;
+    cursor: grab;
+}
+
+#award_deck_page .deck-team-item:last-child {
+    border-bottom: none;
+}
+
+#award_deck_page .deck-team-main {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #202329;
+}
+
+#award_deck_page .deck-team-sub {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+#award_deck_page .deck-page {
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 6px;
+    margin-bottom: 0;
+    background: #fff;
+}
+
+#award_deck_page .deck-page-head {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 5px 8px;
+    border-bottom: 1px solid #eceef1;
+    background: #f8fafc;
+    font-weight: 700;
+}
+
+#award_deck_page .deck-page-head-title {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 编排 panel 标题：归属名单行 + 系统奖项 cn/en（不展示 award_slot_key） */
+#award_deck_page .deck-panel-title-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+}
+
+#award_deck_page .deck-title-group-prefix {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    line-height: 1.25;
+}
+
+#award_deck_page .deck-title-award-line .cn-text {
+    display: block;
+    font-weight: 700;
+}
+
+#award_deck_page .deck-title-award-line .en-text {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    opacity: 0.92;
+}
+
+#award_deck_page .deck-dropzone {
+    min-height: 52px;
+    padding: 5px 6px;
+}
+
+#award_deck_page .deck-dropzone.is-over {
+    outline: 2px dashed #1f6feb;
+    background: #eff6ff;
+}
+
+#award_deck_page .deck-slot-item {
+    border: 1px solid #d8dce3;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-bottom: 4px;
+    background: #fff;
+}
+
+#award_deck_page .deck-slot-item .deck-team-main {
+    font-size: 12px;
+}
+
+#award_deck_page .deck-slot-item:last-child {
+    margin-bottom: 0;
+}
+
+#award_deck_page .deck-fb-letter-hint {
+    display: inline-block;
+    margin-left: 0.35em;
+    font-weight: 800;
+    font-size: 0.92em;
+    color: #0369a1;
+    letter-spacing: 0.04em;
+}
+
+#award_deck_page .deck-group-tab .admin-subnav-stack {
+    align-items: flex-start;
+}
+
+#award_deck_page .deck-group-tab .admin-subnav-cn {
+    display: block;
+}
+
+#award_deck_page .deck-group-tab .en-text {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.82;
+}
+
+/*
+ * 编排区「候选奖项队伍」「编排预览」：每一块 panel 一类奖项配色（与配置轨 .award-deck-special-row--* 同源）。
+ * 类名 deck-award-visual--{suffix} 由 award_deck.js getDeckAwardVisualSuffix 写入 .deck-award-block / .deck-page。
+ */
+#award_deck_page .deck-award-block[class*="deck-award-visual--"],
+#award_deck_page .deck-page[class*="deck-award-visual--"] {
+    background: #fff;
+}
+
+/* 冠亚季军学校：靛青强调条（与金奖金黄、最快解题蓝、女队紫区分） */
+#award_deck_page .deck-award-block.deck-award-visual--champion-school,
+#award_deck_page .deck-page.deck-award-visual--champion-school {
+    border-color: rgba(67, 56, 202, 0.32);
+    box-shadow: inset 4px 0 0 #4338ca;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--champion-school .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--champion-school .deck-page-head {
+    color: #312e81;
+    border-bottom-color: rgba(129, 140, 248, 0.35);
+    background: #eef2ff;
+}
+
+/* 金奖 / 一等奖 */
+#award_deck_page .deck-award-block.deck-award-visual--medal-gold,
+#award_deck_page .deck-page.deck-award-visual--medal-gold {
+    border-color: rgba(202, 138, 4, 0.32);
+    box-shadow: inset 4px 0 0 #ca8a04;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--medal-gold .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--medal-gold .deck-page-head {
+    color: #713f12;
+    border-bottom-color: rgba(250, 204, 21, 0.42);
+    background: #fffbeb;
+}
+
+/* 银奖 / 二等奖 */
+#award_deck_page .deck-award-block.deck-award-visual--medal-silver,
+#award_deck_page .deck-page.deck-award-visual--medal-silver {
+    border-color: rgba(100, 116, 139, 0.35);
+    box-shadow: inset 4px 0 0 #64748b;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--medal-silver .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--medal-silver .deck-page-head {
+    color: #334155;
+    border-bottom-color: rgba(148, 163, 184, 0.4);
+    background: #f1f5f9;
+}
+
+/* 铜奖 / 三等奖 */
+#award_deck_page .deck-award-block.deck-award-visual--medal-bronze,
+#award_deck_page .deck-page.deck-award-visual--medal-bronze {
+    border-color: rgba(180, 83, 9, 0.28);
+    box-shadow: inset 4px 0 0 #b45309;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--medal-bronze .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--medal-bronze .deck-page-head {
+    color: #7c2d12;
+    border-bottom-color: rgba(253, 186, 116, 0.42);
+    background: #fff7ed;
+}
+
+/* 最快解题奖 */
+#award_deck_page .deck-award-block.deck-award-visual--first-blood,
+#award_deck_page .deck-page.deck-award-visual--first-blood {
+    border-color: rgba(3, 105, 161, 0.34);
+    box-shadow: inset 4px 0 0 #0369a1;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--first-blood .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--first-blood .deck-page-head {
+    color: #0c4a6e;
+    border-bottom-color: rgba(56, 189, 248, 0.32);
+    background: #f0f9ff;
+}
+
+/* 最佳女队/女生奖 */
+#award_deck_page .deck-award-block.deck-award-visual--best-female,
+#award_deck_page .deck-page.deck-award-visual--best-female {
+    border-color: rgba(162, 28, 175, 0.32);
+    box-shadow: inset 4px 0 0 #a21caf;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--best-female .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--best-female .deck-page-head {
+    color: #701a75;
+    border-bottom-color: rgba(232, 121, 249, 0.35);
+    background: #fdf4ff;
+}
+
+/* 顽强拼搏奖 */
+#award_deck_page .deck-award-block.deck-award-visual--tenacity,
+#award_deck_page .deck-page.deck-award-visual--tenacity {
+    border-color: rgba(5, 150, 105, 0.32);
+    box-shadow: inset 4px 0 0 #047857;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--tenacity .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--tenacity .deck-page-head {
+    color: #065f46;
+    border-bottom-color: rgba(52, 211, 153, 0.32);
+    background: #ecfdf5;
+}
+
+/* 其它冠亚季军页（非学校槽） */
+#award_deck_page .deck-award-block.deck-award-visual--champion-misc,
+#award_deck_page .deck-page.deck-award-visual--champion-misc {
+    border-color: rgba(71, 85, 105, 0.32);
+    box-shadow: inset 4px 0 0 #475569;
+}
+
+#award_deck_page .deck-award-block.deck-award-visual--champion-misc .deck-award-title,
+#award_deck_page .deck-page.deck-award-visual--champion-misc .deck-page-head {
+    color: #1e293b;
+    border-bottom-color: rgba(148, 163, 184, 0.38);
+    background: #f8fafc;
+}
+
+/* 全屏颁奖：--pres-type-scale / --pres-fit-scale 仅作用于名单区；标题栏仅用 cqmin + --pres-font-scale + --award-pres-head-scale */
+.award-presentation-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100vh;
+    background: #07080c;
+    color: #f8fafc;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box;
+}
+
+.award-presentation-modal::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+html.award-presentation-doc-lock,
+body.award-presentation-doc-lock {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+}
+
+.award-presentation-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    padding-top: env(safe-area-inset-top, 0px);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-viewport {
+    /* 与后台一致：纯色场底 */
+    background: #d0d7e3;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-viewport {
+    background: #080a10;
+}
+
+.award-presentation-toolbar--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    padding-top: calc(0.45rem + env(safe-area-inset-top, 0px));
+    background: rgba(8, 10, 16, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: auto;
+    transition: opacity 0.14s ease-out, transform 0.14s ease-out, visibility 0.14s;
+}
+
+.award-presentation-toolbar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    row-gap: 0.35rem;
+    width: 100%;
+}
+
+.award-presentation-toolbar-cluster {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.award-presentation-toolbar--overlay .award-pres-icon-btn {
+    min-width: 2rem;
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+    font-weight: 700;
+}
+
+.award-pres-aspect-toolbar .award-pres-aspect-input {
+    width: 3.1rem;
+    min-width: 2.5rem;
+    max-width: 4.25rem;
+    padding: 0.2rem 0.25rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.award-pres-aspect-toolbar .award-pres-aspect-colon {
+    color: rgba(248, 250, 252, 0.9);
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.award-presentation-toolbar--overlay.award-presentation-toolbar--hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px);
+}
+
+.award-presentation-toolbar--overlay .btn {
+    font-weight: 600;
+    border-radius: 0.2rem;
+}
+
+.award-presentation-toolbar--overlay .award-pres-theme-dropdown .dropdown-menu {
+    min-width: 12.5rem;
+    font-size: 0.875rem;
+}
+
+.award-presentation-toolbar--overlay .award-pres-theme-dropdown .dropdown-item {
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.award-presentation-page-info {
+    min-width: 5.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    color: rgba(248, 250, 252, 0.92);
+}
+
+.award-presentation-viewport {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: env(safe-area-inset-right, 0) env(safe-area-inset-left, 0) env(safe-area-inset-bottom, 0);
+    box-sizing: border-box;
+}
+
+/* ccpc：平铺整个视口（viewport::before）；slide-shell 透明以透出底纹；名单区由 card-list-vert 实底遮挡 */
+.award-presentation-viewport::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    --award-pres-viewport-tile: 50vmin;
+    padding-block: clamp(12px, 2.5vmin, 40px);
+    padding-inline: 0;
+    background-color: transparent;
+    background-image: url("/static/image/logos/ccpc.svg");
+    background-repeat: repeat;
+    background-position: center center;
+    background-size: var(--award-pres-viewport-tile) var(--award-pres-viewport-tile);
+    background-clip: content-box;
+    background-origin: content-box;
+    opacity: 0.14;
+}
+
+@supports (background-repeat: space) {
+    .award-presentation-viewport::before {
+        background-repeat: space space;
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-viewport::before {
+    opacity: 0.12;
+    filter: brightness(0.42) contrast(1.05);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-viewport::before {
+    opacity: 0.2;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-viewport::before {
+    opacity: 0.22;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-viewport::before {
+    opacity: 0.21;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-viewport::before,
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-viewport::before {
+    opacity: 0.19;
+}
+
+/**
+ * 左右 gutter：仅在信息区（slide shell）与视口左右之间分到宽度时占位，
+ * 不把水印画进 gutter（与 JS 用 viewport 做 contain 的语义一致）。
+ * 注意：此处只用 padding-block；勿设 padding-inline，否则 flex 子项有最小横宽，
+ * 会与「壳宽≈视口宽」叠加造成横向溢出与信息区看似左偏。
+ */
+.award-presentation-viewport-gutter {
+    --award-pres-gutter-edge: clamp(12px, 2.5vmin, 40px);
+    flex: 1 1 0;
+    min-width: 0;
+    align-self: stretch;
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    padding-block: var(--award-pres-gutter-edge);
+    padding-inline: 0;
+    background: transparent;
+}
+
+/* 固定画幅：JS 写入宽高 = contain(视口, 所选比例)；全屏模式加 --fill 占满视口 */
+.award-presentation-slide-shell {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    /* 0 1 auto：与两侧 gutter 同排时可在必要时收缩，避免总宽超出视口 */
+    flex: 0 1 auto;
+    min-width: 0;
+    align-self: center;
+    max-width: 100%;
+    max-height: 100%;
+    --pres-shell-zoom: 1;
+    transform: scale(var(--pres-shell-zoom, 1));
+    transform-origin: center center;
+    overflow: hidden;
+    /* 大屏 bezel：小圆角 + 轻描边，避免「厚卡片」悬浮阴影 */
+    border-radius: clamp(2px, 0.18vmin, 5px);
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.28),
+        0 6px 24px rgba(0, 0, 0, 0.22);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-slide-shell:not(.award-presentation-slide-shell--fill) {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 6px 28px rgba(0, 0, 0, 0.55);
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-slide-shell:not(.award-presentation-slide-shell--fill) {
+    box-shadow:
+        0 0 0 1px rgba(253, 224, 71, 0.35),
+        0 8px 32px rgba(0, 0, 0, 0.55);
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-slide-shell:not(.award-presentation-slide-shell--fill) {
+    box-shadow:
+        0 0 0 1px rgba(248, 113, 113, 0.48),
+        0 8px 30px rgba(0, 0, 0, 0.52);
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-slide-shell:not(.award-presentation-slide-shell--fill) {
+    box-shadow:
+        0 0 0 1px rgba(56, 189, 248, 0.28),
+        0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-slide-shell:not(.award-presentation-slide-shell--fill) {
+    box-shadow:
+        0 0 0 1px rgba(52, 211, 153, 0.28),
+        0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.award-presentation-slide-shell--fill {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.award-presentation-slide {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    box-sizing: border-box;
+    container-type: size;
+    container-name: award-pres;
+    --pres-fit-scale: 1;
+    --pres-font-scale: 1;
+    --pres-type-scale: 1;
+    /* 与字号同源缩放，避免固定 1px / 4px 随画幅放大变「粗条」 */
+    --award-pres-hairline: max(1px, calc(0.078cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+    --award-pres-accent-bar: max(2px, calc(0.36cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+    /* 标题区描边：不随名单 --pres-type-scale / --pres-fit-scale 缩小 */
+    --award-pres-chrome-hairline: max(1px, calc(0.078cqmin * var(--pres-font-scale, 1)));
+    overflow: hidden;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-slide {
+        --award-pres-hairline: max(1px, calc(0.078vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+        --award-pres-accent-bar: max(2px, calc(0.36vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+        --award-pres-chrome-hairline: max(1px, calc(0.078vmin * var(--pres-font-scale, 1)));
+    }
+}
+
+/*
+ * 智能名单：仅用 grid 分列，行高随内容（auto），不用 1fr 等分 ——
+ * 否则在 flex 子项高度吃紧时 minmax(0,1fr) 行可塌成 0，配合 height:100% 会层层叠在同一条基线上。
+ */
+.award-pres-list--smart {
+    --award-pres-list-gap: calc(0.52cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1));
+    align-content: safe center;
+    align-items: start;
+    gap: var(--award-pres-list-gap);
+    /* 禁止 vh：幻灯壳远小于视口时 65vh 会强行高于信息区，导致无法纳入 fit 缩放 */
+    min-height: 0;
+}
+
+.award-pres-list--smart.award-pres-cols-1 {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.award-pres-list--smart.award-pres-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.award-pres-list--smart.award-pres-cols-2 > .award-pres-row {
+    min-width: 0;
+}
+
+.award-pres-list--smart.award-pres-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.award-pres-list--smart.award-pres-cols-3 > .award-pres-row {
+    min-width: 0;
+}
+
+.award-pres-list--smart .award-pres-row {
+    height: auto;
+    min-height: min-content;
+    align-self: start;
+    align-items: start;
+}
+
+/* 末行「零头」：跨整行 flex 居中，子行宽度与满行单格一致 */
+.award-pres-tail-cluster {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    gap: var(--award-pres-list-gap, calc(0.52cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1)));
+}
+
+.award-pres-tail-cluster > .award-pres-row {
+    flex: 0 0 calc((100% - (var(--pres-tail-cols, 2) - 1) * var(--award-pres-list-gap, 0.52cqmin)) / var(--pres-tail-cols, 2));
+    max-width: calc((100% - (var(--pres-tail-cols, 2) - 1) * var(--award-pres-list-gap, 0.52cqmin)) / var(--pres-tail-cols, 2));
+    min-width: 0;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-list--smart {
+        --award-pres-list-gap: calc(0.52vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1));
+        gap: var(--award-pres-list-gap);
+        min-height: 0;
+    }
+
+    .award-pres-tail-cluster > .award-pres-row {
+        flex-basis: calc((100% - (var(--pres-tail-cols, 2) - 1) * var(--award-pres-list-gap)) / var(--pres-tail-cols, 2));
+        max-width: calc((100% - (var(--pres-tail-cols, 2) - 1) * var(--award-pres-list-gap)) / var(--pres-tail-cols, 2));
+    }
+}
+
+.award-presentation-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    /* 顶区随幻灯高度比例变化（cqh），无固定 rem「大块」；无 cqh 时退回 cqmin */
+    padding-top: calc(
+        env(safe-area-inset-top, 0px) + 2.35cqmin * var(--pres-font-scale, 1)
+    );
+    padding-right: calc(1.15cqmin * var(--pres-font-scale, 1));
+    padding-bottom: calc(0.65cqmin * var(--pres-font-scale, 1));
+    padding-left: calc(1.15cqmin * var(--pres-font-scale, 1));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+/*
+ * 标题栏贴顶；名单区在标题下方剩余高度内，把「各队」整块垂直居中：
+ * 外层 justify-content: safe center + 名单 flex:0 1 auto（内容少时不占满高度，居中留白在上下；
+ * 内容多时 max-height:100% 顶满，由网格 align-content: safe center 与 fit 缩放处理）。
+ */
+.award-presentation-card-list-vert {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    align-items: stretch;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.award-presentation-card .award-presentation-card-list-vert > .award-pres-list {
+    flex: 0 1 auto;
+    max-height: 100%;
+    min-height: 0;
+    width: 100%;
+    align-self: stretch;
+}
+
+@supports (height: 1cqh) {
+    .award-presentation-card {
+        padding-top: calc(
+            env(safe-area-inset-top, 0px) + 1.45cqh * var(--pres-font-scale, 1)
+        );
+    }
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-card {
+        padding-top: calc(
+            env(safe-area-inset-top, 0px) + 2.35vmin * var(--pres-font-scale, 1)
+        );
+        padding-right: calc(1.15vmin * var(--pres-font-scale, 1));
+        padding-bottom: calc(0.65vmin * var(--pres-font-scale, 1));
+        padding-left: calc(1.15vmin * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-head {
+    flex: 0 0 auto;
+    margin-bottom: calc(0.35cqmin * var(--pres-font-scale, 1));
+}
+
+.award-presentation-title-row {
+    --award-pres-head-scale: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(clamp(0.45cqmin, 1.05cqmin, 2.8cqmin) * var(--pres-font-scale, 1));
+    flex-wrap: nowrap;
+    min-width: 0;
+    /* 锁定标题行高度，避免金/银/铜标题字号略大时顶栏跳动 */
+    min-height: calc(6.1cqmin * var(--pres-font-scale, 1) * 1.1);
+}
+
+.award-presentation-title-cluster {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: calc(clamp(0.35cqmin, 0.62cqmin, 1.6cqmin) * var(--pres-font-scale, 1));
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.award-presentation-title-cluster .award-presentation-title {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* 与默认主标题同档字号，避免标题行高度随奖项类型变化 */
+.award-presentation-title-cluster .award-presentation-title.award-presentation-title--medal {
+    font-size: calc(5.45cqmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+}
+
+.award-presentation-title-cluster .award-presentation-award-fraction {
+    flex-shrink: 0;
+}
+
+/** 多赛事归属：与主标题同列右对齐（单行省略）；旧版独占行样式保留给无 --head-inline 时 */
+.award-presentation-group {
+    width: 100%;
+    max-width: 100%;
+    margin-top: calc(0.22cqmin * var(--pres-font-scale, 1));
+    padding: calc(0.28cqmin * var(--pres-font-scale, 1))
+        calc(0.45cqmin * var(--pres-font-scale, 1));
+    font-size: calc(4.05cqmin * var(--pres-font-scale, 1));
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: 0.01em;
+    text-align: start;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    border-radius: calc(0.35cqmin * var(--pres-font-scale, 1));
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.award-presentation-title-row .award-presentation-group--head-inline {
+    width: auto;
+    max-width: none;
+    flex: 1 1 0;
+    min-width: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: calc(0.12cqmin * var(--pres-font-scale, 1))
+        calc(0.28cqmin * var(--pres-font-scale, 1));
+    /* 默认更大；超宽仍由 JS 调 --award-pres-head-scale */
+    font-size: calc(4.45cqmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    text-align: start;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    display: block;
+    -webkit-box-orient: unset;
+    overflow: hidden;
+}
+
+.award-presentation-group:not([hidden]) {
+    margin-bottom: calc(0.12cqmin * var(--pres-font-scale, 1));
+}
+
+.award-presentation-title-row .award-presentation-group--head-inline:not([hidden]) {
+    margin-bottom: 0;
+}
+
+.award-presentation-group[hidden] {
+    display: none !important;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-group {
+    color: #0f172a;
+    background: rgba(15, 23, 42, 0.07);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-group {
+    color: #f1f5f9;
+    background: rgba(248, 250, 252, 0.08);
+    border: 1px solid rgba(248, 250, 252, 0.12);
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-group {
+        margin-top: calc(0.22vmin * var(--pres-font-scale, 1));
+        padding: calc(0.28vmin * var(--pres-font-scale, 1))
+            calc(0.45vmin * var(--pres-font-scale, 1));
+        font-size: calc(4.05vmin * var(--pres-font-scale, 1));
+        border-radius: calc(0.35vmin * var(--pres-font-scale, 1));
+    }
+
+    .award-presentation-title-row {
+        gap: calc(clamp(0.45vmin, 1.05vmin, 2.8vmin) * var(--pres-font-scale, 1));
+        min-height: calc(6.1vmin * var(--pres-font-scale, 1) * 1.1);
+    }
+
+    .award-presentation-title-cluster {
+        gap: calc(clamp(0.35vmin, 0.62vmin, 1.6vmin) * var(--pres-font-scale, 1));
+    }
+
+    .award-presentation-title-row .award-presentation-group--head-inline {
+        font-size: calc(4.45vmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    }
+}
+
+.award-presentation-award-fraction {
+    flex: 0 0 auto;
+    font-family: inherit;
+    font-size: calc(2.85cqmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    opacity: 0.78;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-award-fraction {
+    color: #475569;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-award-fraction {
+    color: #cbd5e1;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-head {
+        margin-bottom: calc(0.35vmin * var(--pres-font-scale, 1));
+    }
+
+    .award-presentation-award-fraction {
+        font-size: calc(2.85vmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-card {
+    color: #0b1220;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-presentation-card-list-vert {
+    background: #e9eef6;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(255, 255, 255, 0.45);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-card {
+    color: #e8edf7;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-presentation-card-list-vert {
+    background: #0c0f16;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(255, 255, 255, 0.04);
+}
+
+/* —— 预制配色：表彰红金 honor —— */
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-viewport {
+    background: #7f1d1d;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-group {
+    color: #fffbeb;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(253, 224, 71, 0.45);
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-award-fraction {
+    color: #fde047;
+    opacity: 0.95;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-card {
+    color: #fffbeb;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-card-list-vert {
+    background: #6b1220;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(254, 243, 199, 0.12);
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-row {
+    background: rgba(254, 243, 199, 0.12);
+    border-style: solid;
+    border-color: rgba(253, 224, 71, 0.35);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-rank-inner {
+    color: #fef9c3;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-primary {
+    color: #fffbeb;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-pill {
+    background: rgba(254, 243, 199, 0.14);
+    color: #fef3c7;
+    border-style: solid;
+    border-color: rgba(253, 224, 71, 0.28);
+    border-width: var(--award-pres-hairline);
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-teamid {
+    color: #fde68a;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+/* —— 预制配色：绯红礼赞 ruby（正红鲜调；honor 为红褐+金，本套纯红轴、无金黄主强调） —— */
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-viewport {
+    background: #9f1414;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-group {
+    color: #fff7f7;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(248, 113, 113, 0.55);
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-award-fraction {
+    color: #fecaca;
+    opacity: 0.95;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-card {
+    color: #fff7f7;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-card-list-vert {
+    background: #6e0b0b;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(254, 202, 202, 0.35);
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-row {
+    background: rgba(254, 226, 226, 0.1);
+    border-style: solid;
+    border-color: rgba(239, 68, 68, 0.32);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-rank-inner {
+    color: #fca5a5;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-primary {
+    color: #fff7f7;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-pill {
+    background: rgba(254, 202, 202, 0.12);
+    color: #fef2f2;
+    border-style: solid;
+    border-color: rgba(239, 68, 68, 0.32);
+    border-width: var(--award-pres-hairline);
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-teamid {
+    color: #fecaca;
+    background: rgba(0, 0, 0, 0.28);
+}
+
+/* —— 预制配色：蔚蓝典礼 ocean —— */
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-viewport {
+    background: #082f49;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-group {
+    color: #e0f2fe;
+    background: rgba(7, 89, 133, 0.35);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-award-fraction {
+    color: #7dd3fc;
+    opacity: 0.92;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-card {
+    color: #e0f2fe;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-card-list-vert {
+    background: #0b2f45;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(125, 211, 252, 0.12);
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-row {
+    background: rgba(56, 189, 248, 0.1);
+    border-style: solid;
+    border-color: rgba(14, 165, 233, 0.28);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-rank-inner {
+    color: #bae6fd;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-primary {
+    color: #f0f9ff;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-pill {
+    background: rgba(14, 165, 233, 0.12);
+    color: #bae6fd;
+    border-style: solid;
+    border-color: rgba(56, 189, 248, 0.22);
+    border-width: var(--award-pres-hairline);
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-teamid {
+    color: #7dd3fc;
+    background: rgba(0, 0, 0, 0.22);
+}
+
+/* —— 预制配色：翠玉正式 jade —— */
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-viewport {
+    background: #064e3b;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-group {
+    color: #ecfdf5;
+    background: rgba(4, 47, 46, 0.4);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-award-fraction {
+    color: #6ee7b7;
+    opacity: 0.92;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-card {
+    color: #ecfdf5;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-card-list-vert {
+    background: #053d32;
+    box-shadow: inset 0 var(--award-pres-chrome-hairline) 0 rgba(110, 231, 183, 0.1);
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-row {
+    background: rgba(52, 211, 153, 0.1);
+    border-style: solid;
+    border-color: rgba(16, 185, 129, 0.28);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-rank-inner {
+    color: #a7f3d0;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-primary {
+    color: #f0fdf4;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-pill {
+    background: rgba(16, 185, 129, 0.12);
+    color: #d1fae5;
+    border-style: solid;
+    border-color: rgba(52, 211, 153, 0.22);
+    border-width: var(--award-pres-hairline);
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-teamid {
+    color: #6ee7b7;
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.award-presentation-title {
+    font-size: calc(5.45cqmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-title {
+        font-size: calc(5.45vmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    }
+
+    .award-presentation-title-cluster .award-presentation-title.award-presentation-title--medal {
+        font-size: calc(5.45vmin * var(--pres-font-scale, 1) * var(--award-pres-head-scale, 1));
+    }
+}
+
+.award-presentation-subtitle {
+    font-size: calc(3.35cqmin * var(--pres-font-scale, 1));
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    opacity: 0.74;
+    margin-top: 0.12em;
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-subtitle {
+        font-size: calc(3.35vmin * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-subtitle:empty {
+    display: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-presentation-subtitle {
+    color: #fde68a;
+    opacity: 0.9;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-presentation-subtitle {
+    color: #fecaca;
+    opacity: 0.9;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-presentation-subtitle {
+    color: #bae6fd;
+    opacity: 0.88;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-presentation-subtitle {
+    color: #a7f3d0;
+    opacity: 0.88;
+}
+
+.award-pres-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    align-content: safe center;
+    overflow: hidden;
+    scrollbar-width: none;
+}
+
+.award-pres-list::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.award-pres-list.award-pres-cols-1 {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.award-pres-list.award-pres-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.award-pres-list.award-pres-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* 冠亚季军学校仅 1 队：标题与名单区间距略加大 */
+.award-presentation-card:has(.award-pres-list--solo-champion) .award-presentation-head {
+    margin-bottom: calc(0.52cqmin * var(--pres-font-scale, 1));
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-presentation-card:has(.award-pres-list--solo-champion) .award-presentation-head {
+        margin-bottom: calc(0.52vmin * var(--pres-font-scale, 1));
+    }
+}
+
+/* 冠/亚/季军学校每页仅一队：不用多列网格，整块在信息区内水平+垂直居中 */
+.award-pres-list--solo-champion {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    align-content: center;
+    grid-template-columns: none;
+}
+
+.award-pres-solo-champion-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.award-pres-row--solo-champion-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(100%, 54cqmin);
+    max-width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
+    text-align: center;
+    padding-block: calc(0.28cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+}
+
+.award-pres-row--solo-champion-centered .award-pres-row-main {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-rank-col {
+    padding-top: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-stack {
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* 居中页：选手/教练行勿用 flex:1 拉满行宽，图标与文案成组居中、收紧间距 */
+.award-pres-row--solo-champion-centered .award-pres-details {
+    align-items: center;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-detail-line {
+    justify-content: center;
+    width: auto;
+    max-width: 100%;
+    gap: calc(0.22cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+}
+
+.award-pres-row--solo-champion-centered .award-pres-detail-txt {
+    flex: 0 1 auto;
+    text-align: start;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-line-ico {
+    margin-top: 0.06em;
+}
+
+.award-pres-row--solo-champion-centered .award-pres-fb-under-rank {
+    width: auto;
+    max-width: 100%;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row--solo-champion-centered .award-pres-detail-line {
+        gap: calc(0.22vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-row--solo-champion-centered .award-pres-aside {
+    margin-top: calc(0.3cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row--solo-champion-centered {
+        width: min(100%, 54vmin);
+        padding-block: calc(0.28vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+/* 主区（名次+正文）与侧栏两列，避免三列表在窄双列格子里把「名次列」和「队名」压到同一视觉带 */
+.award-pres-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: start;
+    column-gap: calc(0.55cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    padding-block: calc(0.48cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    padding-inline: calc(0.55cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    border-radius: clamp(2px, calc(0.12cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1)), 5px);
+    min-height: 0;
+}
+
+.award-pres-row-main {
+    display: flex;
+    /* nowrap：needs-marquee 内双倍文案会撑大 max-content，wrap 会把正文区整列换到排名下方 */
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    column-gap: calc(0.5cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    row-gap: calc(0.22cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+}
+
+.award-pres-row-main .award-pres-rank-col {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: calc(0.12cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: calc(3.9cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    max-width: min(34%, calc(7.5cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+    padding-top: 0.04em;
+    box-sizing: border-box;
+}
+
+.award-pres-row-main .award-pres-rank {
+    flex: 0 0 auto;
+    padding-top: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.award-pres-row-main .award-pres-rank-col:not(:has(.award-pres-fb-under-rank)) {
+    gap: 0;
+}
+
+.award-pres-fb-under-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.04em;
+    width: 100%;
+    min-width: 0;
+    /* 题号基准字号在宿主，子元素用 em，避免跑马灯 textContent 抹掉结构后缩成正文大小 */
+    font-size: calc(5.35cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 800;
+    line-height: 1.05;
+    text-align: center;
+}
+
+.award-pres-fb-letters {
+    display: block;
+    /* 最快解题题号：须明显大于名次数字，投屏远处可读 */
+    font-size: 1em;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    font-weight: 900;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row-main .award-pres-rank-col {
+        gap: calc(0.12vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        min-width: calc(3.9vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        max-width: min(34%, calc(7.5vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1)));
+    }
+
+    .award-pres-fb-under-rank {
+        font-size: calc(5.35vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-row-main .award-pres-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+/* 全屏内禁止 min-height:0 把行「压没」导致子块叠在同一带；仍保留列表 flex 子项 min-height:0 */
+.award-presentation-slide .award-pres-row {
+    min-height: auto;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row {
+        grid-template-columns: minmax(0, 1fr) max-content;
+        column-gap: calc(0.55vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        padding-block: calc(0.48vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        padding-inline: calc(0.55vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        border-radius: clamp(2px, calc(0.12vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1)), 5px);
+    }
+
+    .award-pres-row-main {
+        column-gap: calc(0.5vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+        row-gap: calc(0.22vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-row--no-aside {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* 全屏名单：当前页奖项色条（与编排 panel / 配置轨同源） */
+#award_presentation_list.award-pres-deck-visual--champion-school .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #4338ca;
+}
+
+#award_presentation_list.award-pres-deck-visual--medal-gold .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #ca8a04;
+}
+
+#award_presentation_list.award-pres-deck-visual--medal-silver .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #64748b;
+}
+
+#award_presentation_list.award-pres-deck-visual--medal-bronze .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #b45309;
+}
+
+#award_presentation_list.award-pres-deck-visual--first-blood .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #0369a1;
+}
+
+#award_presentation_list.award-pres-deck-visual--best-female .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #a21caf;
+}
+
+#award_presentation_list.award-pres-deck-visual--tenacity .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #047857;
+}
+
+#award_presentation_list.award-pres-deck-visual--champion-misc .award-pres-row {
+    box-shadow: inset var(--award-pres-accent-bar) 0 0 #475569;
+}
+
+/*
+ * 冠亚季军学校「每页仅 1 队」居中行：外层 card 已是主题实色底，与同场配色一致；
+ * 此处刻意**不**套用多队名单那种半透行底 + 描边 + 左侧奖类色条（窄居中块上会像丑的叠层 panel）。
+ */
+.award-presentation-slide .award-pres-row.award-pres-row--solo-champion-centered,
+#award_presentation_list .award-pres-row.award-pres-row--solo-champion-centered {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-row {
+    background: rgba(255, 255, 255, 0.72);
+    border-style: solid;
+    border-color: rgba(15, 23, 42, 0.14);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-row {
+    background: rgba(255, 255, 255, 0.03);
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-width: var(--award-pres-hairline);
+    box-shadow: none;
+}
+
+.award-pres-rank {
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+}
+
+.award-pres-rank-inner {
+    display: inline-block;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.12;
+    font-size: calc(3.35cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-rank-inner {
+        font-size: calc(3.35vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-rank-inner {
+    color: #0f172a;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-rank-inner {
+    color: #f1f5f9;
+}
+
+/* 最快解题题号（名次列下）：字母略大于名次 */
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-fb-letters {
+    color: #0f172a;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-fb-letters {
+    color: #f8fafc;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-fb-letters {
+    color: #fffbeb;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-fb-letters {
+    color: #ffffff;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-fb-letters {
+    color: #f0f9ff;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-fb-letters {
+    color: #ecfdf5;
+}
+
+.award-pres-body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.32em;
+    overflow: visible;
+}
+
+.award-pres-primary {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    font-size: calc(3.55cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.022em;
+    /* 与 .award-pres-marquee-host 一致：单行，超长由 JS 跑马灯（勿换行） */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-primary {
+        font-size: calc(3.55vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-primary {
+    color: #0f172a;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-primary {
+    color: #f8fafc;
+}
+
+.award-pres-primary--fallback {
+    font-weight: 600;
+    opacity: 0.88;
+}
+
+.award-pres-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: calc(0.26cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+    width: 100%;
+}
+
+.award-pres-row--has-en .award-pres-stack {
+    gap: calc(0.2cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+}
+
+.award-pres-primary-en {
+    flex: 0 0 auto;
+    font-size: calc(3.05cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+    min-width: 0;
+    max-width: 100%;
+    opacity: 0.9;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-primary-en {
+        font-size: calc(3.05vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-primary-en {
+    color: #334155;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-primary-en {
+    color: #e2e8f0;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-primary-en {
+    color: #fef3c7;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-primary-en {
+    color: #fee2e2;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-primary-en {
+    color: #bae6fd;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-primary-en {
+    color: #d1fae5;
+}
+
+.award-pres-school-line {
+    flex: 0 0 auto;
+    min-width: 0;
+    width: 100%;
+    padding-top: calc(0.22cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    margin-top: calc(0.08cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-school-line {
+    border-top-color: rgba(248, 250, 252, 0.12);
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-school-line {
+    border-top-color: rgba(253, 224, 71, 0.22);
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-school-line {
+    border-top-color: rgba(239, 68, 68, 0.35);
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-school-line {
+    border-top-color: rgba(56, 189, 248, 0.22);
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-school-line {
+    border-top-color: rgba(52, 211, 153, 0.22);
+}
+
+/* 冠亚季军学校页：学校置顶、字重高于队名；队名略弱化 */
+.award-pres-row--champion-school .award-pres-school-line--lead {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.award-pres-row--champion-school .award-pres-school-line--lead .award-pres-school-txt {
+    font-size: calc(3.55cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 700;
+    letter-spacing: -0.022em;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row--champion-school .award-pres-school-line--lead .award-pres-school-txt {
+        font-size: calc(3.55vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-row--champion-school .award-pres-primary.award-pres-primary--demoted {
+    font-size: calc(3.05cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    opacity: 0.88;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row--champion-school .award-pres-primary.award-pres-primary--demoted {
+        font-size: calc(3.05vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-row--champion-school .award-pres-primary-en.award-pres-primary-en--demoted {
+    font-size: calc(2.75cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    opacity: 0.82;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-row--champion-school .award-pres-primary-en.award-pres-primary-en--demoted {
+        font-size: calc(2.75vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-school-txt {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    font-size: calc(2.92cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-school-txt {
+        font-size: calc(2.92vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-school-txt {
+    color: #475569;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-school-txt {
+    color: #cbd5e1;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-school-txt {
+    color: #fde68a;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-school-txt {
+    color: #fca5a5;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-school-txt {
+    color: #7dd3fc;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-school-txt {
+    color: #6ee7b7;
+}
+
+.award-pres-details {
+    display: flex;
+    flex-direction: column;
+    gap: calc(0.18cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    margin-top: calc(0.12cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+    width: 100%;
+}
+
+.award-pres-fb-problem-line {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: calc(0.38cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    margin-top: calc(0.1cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+    width: 100%;
+    font-size: calc(2.35cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 600;
+    line-height: 1.22;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-fb-problem-line {
+        font-size: calc(2.35vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-pres-fb-problem-stack {
+    display: flex;
+    flex-direction: column;
+    gap: calc(0.06cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.award-pres-line-ico--fb-prob {
+    opacity: 0.92;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-fb-problem-line {
+    color: #334155;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-fb-problem-line {
+    color: #e2e8f0;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-fb-problem-line {
+    color: #fef3c7;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-fb-problem-line {
+    color: #fee2e2;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-fb-problem-line {
+    color: #bae6fd;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-fb-problem-line {
+    color: #a7f3d0;
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-line-ico--fb-prob {
+    color: #475569;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-line-ico--fb-prob {
+    color: #cbd5e1;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-line-ico--fb-prob {
+    color: #fde68a;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-line-ico--fb-prob {
+    color: #f87171;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-line-ico--fb-prob {
+    color: #7dd3fc;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-line-ico--fb-prob {
+    color: #6ee7b7;
+}
+
+.award-pres-detail-line {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: calc(0.38cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    min-width: 0;
+}
+
+.award-pres-line-ico {
+    flex: 0 0 auto;
+    line-height: 1;
+    margin-top: 0.14em;
+    font-size: calc(2.85cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    opacity: 0.88;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-line-ico {
+        font-size: calc(2.85vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-line-ico {
+    color: #475569;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-line-ico {
+    color: #94a3b8;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-line-ico {
+    color: #fcd34d;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-line-ico {
+    color: #f87171;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-line-ico {
+    color: #38bdf8;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-line-ico {
+    color: #34d399;
+}
+
+.award-pres-detail-txt {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: calc(3.05cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 550;
+    line-height: 1.32;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-detail-txt {
+        font-size: calc(3.05vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-detail-txt {
+    color: #334155;
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-detail-txt {
+    color: #e2e8f0;
+}
+
+.award-presentation-stage[data-award-pres-theme="honor"] .award-pres-detail-txt {
+    color: #fff7ed;
+}
+
+.award-presentation-stage[data-award-pres-theme="ruby"] .award-pres-detail-txt {
+    color: #fff7f7;
+}
+
+.award-presentation-stage[data-award-pres-theme="ocean"] .award-pres-detail-txt {
+    color: #e0f2fe;
+}
+
+.award-presentation-stage[data-award-pres-theme="jade"] .award-pres-detail-txt {
+    color: #ecfdf5;
+}
+
+.award-presentation-slide .award-pres-marquee-host {
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.award-presentation-slide .award-pres-marquee-host.needs-marquee {
+    text-overflow: clip;
+    overflow: hidden;
+    position: relative;
+}
+
+.award-presentation-slide .award-pres-marquee-host.needs-marquee > .marquee-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+    animation: csg-award-pres-marquee linear infinite;
+    animation-duration: var(--marquee-duration, 15s);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+@keyframes csg-award-pres-marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(var(--marquee-translate, -100px));
+    }
+}
+
+.award-presentation-slide .award-pres-marquee-host.needs-marquee:hover > .marquee-wrapper {
+    animation-play-state: paused;
+}
+
+.award-pres-meta {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.25rem 0.35rem;
+    line-height: 1.35;
+    margin-top: 0.04em;
+    overflow: visible;
+}
+
+.award-pres-pill {
+    display: inline-block;
+    max-width: none;
+    padding: 0.1em 0.45em;
+    border-radius: 0.15em;
+    font-size: calc(3.05cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    font-weight: 550;
+    letter-spacing: 0.01em;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow: visible;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-pill {
+        font-size: calc(3.05vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-pill {
+    background: rgba(15, 23, 42, 0.06);
+    color: #334155;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-pill {
+    background: rgba(255, 255, 255, 0.07);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.award-pres-aside {
+    justify-self: end;
+    text-align: right;
+    min-width: 0;
+    align-self: start;
+    padding-top: 0.06em;
+}
+
+.award-pres-teamid {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "AW Noto Sans SC", monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-size: calc(2.85cqmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    padding: 0.08em 0.38em;
+    border-radius: 0.12em;
+    white-space: normal;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+
+@supports not (font-size: 1cqmin) {
+    .award-pres-teamid {
+        font-size: calc(2.85vmin * var(--pres-type-scale, 1) * var(--pres-fit-scale, 1) * var(--pres-font-scale, 1));
+    }
+}
+
+.award-presentation-stage[data-award-pres-theme="mist"] .award-pres-teamid {
+    color: #475569;
+    background: rgba(15, 23, 42, 0.05);
+}
+
+.award-presentation-stage[data-award-pres-theme="night"] .award-pres-teamid {
+    color: #cbd5e1;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+/* 颁奖编排 · 配置 Modal：与 status 代码预览一致 — 整模态随外层滚动、无 body 内滚动条，header sticky */
+#award_deck_pager_modal .modal-dialog.award-deck-pager-dialog {
+    max-height: none !important;
+    margin: 1.75rem auto;
+    height: auto;
+}
+
+#award_deck_pager_modal .modal-content {
+    max-height: none !important;
+    height: auto;
+    overflow: visible;
+}
+
+#award_deck_pager_modal .modal-body.award-deck-config-modal-body {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto;
+}
+
+.award-deck-config-modal .modal-header {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+}
+
+#award_deck_pager_modal .modal-header.award-deck-modal-header-sticky,
+.award-deck-config-modal .modal-header.award-deck-modal-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1055;
+    background: var(--bs-light, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* 顶栏中部：当前归属单行居中；过长省略号（与左侧「编排配置」、右侧工具同一行） */
+.award-deck-pager-modal-header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+}
+
+.award-deck-pager-modal-header-center .award-deck-pager-modal-group-line {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.award-deck-pager-modal-group-line {
+    font-size: 0.875rem;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+    color: var(--bs-secondary, #6c757d);
+}
+
+/* 编排弹窗内 md+ 双栏开关：左右栏之间竖线，避免左栏开关与右栏文案误关联 */
+@media (min-width: 768px) {
+    .award-deck-switch-col-pair > [class*="col-md-6"]:nth-child(odd) {
+        border-inline-end: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.1));
+        padding-inline-end: 0.75rem;
+    }
+
+    .award-deck-switch-col-pair > [class*="col-md-6"]:nth-child(even) {
+        padding-inline-start: 0.75rem;
+    }
+}
+
+.award-deck-config-modal .award-deck-modal-header-tools .award-deck-modal-iconbtn {
+    padding: 0.28rem 0.5rem;
+    line-height: 1;
+    border-radius: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.95rem;
+}
+
+.award-deck-config-modal .award-deck-modal-header-tools .award-deck-modal-iconbtn i {
+    font-size: 1.05rem;
+}
+
+.award-deck-config-modal .award-deck-config-modal-body {
+    padding: 0.85rem 1rem 1rem;
+    font-size: 1rem;
+}
+
+@media (min-width: 576px) {
+    .award-deck-config-modal .award-deck-config-modal-body {
+        padding: 1rem 1.15rem 1.1rem;
+    }
+}
+
+.award-deck-config-modal .award-deck-modal-intro {
+    font-size: 0.9375rem;
+}
+
+.award-deck-config-modal .award-deck-form-sec-title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.45rem;
+}
+
+.award-deck-config-modal .form-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.25rem;
+}
+
+.award-deck-config-modal .award-deck-label-switch-row {
+    min-height: 2.5rem;
+    padding: 0.1rem 0;
+}
+
+.award-deck-config-modal .award-deck-pres-hint {
+    font-size: 0.9rem;
+}
+
+.award-deck-config-modal .modal-footer .award-deck-modal-footer-btn {
+    min-width: 7.5rem;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9375rem;
+}
+
+.award-deck-modal-split-main {
+    min-width: 0;
+}
+
+.award-deck-modal-split-rail {
+    min-width: 0;
+    border-left: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.08));
+    padding-left: 1rem;
+}
+
+@media (max-width: 991.98px) {
+    .award-deck-modal-split-rail {
+        border-left: none;
+        border-top: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.08));
+        padding-left: 0;
+        padding-top: 1rem;
+        margin-top: 0.25rem;
+    }
+}
+
+.award-deck-special-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding-right: 2px;
+}
+
+.award-deck-special-rail-empty {
+    line-height: 1.35;
+}
+
+.award-deck-special-row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.35rem;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.12));
+    border-radius: 0.35rem;
+    background: var(--bs-body-bg, #fff);
+    cursor: grab;
+}
+
+.award-deck-special-row.is-dragging {
+    opacity: 0.55;
+    cursor: grabbing;
+}
+
+.award-deck-special-row.is-drop-target {
+    outline: 2px dashed var(--bs-primary, #0d6efd);
+    outline-offset: 1px;
+}
+
+.award-deck-special-row-grip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    color: var(--bs-secondary, #6c757d);
+    user-select: none;
+}
+
+.award-deck-special-row-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    justify-content: center;
+}
+
+.award-deck-special-row-label {
+    font-size: 0.8125rem;
+    line-height: 1.25;
+}
+
+.award-deck-special-row--champion {
+    border-left: 4px solid #4338ca;
+    background: #eef2ff;
+}
+
+.award-deck-special-row--fb {
+    border-left: 4px solid #0369a1;
+    background: #f0f9ff;
+}
+
+.award-deck-special-row--best-female {
+    border-left: 4px solid #a21caf;
+    background: #fdf4ff;
+}
+
+.award-deck-special-row--tenacity {
+    border-left: 4px solid #047857;
+    background: #ecfdf5;
+}
+
+.award-deck-special-row--misc {
+    border-left: 4px solid #64748b;
+}
+
+.award-deck-special-row--medal {
+    font-weight: 600;
+}
+
+.award-deck-special-row--medal-0 {
+    border-left: 4px solid #ca8a04;
+    background: #fffbeb;
+}
+
+.award-deck-special-row--medal-1 {
+    border-left: 4px solid #64748b;
+    background: #f1f5f9;
+}
+
+.award-deck-special-row--medal-2 {
+    border-left: 4px solid #b45309;
+    background: #fff7ed;
+}
+
+.award-deck-special-rail-sortbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.award-deck-special-rail-sortbar .btn {
+    border-radius: 0.35rem;
+}
+
+.award-deck-special-sort-phase-label {
+    flex: 1 1 8rem;
+    min-width: 0;
+    line-height: 1.35;
+}

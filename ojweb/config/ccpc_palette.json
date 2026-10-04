@@ -1,0 +1,106 @@
+[
+  {
+    "name": "红",
+    "color": "#e53935"
+  },
+  {
+    "name": "橙",
+    "color": "#fb8c00"
+  },
+  {
+    "name": "黄",
+    "color": "#fdd835"
+  },
+  {
+    "name": "绿",
+    "color": "#43a047"
+  },
+  {
+    "name": "青",
+    "color": "#00acc1"
+  },
+  {
+    "name": "蓝",
+    "color": "#1e88e5"
+  },
+  {
+    "name": "紫",
+    "color": "#8e24aa"
+  },
+  {
+    "name": "粉",
+    "color": "#f48fb1"
+  },
+  {
+    "name": "白",
+    "color": "#ffffff"
+  },
+  {
+    "name": "银",
+    "color": "#bdbdbd"
+  },
+  {
+    "name": "金",
+    "color": "#d4af37"
+  },
+  {
+    "name": "棕",
+    "color": "#795548"
+  },
+  {
+    "name": "浅蓝",
+    "color": "#90caf9"
+  },
+  {
+    "name": "浅绿",
+    "color": "#a5d6a7"
+  },
+  {
+    "name": "玫红",
+    "color": "#d81b60"
+  },
+  {
+    "name": "深紫",
+    "color": "#512da8"
+  },
+  {
+    "name": "珊瑚",
+    "color": "#ff7f50"
+  },
+  {
+    "name": "柠檬",
+    "color": "#fff176"
+  },
+  {
+    "name": "薄荷",
+    "color": "#80cbc4"
+  },
+  {
+    "name": "靛蓝",
+    "color": "#3949ab"
+  },
+  {
+    "name": "薰衣草",
+    "color": "#b39ddb"
+  },
+  {
+    "name": "米白",
+    "color": "#fff8e1"
+  },
+  {
+    "name": "栗色",
+    "color": "#800000"
+  },
+  {
+    "name": "青绿",
+    "color": "#00897b"
+  },
+  {
+    "name": "桃色",
+    "color": "#ffccbc"
+  },
+  {
+    "name": "橄榄",
+    "color": "#827717"
+  }
+]

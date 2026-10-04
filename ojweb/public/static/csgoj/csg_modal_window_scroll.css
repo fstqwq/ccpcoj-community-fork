@@ -1,0 +1,49 @@
+/**
+ * Modal 窗口级纵向滚动（需求用语「modal 用窗口 scroll」即本套约定）
+ *
+ * 勿使用 Bootstrap 的 modal-dialog-scrollable，勿把 .modal-body 做成固定 height + overflow-y:auto，
+ * 以免出现「弹窗内部一条滚动条」。整段内容随 .modal 根节点（Bootstrap 5 默认 overflow-y:auto）在视口内滚动，
+ * 滚动条在浏览器窗口侧，交互与 /csgoj/status 代码预览 #code_show_modal 一致（见 code_show.css）。
+ *
+ * 用法：根节点加类 csg-modal-window-scroll，并引入本文件：
+ *   <div class="modal fade csg-modal-window-scroll" id="..." ...>
+ */
+
+.csg-modal-window-scroll .modal-dialog {
+    max-height: none !important;
+    height: auto;
+    margin: 1.75rem auto;
+}
+
+.csg-modal-window-scroll .modal-content {
+    max-height: none !important;
+    height: auto;
+}
+
+.csg-modal-window-scroll .modal-body {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto;
+    flex: none !important;
+}
+
+/* 长内容下滑时标题栏仍可见（与 code_show_modal 一致） */
+.csg-modal-window-scroll .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1055;
+    background: var(--bs-body-bg, #fff);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* 题目选择器：保留 admin/contest.css 中的 max-width，去掉原 90vh + body 内滚动 */
+#problemSelectionModal.csg-modal-window-scroll .modal-dialog {
+    max-width: 1200px;
+    height: auto !important;
+}
+
+#problemSelectionModal.csg-modal-window-scroll .modal-content {
+    display: block;
+    height: auto !important;
+}

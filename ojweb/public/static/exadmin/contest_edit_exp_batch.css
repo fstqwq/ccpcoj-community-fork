@@ -1,0 +1,44 @@
+/* 练习添加/复制：按班级的标题与时间（紧凑） */
+#exp_practice_add_batch_panel .card-header {
+    background: var(--bs-light, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    font-size: 0.9rem;
+}
+
+.exp-batch-table {
+    font-size: 0.8125rem;
+}
+
+.exp-batch-table thead th {
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+    padding: 0.35rem 0.5rem;
+}
+
+.exp-batch-table tbody td {
+    vertical-align: middle;
+    padding: 0.35rem 0.5rem;
+}
+
+.exp-batch-table .exp-batch-clss-name {
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.exp-batch-table input[type="text"],
+.exp-batch-table input[type="datetime-local"] {
+    min-width: 0;
+}
+
+.exp-batch-table .form-control-sm {
+    font-size: 0.8125rem;
+}
+
+.exp-batch-empty-hint {
+    font-size: 0.8125rem;
+    color: var(--bs-secondary-color, #6c757d);
+    padding: 0.5rem 0.25rem;
+}

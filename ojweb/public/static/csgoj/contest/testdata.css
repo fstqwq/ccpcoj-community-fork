@@ -1,0 +1,60 @@
+.testdata-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.testdata-container .card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.testdata-container .card-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.25rem;
+}
+
+.testdata-container .table {
+    font-size: 0.9rem;
+}
+
+.testdata-container .table thead th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.75rem;
+}
+
+.testdata-container .table tbody td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.testdata-container .testdown {
+    color: #0d6efd;
+    transition: color 0.2s ease;
+}
+
+.testdata-container .testdown:hover {
+    color: #0a58ca;
+    text-decoration: underline !important;
+}
+
+@media (max-width: 768px) {
+    .testdata-container {
+        padding: 10px;
+    }
+    
+    .testdata-container .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    .testdata-container .table {
+        font-size: 0.85rem;
+    }
+    
+    .testdata-container .table thead th,
+    .testdata-container .table tbody td {
+        padding: 0.5rem;
+    }
+}
+

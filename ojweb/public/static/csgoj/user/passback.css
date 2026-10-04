@@ -1,0 +1,171 @@
+/**
+ * 找回密码 / 重置密码页 — 与 csg-page-header、全站双语约定一致
+ */
+.passback-page {
+	max-width: 32rem;
+	margin: 0 auto;
+	padding-bottom: 2rem;
+}
+
+.passback-page .passback-card {
+	border: 1px solid var(--csg-ph-border, #e2e8f0);
+	background: var(--csg-ph-bg, #ffffff);
+	padding: 1.5rem 1.5rem 1.25rem;
+	margin-top: 0.5rem;
+	box-sizing: border-box;
+}
+
+.passback-page .passback-hint {
+	border-left: 3px solid var(--csg-ph-accent, #2563eb);
+	padding: 0.75rem 1rem;
+	margin-bottom: 1.25rem;
+	background: #f8fafc;
+	color: var(--csg-ph-text, #0f172a);
+	font-size: 0.9375rem;
+	line-height: 1.55;
+}
+
+.passback-page .passback-hint .en-text {
+	color: var(--csg-ph-muted, #64748b);
+	font-style: normal;
+	opacity: 1;
+	margin-top: 0.35rem;
+}
+
+.passback-page .passback-footnote {
+	font-size: 0.8125rem;
+	color: var(--csg-ph-muted, #64748b);
+	line-height: 1.5;
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--csg-ph-border, #e2e8f0);
+}
+
+.passback-page .passback-footnote .en-text {
+	font-style: normal;
+	opacity: 0.95;
+	margin-top: 0.25rem;
+}
+
+.passback-page .form-label {
+	font-weight: 600;
+	color: var(--csg-ph-text, #0f172a);
+	margin-bottom: 0.35rem;
+}
+
+.passback-page .form-label .en-text {
+	font-weight: 500;
+	font-style: normal;
+	color: var(--csg-ph-muted, #64748b);
+}
+
+.passback-page .form-control {
+	border-radius: 0;
+	max-width: 100%;
+}
+
+.passback-page .passback-captcha-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.75rem 1rem;
+	margin-bottom: 1rem;
+}
+
+.passback-page .passback-captcha-row .passback-captcha-input {
+	flex: 1 1 10rem;
+	min-width: 0;
+}
+
+.passback-page .passback-captcha-row label#vcode {
+	cursor: pointer;
+	margin-bottom: 0;
+	line-height: 0;
+}
+
+.passback-page .passback-captcha-row label#vcode img {
+	display: block;
+	border: 1px solid var(--csg-ph-border, #e2e8f0);
+}
+
+.passback-page .passback-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 1rem;
+	margin-top: 0.25rem;
+}
+
+/*
+ * 主提交按钮：idle（含图标）与「提交中(倒计时)」（无图标）须同一套纵向中英结构。
+ * 全站 bilingual.css 对 :has(i) 的按钮使用 grid，无图标时退回另一套 flex，导致两态不一致。
+ */
+.passback-page .btn.passback-bilingual-submit.btn-primary:has(.en-text) {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 0.2rem !important;
+	padding: 0.45rem 1rem !important;
+	grid-template-columns: unset !important;
+	grid-template-rows: unset !important;
+	grid-template-areas: unset !important;
+}
+
+.passback-page .btn.passback-bilingual-submit.btn-primary > .cn-text {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	white-space: nowrap;
+	line-height: 1.2;
+}
+
+.passback-page .btn.passback-bilingual-submit.btn-primary > .en-text {
+	display: block !important;
+	margin-left: 0 !important;
+	margin-top: 0 !important;
+	font-size: 0.7em;
+	line-height: 1.2em;
+	font-style: normal;
+	opacity: 0.9;
+	white-space: nowrap;
+}
+
+.passback-page .passback-back {
+	font-size: 0.875rem;
+}
+
+.passback-page .passback-back a {
+	color: var(--csg-ph-muted, #64748b);
+	text-decoration: none;
+}
+
+.passback-page .passback-back a:hover {
+	color: var(--csg-ph-accent, #2563eb);
+	text-decoration: underline;
+}
+
+.passback-page .passback-back .en-text {
+	display: inline;
+	margin-left: 0.35rem;
+	font-size: 0.8125rem;
+	font-style: normal;
+	opacity: 0.9;
+}
+
+/* 链接失效提示块：与主说明区分 */
+.passback-page .passback-alert-invalid {
+	border-left-color: #94a3b8;
+}
+
+/* 双语文案按钮（无 bilingual-inline）：英文换行在中文下 */
+.passback-page a.btn.btn-outline-primary .en-text {
+	display: block;
+	margin-left: 0;
+	margin-top: 0.25rem;
+	font-size: 0.7rem;
+	font-style: normal;
+	opacity: 0.88;
+	line-height: 1.2;
+}

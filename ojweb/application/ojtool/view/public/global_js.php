@@ -1,0 +1,1 @@
+{include file="../../expsys/view/public/global_js" /}

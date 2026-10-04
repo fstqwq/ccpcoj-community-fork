@@ -1,0 +1,16 @@
+# build_release.sh 输出与运行目录（工作目录常为 dist/）
+dist/
+
+# 与可执行文件同目录的运行态（main 将 cwd 设为 exe 所在目录）
+conf
+log/
+instance.pid
+instance.lock
+*.bin
+
+# 常见本机 go build 产物名（正式 release 在 dist/，已由上一段覆盖）
+csgoj.lanexamproxy
+csgoj.lanexamproxy.exe
+
+# 本地启动镜像用（请用 docker_run.sh.example 复制）
+docker_run.sh

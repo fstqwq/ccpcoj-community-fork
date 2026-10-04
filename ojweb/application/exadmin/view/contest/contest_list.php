@@ -1,0 +1,1 @@
+{include file="../../expsys/view/contest/contest_list" /}

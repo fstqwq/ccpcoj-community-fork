@@ -1,0 +1,124 @@
+/**
+ * 独立投屏页背板明暗四档：`html.contestlive-page-opacity` + `data-contestlive-page-opacity-step`。
+ * 与主 HUD `.contestlive-hud[data-contestlive-hud-opacity-step]` 使用同一套 `--hud-a-*` 数值语义（快捷键 O）。
+ * 另含独立页专有层：`--csl-pa-page-a`、`--csl-pa-page-radial-a`、`--csl-pa-table-th`、`--csl-pa-combo-shell`。
+ */
+
+html.contestlive-page-opacity:is(
+    :not([data-contestlive-page-opacity-step]),
+    [data-contestlive-page-opacity-step='1']
+) {
+    --hud-a-left: 0.78;
+    --hud-a-panel: 0.62;
+    --hud-a-panel-head: 0.42;
+    --hud-a-right: 0.48;
+    --hud-a-embed: 0.45;
+    --hud-a-bottom: 0.82;
+    --hud-a-rl: 0.72;
+    --hud-a-rank-head: 0.92;
+    --hud-a-clock: 0.9;
+    --csl-pa-page-radial-a: 0.12;
+    --csl-pa-page-a: 0.88;
+    --csl-pa-table-th: 0.96;
+    --csl-pa-combo-shell: 0.42;
+}
+
+html.contestlive-page-opacity[data-contestlive-page-opacity-step='0'] {
+    --hud-a-left: 0.9;
+    --hud-a-panel: 0.8;
+    --hud-a-panel-head: 0.52;
+    --hud-a-right: 0.62;
+    --hud-a-embed: 0.58;
+    --hud-a-bottom: 0.9;
+    --hud-a-rl: 0.86;
+    --hud-a-rank-head: 0.96;
+    --hud-a-clock: 0.94;
+    --csl-pa-page-radial-a: 0.14;
+    --csl-pa-page-a: 0.94;
+    --csl-pa-table-th: 0.97;
+    --csl-pa-combo-shell: 0.52;
+}
+
+html.contestlive-page-opacity[data-contestlive-page-opacity-step='2'] {
+    --hud-a-left: 0.55;
+    --hud-a-panel: 0.42;
+    --hud-a-panel-head: 0.3;
+    --hud-a-right: 0.34;
+    --hud-a-embed: 0.3;
+    --hud-a-bottom: 0.62;
+    --hud-a-rl: 0.52;
+    --hud-a-rank-head: 0.78;
+    --hud-a-clock: 0.76;
+    --csl-pa-page-radial-a: 0.08;
+    --csl-pa-page-a: 0.62;
+    --csl-pa-table-th: 0.88;
+    --csl-pa-combo-shell: 0.3;
+}
+
+html.contestlive-page-opacity[data-contestlive-page-opacity-step='3'] {
+    --hud-a-left: 0.36;
+    --hud-a-panel: 0.28;
+    --hud-a-panel-head: 0.22;
+    --hud-a-right: 0.24;
+    --hud-a-embed: 0.22;
+    --hud-a-bottom: 0.48;
+    --hud-a-rl: 0.38;
+    --hud-a-rank-head: 0.62;
+    --hud-a-clock: 0.58;
+    --csl-pa-page-radial-a: 0.05;
+    --csl-pa-page-a: 0.42;
+    --csl-pa-table-th: 0.78;
+    --csl-pa-combo-shell: 0.2;
+}
+
+/* 气球层：占位提示面板（按 I 显示时）与主 HUD 背板语义一致 */
+html.contestlive-page-opacity .contestlive-balloon-page__chrome {
+    background: rgb(15 18 28 / var(--hud-a-panel));
+    border-radius: 0.42rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/*
+ * 独立页整页铺底（肤色与 contestlive_skin 同源色值），透明度随 O 档 `--csl-pa-page-a`；
+ * 避免与评测队列卡片区再用一层同色渐变叠加：含 `.contestlive-queue-page--standalone` 的皮膚下将其置透明。
+ */
+html.contestlive-page-opacity[data-contestlive-skin='dark_stage'] body:is(
+        .contestlive-display--queue,
+        .contestlive-display--ac-only,
+        .contestlive-display--probstats-only,
+        .contestlive-display--combo,
+        .contestlive-display--balloon,
+        .contestlive-display--schoolwall,
+        .contestlive-display--timer,
+        .contestlive-display--rank-live
+    ) {
+    background: radial-gradient(
+        circle at 20% 10%,
+        rgb(31 41 55 / var(--csl-pa-page-a, 1)) 0%,
+        rgb(11 18 32 / var(--csl-pa-page-a, 1)) 45%,
+        rgb(5 8 15 / var(--csl-pa-page-a, 1)) 100%
+    ) !important;
+}
+
+html.contestlive-page-opacity[data-contestlive-skin='light_macaron'] body:is(
+        .contestlive-display--queue,
+        .contestlive-display--ac-only,
+        .contestlive-display--probstats-only,
+        .contestlive-display--combo,
+        .contestlive-display--balloon,
+        .contestlive-display--schoolwall,
+        .contestlive-display--timer,
+        .contestlive-display--rank-live
+    ) {
+    background: linear-gradient(
+        165deg,
+        rgb(241 245 249 / var(--csl-pa-page-a, 1)) 0%,
+        rgb(232 237 243 / var(--csl-pa-page-a, 1)) 45%,
+        rgb(244 246 248 / var(--csl-pa-page-a, 1)) 100%
+    ) !important;
+}
+
+html.contestlive-page-opacity[data-contestlive-skin='dark_stage'] body.contestlive-live-queue-skin-sync .contestlive-queue-page--standalone,
+html.contestlive-page-opacity[data-contestlive-skin='light_macaron'] body.contestlive-live-queue-skin-sync .contestlive-queue-page--standalone {
+    background: transparent !important;
+}

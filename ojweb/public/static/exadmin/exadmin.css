@@ -1,0 +1,406 @@
+/**
+ * exadmin 模块 CSS 样式文件
+ * CSS Styles for exadmin module
+ */
+
+/* ==================== 教师标签样式 ==================== */
+
+.teacher-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.teacher-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.375rem;
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: #495057;
+    font-size: 0.875rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.teacher-tag:hover {
+    background-color: #dee2e6;
+    border-color: #adb5bd;
+    color: #212529;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.teacher-name {
+    white-space: nowrap;
+}
+
+/* ==================== 题型筛选按钮组样式 ==================== */
+
+/* 题型筛选按钮组 - 缩小尺寸 */
+#question_toolbar .btn-group,
+#draft_question_toolbar .btn-group {
+    font-size: 0.875rem;
+}
+
+#question_toolbar .btn-group .btn,
+#draft_question_toolbar .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+}
+
+/* exadmin header 按钮更紧凑（草稿页使用 csg-btn-compact 标记） */
+.admin-page-header-actions .btn.btn-sm.csg-btn-compact {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.55rem;
+    min-height: 32px;
+}
+
+/* 选中状态 - 蓝色背景，白色文字 */
+.btn-group .btn-check:checked + .btn {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* 未选中状态 - 透明背景，蓝色边框和文字 */
+.btn-group .btn-check:not(:checked) + .btn {
+    background-color: transparent;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* 未选中状态的悬停效果 - 浅蓝色背景，保持蓝色边框和文字 */
+.btn-group .btn-check:not(:checked) + .btn:hover {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* 关键：只覆盖“未选中”的 hover，避免选中后因为仍 hover 导致看不出是否已选中 */
+#question_toolbar .btn-group .btn-check:not(:checked) + .btn:hover,
+#draft_question_toolbar .btn-group .btn-check:not(:checked) + .btn:hover {
+    background-color: #e7f1ff !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+}
+
+/* 选中且 hover：仍保持实心（给一个更深的蓝），确保点击后立即有反馈 */
+#question_toolbar .btn-group .btn-check:checked + .btn:hover,
+#draft_question_toolbar .btn-group .btn-check:checked + .btn:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0b5ed7 !important;
+    color: #ffffff !important;
+}
+
+/* 选中状态的悬停效果 - 深蓝色背景，保持白色文字 */
+.btn-group .btn-check:checked + .btn:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+    color: white;
+}
+
+/* ==================== 题目选择页面样式 ==================== */
+
+/* ==================== 题型 Tab/Pills 配色（与 question_default.pkind_color 同步） ==================== */
+.csg-question-type-nav {
+    gap: 0.35rem;
+}
+
+.csg-question-type-nav .nav-link.li_pkind {
+    /* 默认值会被 question_default.js 写入的 --csg-pkind-color 覆盖 */
+    --csg-pkind-color: var(--csg-pkind-color, #0d6efd);
+    border: 1px solid var(--csg-pkind-color);
+    color: var(--csg-pkind-color);
+    background: transparent;
+    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out;
+}
+
+.csg-question-type-nav .nav-link.li_pkind:hover {
+    background: rgba(13, 110, 253, 0.06);
+    background: color-mix(in srgb, var(--csg-pkind-color, #0d6efd) 12%, transparent);
+}
+
+.csg-question-type-nav .nav-link.li_pkind.active {
+    background: var(--csg-pkind-color);
+    border-color: var(--csg-pkind-color);
+    color: #fff;
+}
+
+.csg-question-type-nav .nav-link.li_pkind.disabled {
+    opacity: 0.55;
+}
+
+/* ==================== 题目筛选工具条（checkbox pills）题型配色同步 ==================== */
+.csg-pkind-filter .btn {
+    /* 覆盖 bootstrap 的 outline-primary 视觉，避免所有题型都变成同一种蓝色 */
+    border: 1px solid var(--csg-pkind-color, #0d6efd) !important;
+    color: var(--csg-pkind-color, #0d6efd) !important;
+    background: transparent !important;
+}
+
+/* 未选中 hover：给一点同色系淡底 */
+.csg-pkind-filter .btn-check:not(:checked) + .btn:hover {
+    background: color-mix(in srgb, var(--csg-pkind-color, #0d6efd) 12%, transparent) !important;
+}
+
+/* 选中：实心底色 */
+.csg-pkind-filter .btn-check:checked + .btn {
+    background: var(--csg-pkind-color, #0d6efd) !important;
+    border-color: var(--csg-pkind-color, #0d6efd) !important;
+    color: #fff !important;
+}
+
+/* 兼容旧规则：#question_toolbar / #draft_question_toolbar 里有“统一蓝色 hover”且带 !important，这里用更高优先级覆写为题型色 */
+#question_toolbar .csg-pkind-filter .btn-check:not(:checked) + .btn:hover,
+#draft_question_toolbar .csg-pkind-filter .btn-check:not(:checked) + .btn:hover {
+    background: color-mix(in srgb, var(--csg-pkind-color, #0d6efd) 12%, transparent) !important;
+    border-color: var(--csg-pkind-color, #0d6efd) !important;
+    color: var(--csg-pkind-color, #0d6efd) !important;
+}
+
+/* 选中且 hover：稍微加深一点，仍保持题型色 */
+#question_toolbar .csg-pkind-filter .btn-check:checked + .btn:hover,
+#draft_question_toolbar .csg-pkind-filter .btn-check:checked + .btn:hover {
+    background: color-mix(in srgb, var(--csg-pkind-color, #0d6efd) 88%, #000) !important;
+    border-color: color-mix(in srgb, var(--csg-pkind-color, #0d6efd) 88%, #000) !important;
+    color: #fff !important;
+}
+
+/* 题目标题显示样式 */
+.question-title-display {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.question-title-display.question-title-list {
+    max-width: 250px;
+}
+
+.question-title-display.question-title-selected {
+    width: 180px;
+}
+
+.question-label-display {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100px;
+}
+
+/* 可编辑字段基础样式 */
+.prule-editable,
+.pscore-editable {
+    cursor: pointer;
+    color: #0a58ca;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    border: 1px dashed rgba(13, 110, 253, 0.35);
+    background-color: rgba(13, 110, 253, 0.06);
+    border-radius: 0.375rem;
+    padding: 0.1rem 0.35rem;
+    line-height: 1.35;
+}
+
+.prule-editable {
+    max-width: 120px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pscore-editable {
+    font-weight: 500;
+}
+
+.prule-editable:hover,
+.pscore-editable:hover {
+    color: #084298 !important;
+    background-color: rgba(13, 110, 253, 0.12);
+    border-style: solid;
+    border-color: rgba(13, 110, 253, 0.45);
+}
+
+.prule-editable:active,
+.pscore-editable:active {
+    color: #062c6a !important;
+    background-color: rgba(13, 110, 253, 0.16);
+    border-color: rgba(13, 110, 253, 0.6);
+}
+
+/* 工具栏样式 */
+#question_selected_table_toobar {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0.5rem;
+}
+
+#question_selected_table_toobar .btn-group .btn {
+    border-radius: 0.375rem;
+    margin-left: 0.25rem;
+}
+
+#question_selected_table_toobar .btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+/* 编辑模态框样式优化 */
+#question_edit_modal .modal-body {
+    padding: 1.25rem;
+}
+
+#question_edit_modal .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+#question_edit_modal #edit_field_input {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#question_edit_modal #edit_field_input:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+#question_edit_modal .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+}
+
+#question_edit_modal .modal-footer .btn {
+    margin-left: 0.5rem;
+}
+
+#question_edit_modal .modal-footer .btn:first-child {
+    margin-left: 0;
+}
+
+/* 总分显示样式 */
+#total_score_span {
+    font-size: 1.1rem;
+    /* margin-left 已由父容器的 gap-2 处理，无需单独设置 */
+}
+
+/* 总分容器与按钮组之间的间距 */
+#question_selected_table_toobar > div:first-child {
+    margin-right: 0.375rem; /* 6px 间距 */
+}
+
+/* 左右栏工具栏固定高度，确保表头对齐 */
+#question_filter_toolbar,
+#question_selected_table_toobar {
+    min-height: 3rem; /* 固定最小高度，确保左右栏表头对齐 */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* Bootstrap Table 自动生成的 fixed-table-toolbar 固定高度，确保两个表的表头对齐 */
+#question_list_table.bootstrap-table .fixed-table-toolbar,
+#question_selected_table.bootstrap-table .fixed-table-toolbar {
+    min-height: 3rem !important;
+    height: 3rem !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* 文件输入隐藏 */
+#config_file_input {
+    display: none;
+}
+
+/* 紧凑按钮样式 - 用于下载/上传配置按钮 */
+.btn-compact {
+    padding: 0.15rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+    min-height: auto !important;
+}
+
+.btn-compact i {
+    font-size: 0.85rem !important;
+    margin: 0 !important;
+}
+
+.btn-compact .en-text {
+    font-size: 0.7em !important;
+    margin-top: 0 !important;
+}
+
+.btn-group .btn-check:checked + .btn:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+}
+
+.btn-group .btn-check:not(:checked) + .btn:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* 练习模板管理工具栏：重排 / 批量替换 / 剔除 三钮等高（双语 + 图标行对齐） */
+#tpl_toolbar .tpl-toolbar-equal-actions {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+#tpl_toolbar .tpl-toolbar-equal-actions > .tpl-toolbar-twinline-btn {
+    align-self: stretch;
+    display: inline-flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    white-space: normal !important; /* 覆盖 bilingual.css .btn nowrap，保证纵向双语换行一致 */
+    text-align: center;
+}
+
+#tpl_toolbar .tpl-toolbar-action-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    min-height: 1.25em;
+}
+
+/* 与 Bootstrap Icons 占位同宽，避免无图标钮顶行偏矮 */
+#tpl_toolbar .tpl-toolbar-action-icon-slot {
+    display: inline-block;
+    width: 1em;
+    min-width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    vertical-align: -0.1em;
+}
+
+/* 批量替换模板标题 Modal：测试/提交双语纵向；正则框聚焦时突出常用预设 */
+#tplBulkReplaceModal .tpl-bulk-test-btn,
+#tplBulkReplaceModal .tpl-bulk-submit-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    white-space: normal !important;
+    text-align: center;
+}
+
+#tplBulkReplaceModal .tpl-bulk-preset-wrap--focus {
+    outline: 2px solid rgba(13, 110, 253, 0.35);
+    outline-offset: 3px;
+    border-radius: 0.35rem;
+    transition: outline-color 0.15s ease;
+}

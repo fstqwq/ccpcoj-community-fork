@@ -1,0 +1,73 @@
+/**
+ * 颁奖全屏投屏：自托管 Noto 子集 + 舞台默认字体栈
+ * 路径相对 ojweb/public/static/fonts/award_pres/
+ */
+@font-face {
+    font-family: "AW Noto Sans SC";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("./NotoSansSC-500-sub.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "AW Noto Sans SC";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("./NotoSansSC-700-sub.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "AW Noto Serif SC";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("./NotoSerifSC-700-sub.woff2") format("woff2");
+}
+
+.award-presentation-stage {
+    font-family:
+        "AW Noto Sans SC",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        "Source Han Sans SC",
+        "Noto Sans SC",
+        system-ui,
+        sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1;
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+}
+
+.award-presentation-head .award-presentation-title {
+    font-family:
+        "AW Noto Serif SC",
+        "Songti SC",
+        "STSong",
+        "Noto Serif SC",
+        "Source Han Serif SC",
+        "Times New Roman",
+        serif;
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.award-presentation-head .award-presentation-subtitle,
+.award-presentation-head .award-presentation-group {
+    font-family:
+        "AW Noto Sans SC",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        sans-serif;
+}
+
+.award-presentation-toolbar--overlay .btn {
+    font-family: inherit;
+}
+
+.award-presentation-page-info {
+    font-family: "AW Noto Sans SC", inherit;
+    font-variant-numeric: tabular-nums;
+}

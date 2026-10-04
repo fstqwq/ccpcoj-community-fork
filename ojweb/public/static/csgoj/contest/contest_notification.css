@@ -1,0 +1,335 @@
+/* 公告栏独立面板样式 - Bootstrap 5 风格 */
+
+/* z-index 基准值 */
+:root {
+    --notification-z-index-base: 600;
+}
+
+/* 公告栏切换按钮 */
+.contest-notification-toggle {
+    height: 32px;
+    width: 32px;
+    padding: 0;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: calc(var(--notification-z-index-base) + 22);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.contest-notification-toggle:hover {
+    transform: scale(1.05);
+}
+
+.contest-notification-toggle i {
+    font-size: 1rem;
+}
+
+/* 未读提示样式 */
+.contest-notification-toggle.has-unread {
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    animation: pulse-red 2s infinite;
+}
+
+.contest-notification-toggle.has-unread i {
+    color: #dc3545;
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* 公告栏面板基础样式 */
+#contest_notification_panel {
+    width: 320px;
+    max-width: 90vw;
+    z-index: calc(var(--notification-z-index-base) + 21);
+    display: none !important; /* 默认隐藏 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    /* 高度由 JavaScript 动态计算，确保不超出窗口 */
+    /* 默认 opacity 为 0，在位置计算完成后才显示 */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#contest_notification_panel.show {
+    display: flex !important; /* 显示时使用 flex */
+}
+
+/* 面板头部 */
+.contest-notification-panel-header {
+    height: 42px;
+    padding: 0 1rem;
+    background-color: var(--bs-secondary-bg, #e9ecef);
+    color: var(--bs-secondary-color, #6c757d);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    cursor: grab;
+}
+
+.contest-notification-panel-header .btn,
+.contest-notification-panel-header a {
+    cursor: pointer;
+}
+
+.contest-notification-panel-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.contest-notification-panel-title i {
+    font-size: 1.1rem;
+    color: var(--bs-primary, #0d6efd);
+}
+
+.contest-notification-panel-title .en-text {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-left: 0.25rem;
+}
+
+/* 面板内容区域 */
+.contest-notification-panel-body {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+    background-color: var(--bs-body-bg, #ffffff);
+}
+
+/* 公告内容样式 */
+#contest_notification_div {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--bs-body-color, #212529);
+}
+
+#contest_notification_div h1,
+#contest_notification_div h2,
+#contest_notification_div h3,
+#contest_notification_div h4,
+#contest_notification_div h5,
+#contest_notification_div h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--bs-body-color, #212529);
+}
+
+#contest_notification_div h1 {
+    font-size: 1.5rem;
+}
+
+#contest_notification_div h2 {
+    font-size: 1.3rem;
+}
+
+#contest_notification_div h3 {
+    font-size: 1.1rem;
+}
+
+#contest_notification_div p {
+    margin-bottom: 0.75rem;
+}
+
+#contest_notification_div ul,
+#contest_notification_div ol {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+}
+
+#contest_notification_div code {
+    background-color: var(--bs-secondary-bg, #e9ecef);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.85em;
+    color: var(--bs-danger, #dc3545);
+}
+
+#contest_notification_div pre {
+    background-color: var(--bs-secondary-bg, #f8f9fa);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    overflow-x: auto;
+    margin-bottom: 0.75rem;
+}
+
+/* 查看完整公告 Modal 样式 - 确保内容自动折行，不出现横向滚动条 */
+#announcement_view_modal .modal-body {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#announcement_view_modal .modal-body .md_display_div {
+    max-width: 100% !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+}
+
+/* Modal 中的表格自动适应宽度 */
+#announcement_view_modal .md_display_div table {
+    max-width: 100% !important;
+    width: 100% !important;
+    table-layout: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#announcement_view_modal .md_display_div table td,
+#announcement_view_modal .md_display_div table th {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
+
+/* Modal 中的代码块和 pre 标签自动换行 */
+#announcement_view_modal .md_display_div pre,
+#announcement_view_modal .md_display_div code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
+/* Modal 中的所有元素都确保不超出容器 */
+#announcement_view_modal .md_display_div * {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Modal 中的图片自适应 */
+#announcement_view_modal .md_display_div img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Modal 中的链接和文本内容 - 确保换行正常显示 */
+#announcement_view_modal .md_display_div a,
+#announcement_view_modal .md_display_div p,
+#announcement_view_modal .md_display_div div,
+#announcement_view_modal .md_display_div span {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important; /* 确保换行正常显示 */
+}
+
+/* Modal 中的段落和文本块 - 确保换行符和 <br> 标签生效 */
+#announcement_view_modal .md_display_div p,
+#announcement_view_modal .md_display_div div,
+#announcement_view_modal .md_display_div li {
+    white-space: pre-line !important; /* pre-line 保留换行符，但合并空格 */
+}
+
+#contest_notification_div pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+#contest_notification_div blockquote {
+    border-left: 3px solid var(--bs-border-color, #dee2e6);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--bs-secondary-color, #6c757d);
+    font-style: italic;
+}
+
+#contest_notification_div table {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    border-collapse: collapse;
+}
+
+#contest_notification_div table th,
+#contest_notification_div table td {
+    padding: 0.5rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+#contest_notification_div table th {
+    background-color: var(--bs-secondary-bg, #f8f9fa);
+    font-weight: 600;
+}
+
+/* 自定义滚动条 */
+.contest-notification-panel-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.contest-notification-panel-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.contest-notification-panel-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.contest-notification-panel-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 大屏幕模式：悬浮在 main 区域右侧 */
+@media (min-width: 1400px) {
+    #contest_notification_panel {
+        position: fixed;
+        top: 0;
+        /* 默认位置：基于1200px内容宽度计算，JavaScript会动态调整 */
+        right: clamp(12px, (100vw - 1200px)/2 - 320px, 100px);
+        transform: none;
+    }
+}
+
+/* 小屏幕模式：在右侧贴边 */
+@media (max-width: 1399px) {
+    #contest_notification_panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: auto;
+        transform: none;
+    }
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    #contest_notification_panel {
+        width: calc(100vw - 2rem);
+        max-width: 90vw;
+    }
+    
+    .contest-notification-panel-header {
+        padding: 0 0.75rem;
+    }
+    
+    .contest-notification-panel-title {
+        font-size: 0.85rem;
+    }
+    
+    .contest-notification-panel-body {
+        padding: 0.75rem;
+    }
+    
+    #contest_notification_div {
+        font-size: 0.8rem;
+    }
+}

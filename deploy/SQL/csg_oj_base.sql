@@ -1,0 +1,822 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.2
+-- https://www.phpmyadmin.net/
+--
+-- 主机： db
+-- 生成日期： 2025-12-28 01:59:57
+-- 服务器版本： 8.0.32
+-- PHP 版本： 8.2.29
+--
+-- 注意：此文件包含最新的数据库结构
+-- 新系统导入此文件后无需再执行任何更新脚本
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- 数据库： `csgcpc_csgoj`
+--
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `backtask`
+--
+
+CREATE TABLE IF NOT EXISTS `backtask` (
+  `task_id` bigint NOT NULL AUTO_INCREMENT,
+  `task_type` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '任务类型（代码层定义/分发）',
+  `task_params` json DEFAULT NULL COMMENT '任务参数（JSON）',
+  `status` smallint UNSIGNED NOT NULL DEFAULT '0' COMMENT '状态码：0待执行 10执行中 20成功 30失败 40取消',
+  `priority` tinyint UNSIGNED NOT NULL DEFAULT '0' COMMENT '优先级（越大越优先）',
+  `attempt` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '已尝试次数',
+  `max_attempt` int UNSIGNED NOT NULL DEFAULT '3' COMMENT '最大尝试次数',
+  `scheduled_at` datetime DEFAULT NULL COMMENT '计划执行时间（为空表示立即）',
+  `started_at` datetime DEFAULT NULL COMMENT '开始执行时间',
+  `finished_at` datetime DEFAULT NULL COMMENT '完成时间',
+  `locked_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '执行进程标识（hostname/pid等）',
+  `locked_at` datetime DEFAULT NULL COMMENT '锁定时间（被取走执行）',
+  `heartbeat_at` datetime DEFAULT NULL COMMENT '执行心跳时间（可用于判定卡死/超时）',
+  `last_code` int NOT NULL DEFAULT '0' COMMENT '最近一次执行状态码（业务/异常码）',
+  `last_message` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '最近一次执行简述',
+  `result` json DEFAULT NULL COMMENT '执行结果（JSON）',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`task_id`),
+  KEY `idx_backtask_status_sched` (`status`,`scheduled_at`,`priority`,`task_id`),
+  KEY `idx_backtask_type` (`task_type`),
+  KEY `idx_backtask_locked` (`locked_by`,`locked_at`),
+  KEY `idx_backtask_updated` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='后台任务队列表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `backtask_log`
+--
+
+CREATE TABLE IF NOT EXISTS `backtask_log` (
+  `log_id` bigint NOT NULL AUTO_INCREMENT,
+  `task_id` bigint NOT NULL COMMENT '关联 backtask.task_id',
+  `level` tinyint UNSIGNED NOT NULL DEFAULT '10' COMMENT '日志等级：10info 20warning 30error',
+  `status` smallint UNSIGNED NOT NULL DEFAULT '0' COMMENT '状态码（业务/步骤码）',
+  `message` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '简短信息',
+  `detail` json DEFAULT NULL COMMENT '详情（JSON）',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`),
+  KEY `idx_backtask_log_task_created` (`task_id`,`created_at`),
+  KEY `idx_backtask_log_level_created` (`level`,`created_at`),
+  CONSTRAINT `fk_backtask_log_task` FOREIGN KEY (`task_id`) REFERENCES `backtask` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='后台任务执行日志表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `clss`
+--
+
+CREATE TABLE IF NOT EXISTS `clss` (
+  `clss_id` int NOT NULL AUTO_INCREMENT,
+  `clss_title` varchar(255) NOT NULL,
+  `clss_year` int DEFAULT '-1',
+  `clss_semester` varchar(48) NOT NULL,
+  `in_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'C',
+  PRIMARY KEY (`clss_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `compileinfo`
+--
+
+CREATE TABLE IF NOT EXISTS `compileinfo` (
+  `solution_id` int NOT NULL DEFAULT '0',
+  `error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest`
+--
+
+CREATE TABLE IF NOT EXISTS `contest` (
+  `contest_rank_kind` varchar(8) NOT NULL DEFAULT 'icpc',
+  `ccpc_reveal_policy` varchar(16) NOT NULL DEFAULT 'min_50_20',
+  `contest_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `private` tinyint NOT NULL DEFAULT '0',
+  `langmask` int UNSIGNED NOT NULL DEFAULT '0' COMMENT 'bits for LANG to mask',
+  `password` char(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `clss_id` int NOT NULL DEFAULT '-1',
+  `attach` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '',
+  `topteam` int NOT NULL DEFAULT '1',
+  `award_ratio` int NOT NULL DEFAULT '20015010' COMMENT '获奖比例',
+  `flg_award_qty_mode` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '0=金银铜为百分比(0-100) 1=金银铜为个数',
+  `frozen_minute` int NOT NULL DEFAULT '-1' COMMENT '封榜分钟数',
+  `frozen_after` int NOT NULL DEFAULT '-1' COMMENT '结束后持续封榜分钟数',
+  `teachers` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `addition` json DEFAULT NULL COMMENT '附加信息',
+  `flg_archive` tinyint NOT NULL DEFAULT '0' COMMENT '是否归档',
+  `notification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '公告（队伍面板中显示）',
+  PRIMARY KEY (`contest_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_balloon`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_balloon` (
+  `contest_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `team_id` varchar(64) NOT NULL,
+  `room` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ac_time` int NOT NULL,
+  `pst` tinyint NOT NULL COMMENT 'problem status，2 ac、3 fb',
+  `bst` tinyint NOT NULL COMMENT 'balloon status, 4分配,5已发',
+  `balloon_sender` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`contest_id`,`problem_id`,`team_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='比赛的气球任务管理表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_md`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_md` (
+  `contest_id` int NOT NULL AUTO_INCREMENT,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `notification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '公告 Markdown（队伍面板中显示）',
+  PRIMARY KEY (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_msg`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_msg` (
+  `msg_id` int NOT NULL AUTO_INCREMENT,
+  `contest_id` int NOT NULL,
+  `content` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `in_date` datetime NOT NULL,
+  `team_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`msg_id`),
+  KEY `contest_id` (`contest_id`),
+  CONSTRAINT `contest_msg_ibfk_1` FOREIGN KEY (`contest_id`) REFERENCES `contest` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_print`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_print` (
+  `print_id` int NOT NULL AUTO_INCREMENT,
+  `contest_id` int DEFAULT NULL,
+  `team_id` char(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `source` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `print_status` tinyint DEFAULT '0',
+  `in_date` datetime NOT NULL,
+  `ip` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `code_length` int NOT NULL DEFAULT '0',
+  `room` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`print_id`),
+  KEY `idx_contest_print_contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_problem`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_problem` (
+  `problem_id` int NOT NULL DEFAULT '0',
+  `contest_id` int DEFAULT NULL,
+  `title` char(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `num` int NOT NULL DEFAULT '0',
+  `pscore` double NOT NULL DEFAULT '0',
+  KEY `Index_contest_id` (`contest_id`),
+  KEY `idx_contest_problem_problem_id` (`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_topic`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_topic` (
+  `topic_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `reply` int DEFAULT '0' COMMENT '正数回复的topic_id，负数被回复次数',
+  `public_show` tinyint DEFAULT '0',
+  `contest_id` int NOT NULL DEFAULT '-1',
+  `in_date` datetime DEFAULT NULL,
+  `problem_id` int DEFAULT NULL,
+  PRIMARY KEY (`topic_id`),
+  KEY `idx_contest_topic_contest_problem` (`contest_id`,`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `course`
+--
+
+CREATE TABLE IF NOT EXISTS `course` (
+  `course_id` int NOT NULL AUTO_INCREMENT,
+  `course_key` varchar(32) NOT NULL,
+  `course_title` varchar(128) NOT NULL,
+  `course_description` text NOT NULL,
+  `course_config` json NOT NULL,
+  `course_kind` int NOT NULL DEFAULT '3',
+  `course_unit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '单位，如：人工智能学院',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`course_id`,`course_key`),
+  UNIQUE KEY `course_key` (`course_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `course_item`
+--
+
+CREATE TABLE IF NOT EXISTS `course_item` (
+  `course_item_id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL COMMENT '课程ID，对应course表',
+  `item` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '资源类型：contest、ex_question、problem、news等',
+  `item_id` int NOT NULL COMMENT '资源ID，对应各表的xxx_id',
+  `pvrole` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '角色标识',
+  PRIMARY KEY (`course_item_id`),
+  UNIQUE KEY `uk_course_item_pvrole` (`course_id`,`item`,`item_id`,`pvrole`),
+  KEY `idx_course_item` (`course_id`,`item`,`item_id`),
+  KEY `idx_item_itemid` (`item`,`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='课程资源映射表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `cpc_client`
+--
+
+CREATE TABLE IF NOT EXISTS `cpc_client` (
+  `client_id` int NOT NULL AUTO_INCREMENT,
+  `contest_id` int NOT NULL,
+  `team_id_bind` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '绑定队伍号',
+  `ip_bind` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '绑定IP',
+  `ssh_config` json DEFAULT NULL COMMENT 'SSH配置，支持rsa和user/pass两种方式，以及ssh port存储',
+  `status` json DEFAULT NULL COMMENT '客户端状态（JSON，记录各类状态）',
+  PRIMARY KEY (`client_id`),
+  KEY `contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `cpc_team`
+--
+
+CREATE TABLE IF NOT EXISTS `cpc_team` (
+  `team_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `contest_id` int NOT NULL,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `tmember` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `tkind` tinyint NOT NULL DEFAULT '0' COMMENT '"常规"（0）、"女队"（1）、"打星"（2） ',
+  `coach` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `school` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `room` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `privilege` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '账号权限',
+  `team_global_code` varchar(66) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'default',
+  `region` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '队伍所属国家',
+  `addition` json DEFAULT NULL COMMENT '附加信息',
+  `name_en` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`team_id`,`contest_id`),
+  KEY `idx_cpc_team_contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `contest_group`
+--
+
+CREATE TABLE IF NOT EXISTS `contest_group` (
+  `contest_id` int NOT NULL,
+  `group_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '稳定ID（slug）',
+  `group_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '显示名',
+  `group_name_en` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '英文显示名',
+  `group_order` int NOT NULL DEFAULT '0' COMMENT '排序',
+  `award_ratio_gold` int NOT NULL DEFAULT '10' COMMENT '金奖比例',
+  `award_ratio_silver` int NOT NULL DEFAULT '15' COMMENT '银奖比例',
+  `award_ratio_bronze` int NOT NULL DEFAULT '20' COMMENT '铜奖比例',
+  `flg_award_qty_mode` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '0=金银铜为百分比 1=金银铜为个数',
+  `topteam` int NOT NULL DEFAULT '1' COMMENT '学校排名前N队',
+  `star_mode` tinyint NOT NULL DEFAULT '0' COMMENT '打星模式：0不排名 1不含打星 2参与排名',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `addition` json DEFAULT NULL COMMENT '扩展信息',
+  PRIMARY KEY (`contest_id`,`group_id`),
+  KEY `idx_contest_group_order` (`contest_id`,`group_order`),
+  KEY `idx_contest_group_defunct` (`contest_id`,`defunct`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='比赛分组配置表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `cpc_team_group`
+--
+
+CREATE TABLE IF NOT EXISTS `cpc_team_group` (
+  `contest_id` int NOT NULL,
+  `team_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `group_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `in_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`contest_id`,`team_id`,`group_id`),
+  KEY `idx_cpc_team_group_gid` (`contest_id`,`group_id`,`team_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='比赛队伍分组关系表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `custominput`
+--
+
+CREATE TABLE IF NOT EXISTS `custominput` (
+  `solution_id` int NOT NULL DEFAULT '0',
+  `input_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ex_asheet`
+--
+
+CREATE TABLE IF NOT EXISTS `ex_asheet` (
+  `ex_asheet_id` int NOT NULL AUTO_INCREMENT,
+  `examinee_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'cpc_team表的team_id',
+  `ex_question_id` int NOT NULL,
+  `submission` json NOT NULL,
+  `exam_id` int NOT NULL,
+  `create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `score` float DEFAULT NULL,
+  `notes` varchar(2048) DEFAULT NULL COMMENT '人工阅卷备注',
+  `reviewer` char(48) DEFAULT NULL COMMENT '阅卷人',
+  PRIMARY KEY (`ex_asheet_id`),
+  KEY `idx_ex_asheet_exam_id` (`exam_id`),
+  KEY `idx_ex_asheet_ex_question_id` (`ex_question_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='答卷';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ex_question`
+--
+
+CREATE TABLE IF NOT EXISTS `ex_question` (
+  `ex_question_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(2048) NOT NULL COMMENT '标题',
+  `pkind` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'choice' COMMENT '题目类型(0choice,5TrueFalse,10Fill,15ShorAnswer,20Comprehensive,25Programming）',
+  `description` text NOT NULL,
+  `content` json DEFAULT NULL,
+  `answer` json DEFAULT NULL,
+  `answer_explain` json DEFAULT NULL COMMENT '答案解析',
+  `attach` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `source` varchar(255) NOT NULL,
+  `author` varchar(255) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `uni_id` char(36) NOT NULL,
+  `create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ex_question_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `loginlog`
+--
+
+CREATE TABLE IF NOT EXISTS `loginlog` (
+  `user_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `success` tinyint NOT NULL DEFAULT '0',
+  `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  KEY `user_time_index` (`user_id`,`time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `mail`
+--
+
+CREATE TABLE IF NOT EXISTS `mail` (
+  `mail_id` int NOT NULL AUTO_INCREMENT,
+  `to_user` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'user_id',
+  `from_user` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'user_id',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `new_mail` tinyint(1) NOT NULL DEFAULT '1',
+  `reply` int DEFAULT '-1',
+  `in_date` datetime DEFAULT NULL,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`mail_id`),
+  KEY `uid` (`to_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `news`
+--
+
+CREATE TABLE IF NOT EXISTS `news` (
+  `news_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'user_id',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `time` datetime DEFAULT NULL,
+  `importance` tinyint NOT NULL DEFAULT '0',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `tags` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `category` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `modify_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modify_user_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `attach` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '',
+  PRIMARY KEY (`news_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `news_md`
+--
+
+CREATE TABLE IF NOT EXISTS `news_md` (
+  `news_id` int NOT NULL,
+  `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`news_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `news_tag`
+--
+
+CREATE TABLE IF NOT EXISTS `news_tag` (
+  `news_id` int DEFAULT NULL,
+  `tag` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `outrank`
+--
+
+CREATE TABLE IF NOT EXISTS `outrank` (
+  `outrank_id` int NOT NULL AUTO_INCREMENT,
+  `outrank_uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `in_date` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `ckind` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `addition` json DEFAULT NULL COMMENT '附加信息',
+  `flg_allow` tinyint NOT NULL DEFAULT '1' COMMENT '是否允许推送',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0' COMMENT '0=启用 1=禁用 2=已删除(软删)',
+  PRIMARY KEY (`outrank_id`),
+  UNIQUE KEY `outrank_uuid` (`outrank_uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `privilege`
+--
+
+CREATE TABLE IF NOT EXISTS `privilege` (
+  `privilege_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` char(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `pvrole` char(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `addition` json DEFAULT NULL COMMENT '附加信息',
+  PRIMARY KEY (`privilege_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `privilege_item`
+--
+
+CREATE TABLE IF NOT EXISTS `privilege_item` (
+  `privilege_item_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `rightitem` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `item_id` int NOT NULL DEFAULT '0',
+  `pvrole` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`privilege_item_id`),
+  UNIQUE KEY `uk_user_rightitem_item_pvrole` (`user_id`,`rightitem`,`item_id`,`pvrole`),
+  KEY `idx_user_rightitem_item` (`user_id`,`rightitem`,`item_id`),
+  KEY `idx_rightitem_item` (`rightitem`,`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `problem`
+--
+
+CREATE TABLE IF NOT EXISTS `problem` (
+  `problem_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `output` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `sample_input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `sample_output` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `spj` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0',
+  `hint` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `in_date` datetime DEFAULT NULL,
+  `time_limit` double NOT NULL DEFAULT '1',
+  `memory_limit` int NOT NULL DEFAULT '256',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `accepted` int DEFAULT '0',
+  `submit` int DEFAULT '0',
+  `solved` int DEFAULT '0',
+  `author` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `attach` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '',
+  `archived` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`problem_id`),
+  KEY `idx_problem_defunct_spj` (`defunct`,`spj`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `problem_md`
+-- 每道题目每种语言一行：仅存 Markdown/LaTeX 源码；`locale_key` 与 `problem_locale` 一致。
+--
+
+CREATE TABLE IF NOT EXISTS `problem_md` (
+  `problem_id` int NOT NULL,
+  `locale_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '语言键，与 problem_locale 一致；pdf_desc 下 PDF 文件名为 {locale_key}.pdf',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `output` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `hint` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `author` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`problem_id`,`locale_key`),
+  KEY `idx_problem_md_problem` (`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `problem_locale`（每语言一行：排序、显示名、PDF 开关、做题端可见性；题面 Markdown 在 problem_md，物化 HTML 在 problem_locale_html）
+--
+
+CREATE TABLE IF NOT EXISTS `problem_locale` (
+  `problem_id` int NOT NULL,
+  `locale_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `sort_order` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '同一题内顺序，1 为首选展示语言，数值小优先',
+  `locale_label` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `use_pdf` tinyint(1) NOT NULL DEFAULT 0 COMMENT '该语言是否使用 PDF 题面',
+  `locale_visible` tinyint(1) NOT NULL DEFAULT 1 COMMENT '做题端是否展示（0=仅管理端保留）',
+  PRIMARY KEY (`problem_id`,`locale_key`),
+  KEY `idx_problem_locale_problem` (`problem_id`),
+  KEY `idx_problem_locale_problem_sort` (`problem_id`,`sort_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `problem_locale_html`
+-- 每道题目每种语言一行：Pandoc 物化后的题面 HTML；`locale_key` 与 `problem_locale` / `problem_md` 一致。
+-- 做题端只读本表 + `problem` 主表（首选语言副本），不在 GET 路径对 `problem_md` 再编译。
+--
+
+CREATE TABLE IF NOT EXISTS `problem_locale_html` (
+  `problem_id` int NOT NULL,
+  `locale_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '语言键，与 problem_locale 一致',
+  `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `input` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `output` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `hint` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `author` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`problem_id`,`locale_key`),
+  KEY `idx_problem_locale_html_problem` (`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `regcontest`
+--
+
+CREATE TABLE IF NOT EXISTS `regcontest` (
+  `regcontest_id` int NOT NULL AUTO_INCREMENT,
+  `contest_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `contest_start` datetime DEFAULT NULL,
+  `contest_end` datetime DEFAULT NULL,
+  `contest_startreg` datetime DEFAULT NULL,
+  `contest_endreg` datetime DEFAULT NULL,
+  `contest_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `contest_description_md` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `contest_kind` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `contest_pass` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '比赛加密',
+  `form_require` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`regcontest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `reply`
+--
+
+CREATE TABLE IF NOT EXISTS `reply` (
+  `rid` int NOT NULL AUTO_INCREMENT,
+  `author_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'user_id',
+  `time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `topic_id` int NOT NULL,
+  `status` int NOT NULL DEFAULT '0',
+  `ip` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`rid`),
+  KEY `author_id` (`author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `runtimeinfo`
+--
+
+CREATE TABLE IF NOT EXISTS `runtimeinfo` (
+  `solution_id` int NOT NULL DEFAULT '0',
+  `error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `sim`
+--
+
+CREATE TABLE IF NOT EXISTS `sim` (
+  `s_id` int NOT NULL,
+  `sim_s_id` int DEFAULT NULL,
+  `sim` int DEFAULT NULL,
+  PRIMARY KEY (`s_id`),
+  KEY `Index_sim_id` (`sim_s_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `solution`
+--
+
+CREATE TABLE IF NOT EXISTS `solution` (
+  `solution_id` int NOT NULL AUTO_INCREMENT,
+  `problem_id` int NOT NULL DEFAULT '0',
+  `user_id` char(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `nick` char(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `time` int NOT NULL DEFAULT '0',
+  `memory` int NOT NULL DEFAULT '0',
+  `in_date` datetime NOT NULL DEFAULT '2016-05-13 19:24:00',
+  `result` smallint NOT NULL DEFAULT '0',
+  `language` int UNSIGNED NOT NULL DEFAULT '0',
+  `ip` char(46) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `contest_id` int DEFAULT '0',
+  `valid` tinyint NOT NULL DEFAULT '1',
+  `num` tinyint NOT NULL DEFAULT '-1',
+  `code_length` int NOT NULL DEFAULT '0',
+  `judgetime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `pass_rate` decimal(3,2) UNSIGNED NOT NULL DEFAULT '0.00',
+  `lint_error` int UNSIGNED NOT NULL DEFAULT '0',
+  `judger` char(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'LOCAL',
+  `course_id` int DEFAULT NULL,
+  PRIMARY KEY (`solution_id`),
+  KEY `uid` (`user_id`),
+  KEY `pid` (`problem_id`),
+  KEY `res` (`result`),
+  KEY `cid` (`contest_id`),
+  KEY `idx_solution_problem_contest` (`problem_id`,`contest_id`),
+  KEY `idx_solution_problem_result` (`problem_id`,`result`),
+  KEY `idx_solution_contest_result` (`contest_id`,`result`),
+  KEY `idx_solution_user_contest` (`user_id`,`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `source_code`
+--
+
+CREATE TABLE IF NOT EXISTS `source_code` (
+  `solution_id` int NOT NULL,
+  `source` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `source_code_user`
+--
+
+CREATE TABLE IF NOT EXISTS `source_code_user` (
+  `solution_id` int NOT NULL,
+  `source` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `topic`
+--
+
+CREATE TABLE IF NOT EXISTS `topic` (
+  `tid` int NOT NULL AUTO_INCREMENT,
+  `title` varbinary(60) NOT NULL,
+  `status` int NOT NULL DEFAULT '0',
+  `top_level` int NOT NULL DEFAULT '0',
+  `cid` int DEFAULT NULL,
+  `pid` int NOT NULL,
+  `author_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'user_id',
+  PRIMARY KEY (`tid`),
+  KEY `cid` (`cid`,`pid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `users`
+--
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'user_id',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `submit` int DEFAULT '0',
+  `solved` int DEFAULT '0',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'N',
+  `ip` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `accesstime` datetime DEFAULT NULL,
+  `volume` int NOT NULL DEFAULT '1',
+  `language` int NOT NULL DEFAULT '1',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `reg_time` datetime DEFAULT NULL,
+  `nick` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `school` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

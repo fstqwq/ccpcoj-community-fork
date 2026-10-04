@@ -1,0 +1,531 @@
+/* expsys 榜单样式 - 素雅风格 */
+#rank-table {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+#rank-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.75rem 0.5rem;
+}
+
+/* 题号表头链接样式 */
+#rank-table thead th .problem-header-link {
+    display: inline-block;
+    font-size: 1.15em;
+    font-weight: 700;
+    color: #0d6efd;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(13, 110, 253, 0.1);
+}
+
+#rank-table thead th .problem-header-link:hover {
+    background-color: #e7f1ff;
+    color: #0a58ca;
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+    text-shadow: 0 1px 3px rgba(13, 110, 253, 0.2);
+}
+
+#rank-table thead th .problem-header-link:active {
+    transform: scale(1.05);
+    box-shadow: 0 1px 2px rgba(13, 110, 253, 0.15);
+}
+
+/* 固定表头容器样式（JavaScript 实现） */
+.rank-table-fixed-header-wrapper {
+    display: none; /* 默认隐藏，由 JavaScript 控制显示 */
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rank-table-fixed-header-wrapper table {
+    margin-bottom: 0;
+}
+
+.rank-table-fixed-header-wrapper thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.75rem 0.5rem;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+#rank-table tbody td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+}
+
+#rank-table .team-name-cn {
+    font-weight: 500;
+    color: #212529;
+}
+
+#rank-table .team-name-en {
+    font-size: 0.85em;
+    margin-top: 2px;
+    color: #6c757d;
+}
+
+#rank-table .penalty-time {
+    text-align: center;
+}
+
+#rank-table .penalty-minutes {
+    font-weight: 500;
+    color: #212529;
+}
+
+#rank-table .penalty-hms {
+    font-size: 0.85em;
+    margin-top: 2px;
+}
+
+#rank-table .problem-status {
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    min-width: 50px;
+    display: inline-block;
+}
+
+#rank-table .problem-ac {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#rank-table .problem-wa {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+#rank-table .problem-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+#rank-table .problem-none {
+    color: #6c757d;
+}
+
+#rank-table .problem-submit-count {
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+#rank-table .problem-time {
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+/* 可点击的题目单元格样式 */
+#rank-table .problem-cell-clickable {
+    position: relative;
+}
+
+#rank-table .problem-cell-clickable:hover .problem-status {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0.9;
+}
+
+#rank-table .problem-cell-clickable:active .problem-status {
+    transform: scale(0.98);
+}
+
+/* 学号样式 */
+#rank-table .user-id-text {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+#rank-table .user-id-unit-line {
+    line-height: 1.3;
+}
+
+#rank-loading {
+    display: block;
+}
+
+/* 提交记录 Modal 双语表头样式 - 参考 basecss.css */
+.bilingual-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.bilingual-header .header-cn {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1.2;
+}
+
+.bilingual-header .header-en {
+    font-size: 0.7em;
+    font-weight: 400;
+    color: #6c757d;
+    opacity: 0.8;
+    line-height: 1.2;
+}
+
+/* 提交记录弹窗内通用 .en-text（表头以外，如按钮） */
+#exp-rank-solution-modal .en-text {
+    font-size: 0.85em;
+    color: #6c757d;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+/*
+ * 以下样式仅作用于「榜单页提交记录」弹窗 #exp-rank-solution-modal，
+ * 且仅针对其中的 #status_table_modal，避免影响 contest/status 等其它复用同套 status 表的页面。
+ * 窄屏下列宽：账号列加宽、结果列收窄；整体更小更紧凑。
+ */
+#exp-rank-solution-modal #status_table_modal {
+    font-size: 0.78rem;
+    line-height: 1.25;
+    table-layout: fixed;
+    width: 100% !important;
+    max-width: 100%;
+    margin-bottom: 0;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.36rem 0.32rem;
+    vertical-align: middle;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th .th-inner {
+    padding: 0.32rem 0.3rem !important;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.22;
+}
+
+#exp-rank-solution-modal #status_table_modal thead .en-text {
+    font-size: 0.62em;
+    display: block;
+    margin-top: 0.1em;
+    line-height: 1.15;
+}
+
+#exp-rank-solution-modal #status_table_modal tbody td {
+    padding: 0.34rem 0.32rem;
+    vertical-align: middle;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.28;
+}
+
+#exp-rank-solution-modal #status_table_modal tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/*
+ * 列宽：账号列多占；结果/题号/数字列收紧；语言列需容纳「Language」表头 + C++/Py3 等标签（略加宽并单独内边距）。
+ * 比例在窄 modal 下由 table-layout:fixed 自动挤压未写死列。
+ */
+#exp-rank-solution-modal #status_table_modal thead th[data-field="solution_id"] {
+    width: 4.5rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="user_id"] {
+    width: 24% !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="problem_id"] {
+    width: 2.5rem !important;
+}
+
+/* 结果列：需容纳全局 oj_status.css 中 .result-btn{width:60px} 的徽章按钮 + 单元格 padding */
+#exp-rank-solution-modal #status_table_modal thead th[data-field="result"] {
+    width: 5.1rem !important;
+    min-width: 5rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="pass_rate"] {
+    width: 3.1rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="memory"] {
+    width: 3.45rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="time"] {
+    width: 3.05rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="language"] {
+    width: 5.65rem !important;
+    min-width: 5.25rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="code_length"] {
+    width: 3.55rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="in_date"] {
+    width: 10% !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="judger"] {
+    width: 3rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="rejudge"] {
+    width: 2.5rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th[data-field="sim"] {
+    width: 12% !important;
+}
+
+/* 语言列表头与单元格：左右留白，避免英文表头与 C++ 标签贴边 */
+#exp-rank-solution-modal #status_table_modal thead th.status_language .th-inner {
+    padding-left: 0.42rem !important;
+    padding-right: 0.42rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal tbody td:has(.lang-btn),
+#exp-rank-solution-modal #status_table_modal tbody td:has(.lang-strong) {
+    padding-left: 0.42rem !important;
+    padding-right: 0.42rem !important;
+}
+
+/* 表内按钮、徽章：紧凑但保留触控/视觉留白；语言按钮单独略放大内边距 */
+#exp-rank-solution-modal #status_table_modal .btn-sm {
+    padding: 0.12rem 0.32rem;
+    font-size: 0.68rem;
+    line-height: 1.2;
+}
+
+#exp-rank-solution-modal #status_table_modal .btn:not(.lang-btn) {
+    padding: 0.12rem 0.35rem;
+    font-size: 0.68rem;
+}
+
+#exp-rank-solution-modal #status_table_modal .lang-btn {
+    padding: 0.16rem 0.48rem !important;
+    font-size: 0.7rem !important;
+    line-height: 1.25;
+    border-radius: 0.35rem;
+}
+
+#exp-rank-solution-modal #status_table_modal .badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15em 0.35em;
+}
+
+#exp-rank-solution-modal #status_table_modal .lang-strong {
+    display: inline-block;
+    font-size: 0.74rem !important;
+    font-weight: 600;
+    padding: 0.12rem 0.4rem;
+    line-height: 1.2;
+    border-radius: 0.3rem;
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+/*
+ * 覆盖 oj_status.css 的 .result-btn/.result-span{width:60px}，在窄列里改为自适应且不溢出。
+ * 仅弹窗内生效，status 页仍为 60px。
+ */
+#exp-rank-solution-modal #status_table_modal .result-btn,
+#exp-rank-solution-modal #status_table_modal .result-span {
+    width: auto !important;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.14rem 0.4rem !important;
+    font-size: 0.68rem !important;
+    line-height: 1.2;
+}
+
+#exp-rank-solution-modal #status_table_modal tbody td:has(.result-btn),
+#exp-rank-solution-modal #status_table_modal tbody td:has(.result-span) {
+    padding-left: 0.28rem !important;
+    padding-right: 0.28rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal thead th.status_result .th-inner {
+    padding-left: 0.28rem !important;
+    padding-right: 0.28rem !important;
+}
+
+#exp-rank-solution-modal #status_table_div_modal .fixed-table-pagination,
+#exp-rank-solution-modal #status_table_div_modal .fixed-table-pagination .pagination-info {
+    font-size: 0.72rem;
+    line-height: 1.3;
+}
+
+#exp-rank-solution-modal #status_table_div_modal .pagination .page-link {
+    padding: 0.12rem 0.4rem;
+    font-size: 0.72rem;
+}
+
+/* 提交记录 Modal 标题栏按钮样式 */
+#exp-rank-solution-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+#exp-rank-solution-modal .modal-header .modal-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+}
+
+#exp-rank-solution-modal #exp-solution-view-status-btn {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+}
+
+#exp-rank-solution-modal #exp-solution-view-status-btn .en-text {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 0.25rem;
+}
+
+/*
+ * 提交记录弹窗：加宽于默认 modal-xl，内容在表宽内自适应换行压缩，不出现横向滚动条。
+ * 仅 #exp-rank-solution-modal，不影响其它页面中的 status 表。
+ */
+#exp-rank-solution-modal .exp-rank-solution-modal-dialog {
+    max-width: min(98vw, 1400px);
+    max-height: calc(100vh - 2rem);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    min-width: 0;
+    width: 100%;
+}
+
+#exp-rank-solution-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: min(90vh, calc(100vh - 2rem));
+    overflow-x: hidden;
+}
+
+#exp-rank-solution-modal .modal-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #dee2e6;
+}
+
+#exp-rank-solution-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* flex 子项 min-width:0，避免表格最小内容宽度撑破弹窗；不启用横向滚动 */
+#exp-rank-solution-modal #status_table_div_modal {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#exp-rank-solution-modal #status_table_div_modal .bootstrap-table {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+#exp-rank-solution-modal #status_table_div_modal .fixed-table-container {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/*
+ * 覆盖 FormatterStatusUser 内联 max-width:120px + nowrap，在弹窗加宽账号列后改为可换行，避免与 ID 列挤叠。
+ */
+#exp-rank-solution-modal #status_table_modal .status-user-name,
+#exp-rank-solution-modal #status_table_modal .status-user-id {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#exp-rank-solution-modal #status_table_modal .status-user-id a {
+    font-size: inherit !important;
+    line-height: 1.25;
+}
+
+/*
+ * 仅在此弹窗内覆盖 FormatterSim 内联 nowrap，使相似度格与整表一起在固定列宽下换行。
+ * 选择器必须保留 #exp-rank-solution-modal 前缀，避免影响 /contest/status 等页的 #status_table。
+ */
+#exp-rank-solution-modal #status_table_modal .sim-container {
+    box-sizing: border-box;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.72rem;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#exp-rank-solution-modal #status_table_modal .sim-container .sim-value {
+    font-size: 0.75rem !important;
+}
+
+#exp-rank-solution-modal #status_table_modal .sim-container .sim-user-info {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+}
+
+#exp-rank-solution-modal #status_table_modal .sim-container .sim-user-name {
+    max-width: none !important;
+    white-space: normal !important;
+    display: inline !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    vertical-align: baseline !important;
+}
+

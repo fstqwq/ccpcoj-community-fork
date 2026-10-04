@@ -1,0 +1,7 @@
+{
+  "repository": "library/mysql",
+  "tag": "8.4",
+  "version_executed": "8.4.11",
+  "manifest_digest": "sha256:80f4933e3835f9dc4d35a28ec500d7986cb4414e6c6821c5461239cb7beb8995",
+  "platform": "linux/amd64"
+}

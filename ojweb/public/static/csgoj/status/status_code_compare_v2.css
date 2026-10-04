@@ -1,0 +1,26 @@
+/* VSCode-like compare layout (Monaco Diff) */
+.code-compare-v2 {
+  height: calc(100vh - 120px);
+  min-height: 520px;
+}
+
+.code-compare-v2 .monaco-container {
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.code-compare-v2 .toolbar-hint {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.code-compare-v2 .toolbar-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+

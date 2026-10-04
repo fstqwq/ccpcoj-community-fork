@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# 复制为 docker_run.sh 后按实际环境修改（docker_run.sh 已 gitignore，本文件可入库）。
+#
+# 用法：
+#   ./docker_run.sh.example              仅用镜像内 /oj-proxy（不在此脚本挂载二进制）
+#   ./docker_run.sh.example dev          设 OJ_PROXY_DOCKER_DEV_LOGS=1：文件日志不变，同一行再写 stderr，docker logs 可见
+#   ./docker_run.sh.example log          将宿主 ./dist/log 挂到容器 /log（与镜像内工作目录 / 下的 log 一致）
+#   ./docker_run.sh.example dev log      可同时使用
+#
+# 启动方式对齐 start_db.sh：后台常驻（-dit）、--restart=unless-stopped。
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# ---------- 本机环境（明文修改；写法参考 tests/dev_local_start_script.sh）----------
+IMAGE=csgrandeur/oj-proxy:latest
+CONTAINER_NAME=oj-proxy
+OJ_PROXY_LISTEN_PORT=8080
+OJ_PROXY_PUBLIC_URL=
+OJ_PROXY_UPSTREAM_PASSWORD=
+LINK_LOCAL=
+# ----------------------------------------------------------------------------
+
+if [ -z "$OJ_PROXY_PUBLIC_URL" ]; then
+	echo "错误: 请在本脚本「本机环境」区填写 OJ_PROXY_PUBLIC_URL" >&2
+	exit 1
+fi
+
+if docker ps -a --format '{{.Names}}' | grep -qx "${CONTAINER_NAME}"; then
+	echo "✅ 容器 ${CONTAINER_NAME} 已存在，跳过创建。已停止可: docker start ${CONTAINER_NAME}；重建: docker rm -f ${CONTAINER_NAME}"
+	exit 0
+fi
+
+RUN_DEV=0
+MOUNT_LOG=0
+for a in "$@"; do
+	case "$a" in
+	dev) RUN_DEV=1 ;;
+	log) MOUNT_LOG=1 ;;
+	*)
+		echo "错误: 未知参数 \"$a\"（仅支持 dev、log）" >&2
+		exit 1
+		;;
+	esac
+done
+
+VOL_ARGS=()
+if [ "$MOUNT_LOG" -eq 1 ]; then
+	mkdir -p "$SCRIPT_DIR/dist/log"
+	VOL_ARGS=( -v "$SCRIPT_DIR/dist/log:/log:rw" )
+fi
+
+ENV_DEV=()
+if [ "$RUN_DEV" -eq 1 ]; then
+	ENV_DEV=( -e OJ_PROXY_DOCKER_DEV_LOGS=1 )
+fi
+
+# shellcheck disable=SC2086
+docker run -dit $LINK_LOCAL \
+	--name "${CONTAINER_NAME}" \
+	-p "${OJ_PROXY_LISTEN_PORT}:${OJ_PROXY_LISTEN_PORT}" \
+	-e OJ_PROXY_PUBLIC_URL="${OJ_PROXY_PUBLIC_URL}" \
+	-e OJ_PROXY_LISTEN_PORT="${OJ_PROXY_LISTEN_PORT}" \
+	-e OJ_PROXY_UPSTREAM_PASSWORD="${OJ_PROXY_UPSTREAM_PASSWORD}" \
+	"${ENV_DEV[@]}" \
+	--restart=unless-stopped \
+	"${VOL_ARGS[@]}" \
+	"$IMAGE" \
+	flg_env
+
+echo "✅ 容器 ${CONTAINER_NAME} 已启动（后台常驻，restart=unless-stopped）"
+[ "$RUN_DEV" -eq 1 ] && echo "   dev：文件+log 行已镜像到 stderr，请用 docker logs -f ${CONTAINER_NAME} 查看"
+[ "$MOUNT_LOG" -eq 1 ] && echo "   log：宿主日志目录 $SCRIPT_DIR/dist/log → 容器 /log"

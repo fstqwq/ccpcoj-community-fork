@@ -1,0 +1,826 @@
+/* 大题标题样式 */
+.question-section-header {
+    margin: 30px 0 20px 0;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 4px solid;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.question-section-header:first-child {
+    margin-top: 0;
+}
+
+.section-title-badge {
+    width: 8px;
+    height: 24px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.section-title-badge + h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.section-question-count {
+    font-size: 0.9rem;
+    font-weight: normal;
+    margin-left: 12px;
+}
+
+/* 题目样式优化 */
+.question_div {
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    scroll-margin-top: 80px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.question_div:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   题目未保存修改态：浅红背景（与导航红点一致）
+   只在 data-modified="true" 时生效
+   ========================= */
+.question_div[data-modified="true"] {
+    background: #fff5f5;
+    border-color: rgba(220, 53, 69, 0.25);
+}
+.question_div[data-modified="true"]:hover {
+    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.12);
+}
+
+/* 题目序号样式 */
+.question-number {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #495057;
+    margin-right: 8px;
+}
+.question-number-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 700;
+    margin-right: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* 小题题号（综合题子题号）：更贴近整体 UI 的“描边胶囊”风格
+   颜色仍由题型决定（见下方按 pkind 映射） */
+.question-sub-number-badge {
+    min-width: 44px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: none;
+    border: 1px solid transparent;
+}
+
+/* 小题分数 badge：更轻、更不抢视觉 */
+.question_div .badge.bg-info {
+    background: rgba(13, 202, 240, 0.12) !important;
+    color: #0aa2c0 !important;
+    border: 1px solid rgba(13, 202, 240, 0.25);
+    box-shadow: none;
+}
+
+/* 题型颜色映射：保持题目类型色彩体现（子题号使用同色系浅底+描边）
+   这里只覆盖子题号，不影响主题号（主题号仍由 inline pkColor 决定） */
+.question_div[pkind="0"] .question-sub-number-badge { background: rgba(13,110,253,0.12) !important; color:#0d6efd !important; border-color: rgba(13,110,253,0.28); }
+.question_div[pkind="1"] .question-sub-number-badge { background: rgba(102,16,242,0.12) !important; color:#6610f2 !important; border-color: rgba(102,16,242,0.28); }
+.question_div[pkind="5"] .question-sub-number-badge { background: rgba(13,202,240,0.14) !important; color:#0aa2c0 !important; border-color: rgba(13,202,240,0.28); }
+.question_div[pkind="10"] .question-sub-number-badge { background: rgba(111,66,193,0.12) !important; color:#6f42c1 !important; border-color: rgba(111,66,193,0.28); }
+.question_div[pkind="15"] .question-sub-number-badge { background: rgba(25,135,84,0.12) !important; color:#198754 !important; border-color: rgba(25,135,84,0.28); }
+.question_div[pkind="20"] .question-sub-number-badge { background: rgba(253,126,20,0.14) !important; color:#fd7e14 !important; border-color: rgba(253,126,20,0.30); }
+.question_div[pkind="25"] .question-sub-number-badge { background: rgba(108,117,125,0.14) !important; color:#6c757d !important; border-color: rgba(108,117,125,0.30); }
+
+/* =========================
+   图片上传行：按钮 + 预览组合更紧凑
+   ========================= */
+.exam-image-reqs .exam-image-upload-row {
+    background: rgba(248, 249, 250, 0.7);
+    border: 1px solid rgba(222, 226, 230, 0.8);
+    border-radius: 10px;
+    padding: 8px 10px;
+    align-items: center;
+    gap: 10px !important;
+}
+.exam-image-reqs .exam-image-upload-row .btn {
+    white-space: nowrap;
+}
+.exam-image-reqs .exam-image-upload-row img.img-thumbnail {
+    max-width: 220px !important;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border-color: rgba(222, 226, 230, 0.9);
+}
+
+@media (max-width: 768px) {
+    .exam-image-reqs .exam-image-upload-row {
+        flex-wrap: wrap !important;
+    }
+    .exam-image-reqs .exam-image-upload-row img.img-thumbnail {
+        max-width: 100% !important;
+    }
+}
+
+.question-score-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.question-id-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    background: #e9ecef;
+    border-radius: 4px;
+    color: #6c757d;
+    margin-left: 8px;
+    font-weight: normal;
+}
+
+/* 保存按钮与题目序号同行 */
+.question-submit-inline {
+    display: inline-flex;
+    gap: 8px;
+    margin-left: 12px;
+    vertical-align: middle;
+    align-items: center;
+}
+
+.question-submit-inline .btn {
+    padding: 0.25rem 0.625rem; /* 稍微减小padding，让按钮更扁 */
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.4; /* 优化行高，配合双语样式 */
+    min-height: auto; /* 移除最小高度限制 */
+}
+
+/* 题号部分样式 */
+.question-number-part {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap; /* 允许换行，避免提醒信息挤压 */
+}
+
+/* 题号旁边的提醒样式 - 内联显示 */
+.save-reminder-slot-inline {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    gap: 4px;
+}
+
+.save-reminder-inline {
+    display: inline-flex;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 0.25rem 0.5rem;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 0.25rem;
+    color: #856404;
+    font-size: 0.8rem;
+    animation: slideIn 0.3s ease-out;
+    vertical-align: middle;
+}
+
+.save-reminder-inline i {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+}
+
+/* 中文和英文上下结构显示 */
+.save-reminder-inline > span {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.save-reminder-inline .en-text {
+    display: block;
+    margin-left: 0;
+    margin-top: 2px;
+    font-size: 0.7em;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* 响应式：小屏幕时按钮回到顶部横向 */
+@media (max-width: 992px) {
+    .question-submit-left {
+        position: static;
+        flex-direction: row;
+        width: auto;
+        margin-bottom: 12px;
+    }
+    
+    .question-submit-left .btn {
+        writing-mode: horizontal-tb;
+        width: auto;
+        padding: 8px 12px;
+    }
+    
+    .question-submit-left .btn i {
+        margin: 0 4px 0 0;
+    }
+    
+    .question_div:has(.question-submit-left) {
+        padding-left: 20px;
+    }
+}
+
+#answer_sheet_div {
+    overflow-y: auto;
+    position: relative;
+    padding-right: 280px; /* 为右侧导航菜单留出空间 */
+}
+
+.question-list-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 工具栏居中 */
+#exam_problemset_toolbar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 登录提示容器样式（与工具栏对齐） */
+.exam-login-notice-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 题目占位符（用于懒加载） */
+.question-placeholder {
+    min-height: 200px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+/* 右侧悬浮导航菜单 - 不遮挡题目区域 */
+.question-nav-menu {
+    position: fixed;
+    right: clamp(20px, (100vw - 1200px)/2 - 260px, 120px);
+    /* 顶栏右上角有公告/登录信息等按钮，导航栏下移避免遮挡 */
+    top: 120px;
+    width: 260px;
+    max-height: calc(100vh - 140px);
+    background: #2c3e50;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 当屏幕宽度足够时，导航栏放在内容区域左侧，不遮挡 */
+@media (min-width: 1600px) {
+    .question-nav-menu {
+        right: calc((100vw - 1200px) / 2 - 280px); /* 放在内容区域左侧 */
+        top: 120px; /* 下移，避免与顶栏右上角区域冲突 */
+    }
+}
+
+/* 当屏幕宽度不够时，导航栏在右侧，但可以收起 */
+@media (max-width: 1599px) {
+    .question-nav-menu {
+        right: 20px;
+        top: 120px; /* 下移，避免与顶栏右上角区域冲突 */
+    }
+}
+
+.question-nav-menu.collapsed {
+    width: 50px;
+}
+
+.question-nav-menu.collapsed .question-nav-content {
+    display: none;
+}
+
+.question-nav-menu.collapsed .question-nav-header {
+    /* 收起时按钮贴右上角（而不是居中），符合“往右上角收”的直觉 */
+    justify-content: flex-end;
+    padding: 12px 8px;
+}
+
+.question-nav-menu.collapsed .question-nav-header strong {
+    display: none;
+}
+
+.question-nav-header {
+    padding: 12px 16px;
+    background: #34495e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    border-bottom: 1px solid #3d566e;
+}
+
+/* 题目导航可拖动：避免拖动时选中文本/触发过渡导致“发黏” */
+body.question-nav-dragging {
+    user-select: none;
+}
+.question-nav-menu.dragging {
+    transition: none !important;
+}
+.question-nav-header {
+    cursor: move;
+}
+
+/* 收起/展开按钮：更醒目、更像“可展开”的控件 */
+.nav-menu-toggle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.nav-menu-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+.nav-menu-toggle-btn i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.question-nav-content {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px;
+    /* 深色系滚动条：与导航栏融为一体 */
+    scrollbar-width: thin;
+    scrollbar-color: #3d566e #2c3e50;
+}
+/* WebKit 系浏览器：滚动条轨道与滑块深色风格 */
+.question-nav-content::-webkit-scrollbar {
+    width: 8px;
+}
+.question-nav-content::-webkit-scrollbar-track {
+    background: #2c3e50;
+    border-radius: 4px;
+}
+.question-nav-content::-webkit-scrollbar-thumb {
+    background: #3d566e;
+    border-radius: 4px;
+}
+.question-nav-content::-webkit-scrollbar-thumb:hover {
+    background: #4a6578;
+}
+.question-nav-content::-webkit-scrollbar-thumb:active {
+    background: #5a7588;
+}
+.question-nav-content::-webkit-scrollbar-corner {
+    background: #2c3e50;
+}
+
+.question-nav-item {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background: #34495e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.question-nav-item:hover {
+    background: #3d566e;
+    transform: translateX(-2px);
+}
+
+.question-nav-item.active {
+    background: #3498db;
+    font-weight: 600;
+}
+
+.question-nav-item-number {
+    min-width: 30px;
+    font-weight: 600;
+    color: #ecf0f1;
+}
+
+.question-nav-item-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ecf0f1;
+}
+
+.question-nav-item-type {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.question-nav-item-status {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.question-nav-item-status.unsaved {
+    background: #e74c3c;
+    box-shadow: 0 0 4px rgba(231, 76, 60, 0.5);
+}
+
+.question-nav-item-status.saved {
+    background: #27ae60;
+}
+
+.question-nav-item-status.empty {
+    background: #95a5a6;
+}
+
+#to_top_a {
+    position: fixed;
+    bottom: 10%;
+    right: 10%;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 64px;
+    color: #3498db;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+#to_top_a:hover {
+    opacity: 1;
+}
+
+#loading_spinner_div {
+    position: fixed;
+    top: 30vh;
+    left: 40%;
+    z-index: 21;
+    color: white;
+    text-shadow: 3px 3px 8px black;
+}
+
+#loading_div {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(to top, rgba(200,200,200,1), rgba(200,200,200,0));
+    z-index: 20;
+}
+
+#loading_text {
+    font-size: 2rem;
+}
+
+/* 手机全屏模式 */
+#answer_sheet_div.mobile-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: white;
+    padding-right: 0;
+    overflow-y: auto;
+}
+
+#answer_sheet_div.mobile-fullscreen .question-nav-menu {
+    right: 10px;
+    top: 120px; /* 手机全屏模式也下移，避免遮挡顶栏按钮 */
+    max-height: calc(100vh - 140px);
+    width: 240px;
+}
+
+#answer_sheet_div.mobile-fullscreen #exam_problemset_toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 0;
+}
+
+/* 桌面全屏模式优化 - 工具栏和题目区域一起居中 */
+#answer_sheet_div:fullscreen,
+#answer_sheet_div:-webkit-full-screen,
+#answer_sheet_div:-moz-full-screen {
+    background: white;
+    padding-right: 280px; /* 为导航栏留出空间 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#answer_sheet_div:fullscreen #exam_problemset_toolbar,
+#answer_sheet_div:-webkit-full-screen #exam_problemset_toolbar,
+#answer_sheet_div:-moz-full-screen #exam_problemset_toolbar {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+#answer_sheet_div:fullscreen .question-list-container,
+#answer_sheet_div:-webkit-full-screen .question-list-container,
+#answer_sheet_div:-moz-full-screen .question-list-container {
+    width: 100%;
+}
+
+#answer_sheet_div:fullscreen .question-nav-menu,
+#answer_sheet_div:-webkit-full-screen .question-nav-menu,
+#answer_sheet_div:-moz-full-screen .question-nav-menu {
+    right: 20px;
+    top: 120px; /* 全屏模式也下移，避免遮挡顶栏按钮 */
+    z-index: 10001;
+}
+
+#answer_sheet_div:fullscreen .question-nav-menu.collapsed,
+#answer_sheet_div:-webkit-full-screen .question-nav-menu.collapsed,
+#answer_sheet_div:-moz-full-screen .question-nav-menu.collapsed {
+    right: 20px !important; /* 全屏模式收起时也固定在右上角 */
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    #answer_sheet_div {
+        padding-right: 0;
+    }
+    
+    .question-nav-menu {
+        right: -240px;
+    }
+    
+    .question-nav-menu.expanded {
+        right: 20px;
+    }
+}
+
+/* 手机端优化 */
+@media (max-width: 768px) {
+    .question-nav-menu {
+        display: none; /* 手机端隐藏导航菜单 */
+    }
+    
+    #answer_sheet_div {
+        padding-right: 0;
+    }
+    
+    .question-list-container {
+        padding: 10px;
+    }
+    
+    .question_div {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    #exam_problemset_toolbar .btn {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.5rem;
+    }
+    
+    #to_top_a {
+        font-size: 48px;
+        bottom: 5%;
+        right: 5%;
+    }
+}
+
+/* 独立页模式样式优化 */
+body.exam-single-page {
+    background-color: #f8f9fa;
+    overflow-x: hidden;
+}
+
+body.exam-single-page #answer_sheet_div {
+    padding-right: 280px; /* 为右侧导航菜单留出空间 */
+    min-height: calc(100vh - 80px); /* 减去顶部标题栏高度 */
+    background-color: white;
+}
+
+body.exam-single-page .question-nav-menu {
+    right: clamp(20px, (100vw - 1200px)/2 - 260px, 120px);
+    top: 80px; /* 独立页模式顶部标题栏较矮，导航栏上移 */
+    max-height: calc(100vh - 100px);
+}
+
+@media (min-width: 1600px) {
+    body.exam-single-page .question-nav-menu {
+        right: calc((100vw - 1200px) / 2 - 280px);
+        top: 80px;
+    }
+}
+
+@media (max-width: 1599px) {
+    body.exam-single-page .question-nav-menu {
+        right: 20px;
+        top: 80px;
+    }
+}
+
+@media (max-width: 1200px) {
+    body.exam-single-page #answer_sheet_div {
+        padding-right: 0;
+    }
+    
+    body.exam-single-page .question-nav-menu {
+        right: -240px;
+    }
+    
+    body.exam-single-page .question-nav-menu.expanded {
+        right: 20px;
+    }
+}
+
+/* 独立页模式：隐藏全屏按钮（因为已经在独立页了） */
+body.exam-single-page .button_fullscreen {
+    display: none;
+}
+
+/* Markdown 答题区域样式：按钮和预览区合并边框 */
+.md-answer-container {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.md-answer-header {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.md-answer-header .btn {
+    margin: 0;
+}
+
+.md-answer-container .md-answer-preview {
+    padding: 0.75rem;
+    margin: 0;
+    min-height: 60px;
+    border: none;
+    border-radius: 0;
+    background: #ffffff;
+}
+
+.md-answer-container .md-answer-preview:empty::before {
+    content: '暂无内容 / No content';
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Markdown 编辑器模态框标题栏样式 */
+#markdown_editor_modal .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1055;
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+}
+
+#markdown_editor_modal .modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* 中英双语上下结构 */
+.bilingual-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.3;
+}
+
+.bilingual-vertical .cn-text {
+    display: block;
+    font-size: 1em;
+}
+
+.bilingual-vertical .en-text {
+    display: block;
+    font-size: 0.75em;
+    opacity: 0.85;
+    margin-top: 2px;
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* 题目信息样式 */
+.md-question-info {
+    background: rgba(13, 110, 253, 0.05);
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid rgba(13, 110, 253, 0.1);
+    transition: all 0.2s ease;
+}
+
+.md-question-info:hover {
+    background: rgba(13, 110, 253, 0.08);
+    border-color: rgba(13, 110, 253, 0.2);
+    transform: translateY(-1px);
+}
+
+.md-question-info .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-radius: 0.25rem;
+}
+
+.md-question-info #md_question_title_text {
+    font-size: 0.85rem;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 按钮组样式 */
+.md-actions {
+    gap: 0.5rem;
+}
+
+.md-actions .btn {
+    padding: 0.25rem 0.5rem;
+    min-width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 992px) {
+    .md-question-info {
+        display: none !important;
+    }
+    
+    #markdown_editor_modal .modal-header .d-flex {
+        flex-wrap: wrap;
+    }
+    
+    .md-actions {
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+

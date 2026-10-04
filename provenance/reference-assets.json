@@ -1,0 +1,44 @@
+[
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/balloon_manager.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 237038,
+    "sha256": "63d56a24e95350a90ed0435e436b1d726548beaa5eb5b072580541661ef7225e"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank.css",
+    "retrieved_at": "2026-10-04",
+    "bytes": 156415,
+    "sha256": "26aa11cd5cee8633b4de869276d85468c22fa175b0ec31437bef6c16d2e3c809"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 274304,
+    "sha256": "f05ca28cb9162037f85a09d738fb856e18626a40742076c17f8a5f115dd41b32"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank_ccpc.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 11675,
+    "sha256": "6476829a20e5fbced63ea568f4b7af487de7637f808eaf0ba68438175cf67554"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank_core.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 54280,
+    "sha256": "5b9914746bdbafefc9ba800c59b3ef0583bb24f313d074e10909c7b3589cc370"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank_page.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 92833,
+    "sha256": "eac36730fedd1c5a14d06d0cfbd470d299a15560cd78550fb293d3855d5d9ac6"
+  },
+  {
+    "url": "https://cpc.csgrandeur.cn/static/csgoj/contest/rank_tool.js",
+    "retrieved_at": "2026-10-04",
+    "bytes": 115526,
+    "sha256": "526ba262e945bb1632357393f45e6bb8bfc12ce7b0638aa042a6d61a8be48200"
+  }
+]

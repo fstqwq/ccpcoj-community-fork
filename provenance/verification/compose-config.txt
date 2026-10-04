@@ -1,0 +1,2 @@
+Docker Compose v2.39.4 config --quiet, .env.example, profile judge
+Exit code: 0

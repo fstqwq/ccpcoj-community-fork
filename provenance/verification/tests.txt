@@ -1,0 +1,28 @@
+PASS 56 rule assertions
+PASS 13 production endpoint/auth assertions (database boundary stubbed)
+PASS 900 randomized snapshots against independent oracle (180 contests x 5 time boundaries)
+✔ production RankSystem consumes hidden server snapshots and retains all registered teams (11.594161ms)
+✔ freeze snapshot exposes aligned letters but retains pending verdicts (2.093786ms)
+✔ legacy XCPC result processing and same-second ordering still work (1.322931ms)
+✔ CCPC renderer escapes attributes and only displays labels supplied by server (0.474214ms)
+✔ CCPC school view does not combine unrelated hidden problems (0.558101ms)
+✔ CCPC factory retains upstream page class and skins (0.195341ms)
+✔ production balloon queue uses server labels and never schedules frozen deliveries (4.236559ms)
+✔ production ticket printer rejects stale pre-freeze queues using server clock offset (2.754319ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 140.40075
+test_layer_traversal_and_whiteouts (test_repository.Tests.test_layer_traversal_and_whiteouts) ... ok
+test_migration_is_idempotent_and_preserves_existing_columns (test_repository.Tests.test_migration_is_idempotent_and_preserves_existing_columns) ... ok
+test_migration_partial_upgrade (test_repository.Tests.test_migration_partial_upgrade) ... ok
+test_migration_rejects_missing_lock (test_repository.Tests.test_migration_rejects_missing_lock) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.005s
+
+OK

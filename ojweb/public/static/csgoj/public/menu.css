@@ -1,0 +1,74 @@
+/**
+ * 菜单样式 - 紧凑美观版
+ * Menu Styles - Compact & Beautiful Version
+ */
+
+/* 菜单容器样式 */
+#menu_container,
+#sidebar_div {
+    padding: 0.75rem 0;
+}
+
+/* 菜单项样式 - 适中间距 */
+#menu_container .nav-item,
+#sidebar_div .nav-item {
+    margin-bottom: 0.15rem;
+    margin-top: 0.15rem;
+}
+
+/* 菜单链接样式 - 平衡紧凑与美观 */
+#menu_container .nav-link,
+#sidebar_div .nav-link {
+    padding: 0.5rem 0.85rem;
+    margin: 0.1rem 0.5rem;
+    line-height: 1.4;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+/* 菜单链接悬停效果 */
+#menu_container .nav-link:hover,
+#sidebar_div .nav-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: translateX(2px);
+}
+
+/* 激活状态样式 */
+#menu_container .nav-link.active,
+#sidebar_div .nav-link.active {
+    background-color: #0d6efd;
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+/* 激活状态下的英文文本颜色 */
+#menu_container .nav-link.active .en-text,
+#sidebar_div .nav-link.active .en-text {
+    color: rgba(255, 255, 255, 0.85) !important;
+    opacity: 0.9 !important;
+}
+
+/* 分隔线样式 */
+#menu_container hr,
+#sidebar_div hr {
+    margin: 0.5rem 0.5rem;
+    border-top-width: 1px;
+    opacity: 0.3;
+}
+
+/* 响应式调整 */
+@media (max-width: 767.98px) {
+    #menu_container .nav-link,
+    #sidebar_div .nav-link {
+        padding: 0.6rem 0.85rem;
+        margin: 0.15rem 0;
+    }
+    
+    #menu_container .nav-item,
+    #sidebar_div .nav-item {
+        margin-bottom: 0.2rem;
+        margin-top: 0.2rem;
+    }
+}
+

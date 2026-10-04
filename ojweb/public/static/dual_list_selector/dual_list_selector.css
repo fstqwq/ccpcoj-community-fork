@@ -1,0 +1,57 @@
+/* 通用左右双栏选择器 DualListSelector */
+.dual-list-selector .row {
+    margin: 0;
+}
+.dual-list-selector .col-md-6 {
+    padding: 0 0.5rem;
+}
+
+.dual-list-selector .dual-list-candidate-list {
+    background: #fff;
+    border: 1px solid #dee2e6;
+}
+.dual-list-selector .dual-list-candidate-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+.dual-list-selector .dual-list-candidate-item:last-child {
+    border-bottom: none;
+}
+.dual-list-selector .dual-list-candidate-item:hover {
+    background-color: #f8f9fa;
+}
+.dual-list-selector .dual-list-candidate-item.active {
+    background-color: #e7f3ff;
+}
+.dual-list-selector .dual-list-candidate-item .form-check-label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.dual-list-selector .dual-list-selected-list {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+.dual-list-selector .dual-list-selected-item {
+    background-color: white;
+    margin: 4px;
+    border-radius: 4px;
+}
+.dual-list-selector .dual-list-selected-item .dual-list-remove-btn:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.dual-list-selector .dual-list-selected-count {
+    font-size: 0.85em;
+}
+
+.dual-list-selector .dual-list-loading {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

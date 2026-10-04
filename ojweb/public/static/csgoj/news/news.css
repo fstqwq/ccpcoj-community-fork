@@ -1,0 +1,226 @@
+/**
+ * News Module CSS样式文件
+ * 包含新闻列表、详情页等样式
+ * 参考 oj_problem.css 保持 UI 风格一致
+ */
+
+/* ==================== 新闻详情页头部样式 ==================== */
+/* 参考 problem-header-row 和 problem-info-inline 的样式 */
+
+/* 新闻标题样式 - 更有高级感 */
+.news-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+    word-wrap: break-word;
+}
+
+.problem-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.75rem 0;
+    padding: 0.5rem 0;
+    flex-wrap: wrap;
+}
+
+.problem-info-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.problem-info-inline .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+/* 当有足够空间时，水平排列（需要足够宽才能容纳所有信息项） */
+@media (min-width: 1400px) {
+    .problem-info-inline .info-item {
+        flex-direction: row;
+        align-items: center;
+        white-space: nowrap;
+    }
+}
+
+.problem-info-inline .info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.problem-info-inline .info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+    word-break: break-word;
+    word-wrap: break-word;
+}
+
+/* 水平排列时添加左边距 */
+@media (min-width: 1400px) {
+    .problem-info-inline .info-value {
+        margin: 0 0.25rem;
+    }
+}
+
+.problem-info-inline .info-unit {
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1.2;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .news-title {
+        font-size: 1.75rem;
+        letter-spacing: -0.01em;
+    }
+    
+    .problem-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .problem-info-inline {
+        gap: 1rem;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .problem-info-inline .info-item {
+        gap: 0.2rem;
+    }
+    
+    .problem-info-inline .info-label {
+        font-size: 0.8rem;
+    }
+    
+    .problem-info-inline .info-value {
+        font-size: 0.9rem;
+    }
+    
+    .problem-info-inline .info-unit {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .news-title {
+        font-size: 1.5rem;
+    }
+    
+    .problem-info-inline {
+        gap: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .problem-info-inline .info-item {
+        width: 100%;
+    }
+}
+
+/* ==================== 新闻列表样式 ==================== */
+
+/* Carousel Styles */
+.carousel-control.left {
+    background-image: none;
+}
+.carousel-control.right {
+    background-image: none;
+}
+.news-new {
+    color: red;
+}
+
+.news-list-container {
+    margin-top: 1rem;
+}
+
+.news-item {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 0;
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+.news-item-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #212529;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.news-item-title:hover {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.news-meta {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.news-tags {
+    margin-top: 0.5rem;
+}
+
+.news-tag {
+    display: inline-block;
+    background-color: #f8f9fa;
+    color: #495057;
+    padding: 0.25rem 0.5rem;
+    margin: 0.125rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.news-tag:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+}
+
+/* ==================== 其他样式 ==================== */
+
+/* 分类文章卡片样式 */
+.category-news-card {
+    transition: box-shadow 0.2s ease;
+}
+
+.category-news-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 空状态 */
+.news-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.news-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}

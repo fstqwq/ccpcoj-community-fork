@@ -1,0 +1,2 @@
+# 上下文根为本目录（见 build_image.sh）。勿忽略 dist/oj-proxy，否则 --target runtime-local 失败。
+docker_run.sh

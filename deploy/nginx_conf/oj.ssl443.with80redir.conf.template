@@ -1,0 +1,127 @@
+# TEMPLATE ONLY（配置模板，不是可直接使用的 nginx 配置）
+# - PORT_OJ=443：最佳实践是额外提供 80 -> 443 的 301 重定向
+# - entrypoint.sh 会替换 __SERVER_NAME__ / __SSL_CERT__ / __SSL_KEY__
+
+server {
+    listen 80;
+    server_name __SERVER_NAME__;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name __SERVER_NAME__;
+
+    ssl_certificate __SSL_CERT__;
+    ssl_certificate_key __SSL_KEY__;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    # 497 重定向：当用户用 http://host:443 访问时，跳转到 https://host/
+    error_page 497 https://$host$request_uri;
+
+    charset utf-8;
+    client_max_body_size 128m;
+    keepalive_timeout 65s;
+    client_body_timeout 60s;
+    # FastCGI 间隔超时：须覆盖 event-feed 等长流无字节窗口；见 oj.http.conf.template 同段说明。
+    root /ojweb/public;
+    index index.php index.html index.htm;
+
+    resolver 127.0.0.11 ipv6=off valid=10s;
+    resolver_timeout 2s;
+    set $php_upstream php-csgoj:9000;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 2048;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/javascript
+        application/xml+rss
+        application/json
+        application/xml
+        image/svg+xml;
+
+    location / {
+        try_files $uri @rewrite;
+    }
+
+    location /static/ {
+        alias /var/www/baseoj/public/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        gzip_static on;
+    }
+
+    # CSGOJ_OJ_LOC_SYNC_BEGIN
+    # gzip 写在本层 location（勿仅用嵌套 ~* \.json$）；webp 等不在 gzip_types 内，不会被压缩。
+    location ^~ /upload/outrank_attach/ {
+        alias /var/www/public/csgoj/upload/outrank_attach/;
+        open_file_cache off;
+        gzip on;
+        gzip_vary on;
+        gzip_types application/json text/plain;
+        expires 1d;
+    }
+    # CSGOJ_OJ_LOC_SYNC_END
+
+    location /upload/ {
+        alias /var/www/public/csgoj/upload/;
+        location ~* \.(txt|log|json|xml|css|js)$ {
+            gzip on;
+            gzip_vary on;
+            expires 1d;
+        }
+        location ~* \.(jpg|jpeg|png|gif|ico|pdf|zip|rar|mp4|avi)$ {
+            expires 1y;
+            add_header Cache-Control "public";
+        }
+    }
+
+    location ~ /upload/.*\.php$ { deny all; }
+    location ~ /static/.*\.php$ { deny all; }
+
+    location @rewrite {
+        set $static 0;
+        if ($uri ~ \.(css|js|jpg|jpeg|png|gif|ico|woff|eot|svg|css\.map|min\.map)$) {
+            set $static 1;
+        }
+        if ($static = 0) {
+            rewrite ^/(.*)$ /index.php?s=/$1;
+        }
+    }
+
+    location ~ \.php/ {
+        if ($request_uri ~ ^(.+\.php)(/.+?)($|\?)) { }
+        fastcgi_connect_timeout 2s;
+        fastcgi_send_timeout 3600s;
+        fastcgi_read_timeout 3600s;
+        fastcgi_pass $php_upstream;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_NAME $1;
+        fastcgi_param PATH_INFO $2;
+        fastcgi_param SCRIPT_FILENAME $document_root$1;
+    }
+
+    location ~ \.php$ {
+        fastcgi_connect_timeout 2s;
+        fastcgi_send_timeout 3600s;
+        fastcgi_read_timeout 3600s;
+        fastcgi_pass $php_upstream;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht { deny all; }
+
+    access_log /var/log/nginx/csgoj_access.log;
+    error_log /var/log/nginx/csgoj_error.log;
+}
+
+

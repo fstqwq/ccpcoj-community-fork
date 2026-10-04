@@ -1,0 +1,101 @@
+/* examsys/question_edit.css
+ * 题目编辑页样式（exadmin / examsys 共用）
+ * 注意：题型配色来自 question_default.js 写入的 CSS 变量 --csg-pkind-color
+ */
+
+/* ==================== 题目编辑页：背景随题型配色 ==================== */
+.question-edit-surface {
+    /* 默认值会被 question_default.js 写入的 --csg-pkind-color 覆盖 */
+    --csg-pkind-color: var(--csg-pkind-color, #0d6efd);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: background-color 160ms ease-in-out, border-color 160ms ease-in-out;
+    border: 1px solid color-mix(in srgb, var(--csg-pkind-color) 22%, rgba(0, 0, 0, 0.08));
+    background: color-mix(in srgb, var(--csg-pkind-color) 8%, #ffffff);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+}
+
+/* 草稿模式：保留更强的绿色边框提示，但底色仍跟随题型 */
+.question-edit-surface.csg-draft-surface {
+    border: 3px solid #198754;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+    background: color-mix(in srgb, var(--csg-pkind-color) 6%, #ffffff);
+}
+
+.min-h-100 { min-height: 100px; }
+
+#content_edit_area,
+#answer_edit_area {
+    min-height: 50px;
+}
+
+.option-item,
+.fill-item {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+/* 综合题小题样式 - 增强分界 */
+.comprehensive-item {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+.comprehensive-item:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* 综合题小题标题行 */
+.comprehensive-item > .d-flex:first-child {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* 综合题图片要求样式 - 增强区分度 */
+.comprehensive-item .img-wrap {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #dee2e6;
+}
+
+.comprehensive-item .img-list-item {
+    border: 1px solid #d1e7dd;
+    border-left: 3px solid #198754;
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    background-color: #f8fdf9;
+    transition: all 0.2s ease;
+}
+
+.comprehensive-item .img-list-item:hover {
+    background-color: #f0f9f4;
+    border-color: #198754;
+}
+
+.comprehensive-item .img-list-item strong {
+    color: #198754;
+    font-size: 0.95rem;
+}
+
+.option-preview,
+.fill-preview,
+.comprehensive-preview {
+    padding: 8px;
+    background-color: white;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+

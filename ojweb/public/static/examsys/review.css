@@ -1,0 +1,964 @@
+/* ############################################# */
+/* 阅卷页面样式 - 统一样式文件 */
+/* ############################################# */
+
+/* 主布局：左侧固定，右侧滚动 */
+#review_area_div {
+    display: flex;
+    height: calc(100vh - 120px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 独立页版本：高度调整 */
+body.review-single-page #review_area_div {
+    height: calc(100vh - 80px);
+}
+
+/* 左侧学生列表 - 固定，内部滚动 */
+#review_examinee_panel_wrapper {
+    width: 320px;
+    min-width: 320px;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#review_examinee_table_div {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 考生列表滚动条样式 - Webkit */
+#review_examinee_table_div::-webkit-scrollbar {
+    width: 8px;
+}
+
+#review_examinee_table_div::-webkit-scrollbar-track {
+    background: #e9ecef;
+}
+
+#review_examinee_table_div::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
+#review_examinee_table_div::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+/* 考生列表滚动条样式 - Firefox */
+#review_examinee_table_div {
+    scrollbar-width: thin;
+    scrollbar-color: #adb5bd #e9ecef;
+}
+
+/* 考生列表选中行样式 - 黑色背景 */
+#review_examinee_table .table-dark,
+#review_examinee_table .table-dark td,
+#review_examinee_table .table-dark th {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+}
+
+#review_examinee_table .table-dark a {
+    color: #ffffff !important;
+}
+
+#review_examinee_table .table-dark .text-muted {
+    color: #adb5bd !important;
+}
+
+/* 右侧阅卷区域 - 可滚动 */
+#review_asheet_panel_wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    background: #f8f9fa;
+}
+
+/* 阅卷区域滚动条样式 - Webkit */
+#review_asheet_panel_wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+#review_asheet_panel_wrapper::-webkit-scrollbar-track {
+    background: #e9ecef;
+}
+
+#review_asheet_panel_wrapper::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 5px;
+}
+
+#review_asheet_panel_wrapper::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+/* 阅卷区域滚动条样式 - Firefox */
+#review_asheet_panel_wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: #adb5bd #e9ecef;
+}
+
+/* 题目列表容器 */
+.question-list-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 宽屏：题目区域适度加宽，方便左右对照 */
+@media (min-width: 1400px) {
+    .question-list-container {
+        max-width: 1600px;
+    }
+}
+
+/* 独立页：更宽的布局，且可能居中显示 */
+body.review-single-page .question-list-container {
+    max-width: 1600px;
+    width: 100%;
+    margin-left: clamp(0px, calc(50vw - 1120px), 9999px);
+}
+
+/* 初始提示：未选择考生时显示 */
+#review_question_panel {
+    position: relative;
+    min-height: 100%;
+}
+
+.review-empty-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 600px;
+    padding: 40px 20px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.review-empty-hint.hidden {
+    display: none;
+}
+
+/* 题目样式 */
+.question_div {
+    background-color: #ffffff;
+    color: #212529;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* 题目标题行样式 */
+.question-header-row {
+    border-radius: 8px 8px 0 0;
+}
+
+/* 分数区域样式 */
+.question-score-area {
+    transition: background-color 0.2s ease;
+}
+
+/* 阅卷对照：左考生答卷 / 右参考答案 */
+.review-compare-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+.review-compare-left,
+.review-compare-right {
+    min-width: 0;
+}
+@media (max-width: 1199.98px) {
+    .review-compare-row {
+        grid-template-columns: 1fr;
+    }
+}
+.review-compare-right {
+    /* 右侧容器本身不再负责样式，交给内部 md-answer-container 统一外观 */
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+}
+/* 参考答案使用 md-answer-container 统一样式
+ * 注意：不要依赖 :has()（部分浏览器不支持，会导致回退到默认蓝色边框）
+ */
+.md-answer-container.md-ref-answer-container {
+    border-color: rgba(25, 135, 84, 0.35);
+    background-color: rgba(248, 253, 249, 0.45);
+    box-shadow: 0 0.125rem 0.25rem rgba(25, 135, 84, 0.05);
+}
+.md-answer-container.md-ref-answer-container .md-answer-header-review {
+    border-bottom-color: rgba(25, 135, 84, 0.18);
+}
+
+/* 右侧参考答案内容区：对齐 md-answer-preview 的内边距风格 */
+.md-answer-container.md-ref-answer-container .ref-answer-slot {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 0;
+}
+
+/* 左右元信息块：紧凑且不抢眼 */
+.review-meta-box {
+    background: #ffffff;
+}
+.review-meta-box .review-meta-item + .review-meta-item {
+    margin-top: 10px;
+}
+
+.review-meta-note {
+    line-height: 1.15;
+}
+.review-meta-header .review-meta-note {
+    flex: 0 0 auto;
+}
+
+/* 题目级元信息区：为空时不占位 */
+.answer_meta_left_div:empty,
+.answer_meta_right_div:empty {
+    display: none;
+}
+
+/* 综合题：小题描述与小题打分左右对齐 */
+.review-subq-desc-score {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+}
+@media (max-width: 1199.98px) {
+    .review-subq-desc-score {
+        grid-template-columns: 1fr;
+    }
+}
+
+.review_div {
+    min-width: 300px;
+    max-width: 500px;
+}
+
+/* 独立页：更宽的阅卷区域 */
+body.review-single-page .review_div {
+    max-width: 500px;
+}
+
+.answer_div {
+    border: 1px solid #d1e7dd;
+    background: #f8fdf9;
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+body.review-single-page .answer_div {
+    min-width: 0;
+}
+
+/* review_div 仍在题卡内部，答案已移到题卡外侧，所以这里不再负责布局 */
+.ans_review_div {
+    display: block;
+}
+
+/* 评语/打分（你刚调整的结构） */
+.review-eval-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: stretch;
+}
+.review-eval-right {
+    display: flex;
+    align-items: stretch;
+}
+.review-submit-vertical {
+    /* 不用百分比高度，避免在 auto 高度容器下被异常拉伸 */
+    height: auto;
+    align-self: stretch;
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* 供右上角提示图标定位 */
+}
+.review-submit-text {
+    display: inline-block;
+    line-height: 1.2;
+    text-align: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+/* 总“保存评阅”按钮：右上角警告图标（不干扰竖排文字） */
+.review-submit-vertical .review-save-warn-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    writing-mode: horizontal-tb;
+    text-orientation: initial;
+    line-height: 1;
+}
+
+@media (max-width: 575.98px) {
+    .review-eval-wrap {
+        grid-template-columns: 1fr;
+    }
+    .review-eval-right {
+        justify-content: flex-end;
+    }
+    .review-submit-vertical {
+        height: auto;
+    }
+    .review-submit-text {
+        writing-mode: horizontal-tb;
+        text-orientation: initial;
+    }
+}
+
+/* 综合题：每小题旁的打分面板（紧凑） */
+.review-subscore-slot {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+.review-subq-head .review-subscore-slot {
+    align-items: center;
+}
+
+/* 综合题：未作答（默认 0 分且禁评阅）时，隐藏上下打分控件，避免误操作 */
+#review_question_panel .question_div.review-question-blank[pkind="20"] .review-subscore-slot,
+#review_question_panel .question_div.review-question-blank[pkind="20"] .review-subq-foot,
+#review_question_panel .question_div.review-question-blank[pkind="20"] .review-subscore-summary,
+#review_question_panel .question_div.review-question-blank[pkind="20"] .review-subscore-source {
+    display: none !important;
+}
+
+/* 未作答（默认 0 分且禁评阅）：题卡淡红底色提示 */
+#review_question_panel .question_div.review-question-blank {
+    /* Bootstrap danger 的浅色化：尽量“提示”而不抢视觉 */
+    background-color: rgba(220, 53, 69, 0.06);
+    border-color: rgba(220, 53, 69, 0.22);
+}
+.review-subscore-panel {
+    max-width: 100%;
+}
+.review-subq-head .review-subscore-panel {
+    padding: 2px 6px;
+}
+.review-subq-head .review-subscore-panel .review-subscore-item input.review_score_input {
+    width: 84px;
+    max-width: 84px;
+}
+
+/* 综合题：小题底部弱化标题栏（便于底部打分） */
+#review_question_panel .question_div[pkind="20"] .review-subq-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(108, 117, 125, 0.35);
+    opacity: 1;
+    flex-wrap: wrap;
+}
+#review_question_panel .question_div[pkind="20"] .review-subq-foot .review-subq-foot-hint {
+    flex: 1 1 auto;
+    text-align: center;
+    min-width: 160px;
+    white-space: nowrap;
+    opacity: 0.85;
+}
+#review_question_panel .question_div[pkind="20"] .review-subq-foot .review_subscore_bottom_input {
+    width: 84px;
+    max-width: 84px;
+}
+
+/* 综合题：小题之间分隔更明显（避免打错分） */
+#review_question_panel .question_div[pkind="20"] ul.list-group > li.list-group-item {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 12px;
+    position: relative;
+}
+#review_question_panel .question_div[pkind="20"] ul.list-group > li.list-group-item + li.list-group-item {
+    /* 覆盖 bootstrap 的 margin-top:-1px 合并边框行为 */
+    margin-top: 14px !important;
+}
+#review_question_panel .question_div[pkind="20"] ul.list-group > li.list-group-item + li.list-group-item::before {
+    /* 两小题之间的显著分隔线（不使用左侧色条） */
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    right: 12px;
+    height: 2px;
+    background: rgba(108, 117, 125, 0.25);
+    border-radius: 2px;
+}
+#review_question_panel .question_div[pkind="20"] ul.list-group > li.list-group-item:focus-within {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+}
+.review-subscore-panel .review-subscore-item {
+    margin: 0;
+}
+.review-subscore-panel .review-subscore-item .text-muted.small {
+    display: none; /* 标题行太挤，默认隐藏；需要时可再打开 */
+}
+.review-subscore-panel .review-subscore-item .btn-group {
+    flex: none;
+}
+.review-subscore-panel .review-subscore-item input.review_score_input {
+    width: 84px;
+    max-width: 84px;
+}
+
+/* 综合题：总打分区（每小题输入框汇总） */
+.review-subscore-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+}
+.review-subscore-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 1px dashed rgba(25, 135, 84, 0.25);
+    border-radius: 6px;
+    background: rgba(25, 135, 84, 0.04);
+}
+.review-subscore-summary-left {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    min-width: 0;
+}
+.review-subscore-summary-label {
+    flex: 0 0 auto;
+    font-weight: 600;
+    color: #0d6efd;
+}
+.review-subscore-summary-max {
+    line-height: 1.1;
+}
+.review-subscore-summary-item input.review_subscore_summary_input {
+    width: 84px;
+    max-width: 84px;
+}
+
+@media (max-width: 575.98px) {
+    .review-subscore-slot {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+body.review-single-page .ans_review_div {
+    width: 100%;
+}
+
+.question_div>* {
+    max-width: 1024px;
+}
+
+/* 阅卷页：为了左右对照，允许题目内容铺满题卡宽度 */
+#review_question_panel .question_div>* {
+    max-width: none;
+}
+
+/* 独立页：题目内容元素可以自动伸展 */
+body.review-single-page .question_div>* {
+    max-width: none;
+}
+
+body.review-single-page .question-header-row {
+    width: 100%;
+}
+
+.question_div * {
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.question_div .ln_code_pre_td pre {
+    max-width: 984px;
+}
+
+body.review-single-page .question_div .ln_code_pre_td pre {
+    max-width: 100%;
+}
+
+.question_div .ln_number_pre_table {
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.stu_asheet_span {
+    color: #0d6efd;
+}
+
+/* 填空、简答、综合题的考生答卷预览区域 */
+.md-answer-preview {
+    border: 1px solid #cfe2ff;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9ff;
+    min-height: 40px;
+    position: relative;
+}
+
+/* 在容器内的预览区（答题模式）：移除独立边框，使用容器边框 */
+.md-answer-container .md-answer-preview {
+    border: none;
+    border-radius: 0;
+    background-color: #ffffff;
+    margin: 0;
+}
+
+.md-answer-preview:empty::before {
+    content: '暂无答案 / No answer';
+    color: #adb5bd;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.md-answer-container .md-answer-preview:empty::before {
+    content: '暂无内容 / No content';
+    color: #6c757d;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#loading_spinner {
+    text-align: center;
+}
+
+.content_show_modal_copy {
+    display: none;
+}
+
+.btn-xs {
+    --bs-btn-padding-y: .15rem; 
+    --bs-btn-padding-x: .25rem; 
+    --bs-btn-font-size: .55rem;
+}
+
+/* 答案解析预览样式 */
+.answer-explain-preview {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* ############################################# */
+/* 评阅输入区：评语/打分/保存评阅（旧版 flex+height:100% 会导致按钮被拉到离谱高度） */
+/* 已统一使用上方的 grid 版本样式（.review-eval-wrap / .review-submit-vertical） */
+/* ############################################# */
+
+.answer-explain-preview:hover {
+    background: #e9ecef !important;
+    border-color: #adb5bd !important;
+}
+
+.answer-explain-expand-link {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.answer-explain-expand-link:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+.answer-explain-full-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* ############################################# */
+/* 右侧悬浮题目导航 */
+/* ############################################# */
+
+.question-nav-menu {
+    position: fixed;
+    right: clamp(20px, calc((100vw - 320px - 1200px) / 2 - 260px), 120px);
+    /* 顶栏右上角有公告/登录信息等按钮，导航栏下移避免遮挡 */
+    top: 120px;
+    width: 260px;
+    max-height: calc(100vh - 140px);
+    background: #2c3e50;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 独立页：导航栏固定距顶部 */
+body.review-single-page .question-nav-menu {
+    top: 80px; /* 独立页模式顶部标题栏较矮，导航栏上移 */
+    max-height: calc(100vh - 100px);
+    right: 20px;
+}
+
+/* 当屏幕宽度足够时，导航栏放在内容区域左侧，不遮挡 */
+@media (min-width: 1600px) {
+    .question-nav-menu {
+        right: calc((100vw - 320px - 1200px) / 2 - 280px); /* 放在内容区域左侧 */
+        top: 120px; /* 下移，避免与顶栏右上角区域冲突 */
+    }
+}
+
+/* 当屏幕宽度不够时，导航栏在右侧，但可以收起 */
+@media (max-width: 1599px) {
+    .question-nav-menu {
+        right: 20px;
+        top: 120px; /* 下移，避免与顶栏右上角区域冲突 */
+    }
+}
+
+/* 独立页在超宽屏时，导航栏在内容区右侧 */
+@media (min-width: 1600px) {
+    body.review-single-page .question-nav-menu {
+        right: calc((100vw - 1200px) / 2 - 280px);
+        top: 80px;
+    }
+}
+
+@media (max-width: 1599px) {
+    body.review-single-page .question-nav-menu {
+        right: 20px;
+        top: 80px;
+    }
+}
+
+.question-nav-menu.collapsed {
+    width: 50px;
+}
+
+.question-nav-menu.collapsed .question-nav-content {
+    display: none;
+}
+
+.question-nav-menu.collapsed .question-nav-header {
+    /* 收起时按钮贴右上角（而不是居中），符合"往右上角收"的直觉 */
+    justify-content: flex-end;
+    padding: 12px 8px;
+}
+
+.question-nav-menu.collapsed .question-nav-header strong {
+    display: none;
+}
+
+/* 题目导航可拖动：避免拖动时选中文本/触发过渡导致"发黏" */
+body.question-nav-dragging {
+    user-select: none;
+}
+.question-nav-menu.dragging {
+    transition: none !important;
+}
+.question-nav-header {
+    padding: 12px 16px;
+    background: #34495e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    font-size: 14px;
+    border-bottom: 1px solid #3d566e;
+}
+
+/* 收起/展开按钮：更醒目、更像"可展开"的控件 */
+.nav-menu-toggle-btn,
+#nav_menu_toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.nav-menu-toggle-btn:hover,
+#nav_menu_toggle:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+.nav-menu-toggle-btn i,
+#nav_menu_toggle i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.question-nav-content {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px;
+}
+
+/* 导航栏滚动条样式 - Webkit */
+.question-nav-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.question-nav-content::-webkit-scrollbar-track {
+    background: rgba(52, 73, 94, 0.3);
+    border-radius: 3px;
+}
+
+.question-nav-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.question-nav-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 导航栏滚动条样式 - Firefox */
+.question-nav-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(52, 73, 94, 0.3);
+}
+
+.question-nav-item {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background: #34495e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.question-nav-item:hover {
+    background: #3d566e;
+    transform: translateX(-2px);
+}
+
+.question-nav-item.active {
+    background: #3498db;
+    font-weight: 600;
+}
+
+.question-nav-item .nav-item-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0; /* 允许 flex 子元素收缩 */
+}
+
+.question-nav-item {
+    position: relative;
+    padding-left: 14px;
+}
+
+/* 导航项左侧状态色指示条 */
+.question-nav-item::before {
+    content: '';
+    width: 4px;
+    height: calc(100% - 8px);
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    background: var(--score-status-color, transparent);
+    border-radius: 2px;
+    z-index: 1;
+}
+
+/* 导航项右侧题目类型颜色指示条 */
+.question-nav-item::after {
+    content: '';
+    width: 4px;
+    height: calc(100% - 8px);
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    background: var(--pkind-color, transparent);
+    border-radius: 2px;
+    z-index: 1;
+}
+
+/* 导航项 tooltip 样式 */
+.nav-item-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10000;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+.question-nav-item .nav-item-score {
+    font-weight: 700;
+    min-width: 55px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    color: #2c3e50;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.question-nav-item:hover .nav-item-score {
+    background: #ffffff;
+    color: #1a252f;
+}
+
+.question-nav-item.active .nav-item-score {
+    background: #ffffff;
+    color: #3498db;
+    font-weight: 800;
+}
+
+/* 独立页特有样式：隐藏"独立页"按钮 */
+body.review-single-page .review-single-page-btn {
+    display: none;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+    .question-nav-menu {
+        right: 10px;
+        width: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .question-nav-menu {
+        right: 10px;
+        width: 200px;
+    }
+    
+    .question-nav-menu.collapsed {
+        width: 50px;
+        right: 10px;
+    }
+}
+
+/* 阅卷页面代码容器样式：确保只有最外层有滚动条，内部层级不出现滚动条 */
+.answer-code-container {
+    /* answer-code-container 本身不应该有滚动条 */
+    overflow: visible !important;
+}
+
+/* 确保代码容器样式类在 review 模块下正确应用 - 只有最外层有滚动条 */
+.code-viewer-answer,
+.code-viewer-template,
+.code-viewer-student {
+    overflow: auto;
+    /* 确保内部元素不产生滚动条 */
+}
+
+.code-viewer-answer .code-viewer-content,
+.code-viewer-template .code-viewer-content,
+.code-viewer-student .code-viewer-content {
+    overflow: visible !important;
+}
+
+.code-viewer-answer .code-line-number-table,
+.code-viewer-template .code-line-number-table,
+.code-viewer-student .code-line-number-table {
+    overflow: visible !important;
+}
+
+.code-viewer-answer .code-line-content-td,
+.code-viewer-template .code-line-content-td,
+.code-viewer-student .code-line-content-td {
+    overflow: visible !important;
+}
+
+.code-viewer-answer .code-line-content-pre,
+.code-viewer-template .code-line-content-pre,
+.code-viewer-student .code-line-content-pre {
+    overflow: visible !important;
+}
+
+/* 向后兼容：div 方式的代码容器 */
+.code-viewer-answer .code-with-lines,
+.code-viewer-template .code-with-lines,
+.code-viewer-student .code-with-lines {
+    overflow: visible !important;
+}
+
+.code-viewer-answer .code-content,
+.code-viewer-template .code-content,
+.code-viewer-student .code-content {
+    overflow: visible !important;
+}
+
+.code-viewer-answer {
+    max-height: 400px;
+}
+
+.code-viewer-template {
+    max-height: 300px;
+}
+
+.code-viewer-student {
+    max-height: 600px;
+}
+
+/* ############################################# */
+/* 数学公式字号控制 - 与正文字号保持一致 */
+/* ############################################# */
+
+/* 让 katex 字号继承父元素字号，与正文保持一致 */
+.question_div .katex,
+.md_display_div .katex {
+    font-size: inherit;
+}
+
+/* 确保 katex 内部元素也使用相对字号 */
+.question_div .katex *,
+.md_display_div .katex * {
+    font-size: inherit;
+}
+

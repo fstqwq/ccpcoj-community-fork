@@ -1,0 +1,2 @@
+# backtask worker 依赖 (最小集)
+PyMySQL==1.1.2

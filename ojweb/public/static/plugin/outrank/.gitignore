@@ -1,0 +1,3 @@
+# 由 deploy_files/tools/外榜/build_release.sh 生成交叉编译产物，勿提交仓库
+csg_outrank_push_linux_amd64
+csg_outrank_push_windows_amd64.exe

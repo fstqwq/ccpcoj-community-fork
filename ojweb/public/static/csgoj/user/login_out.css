@@ -1,0 +1,343 @@
+/**
+ * 登录/登出框专用样式
+ * 统一管理所有登录和登出相关的样式
+ */
+
+/* 关闭网页登录时侧栏提示（窄栏：纵向排版 + 短文案，避免单字吊行） */
+.sidebar-login-notice .sidebar-login-notice__card {
+	margin: 0;
+	padding: 0.65rem 0.5rem 0.7rem;
+	border-radius: 0.5rem;
+	border: 1px solid rgba(15, 23, 42, 0.08);
+	background-color: #f8fafc;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	text-align: center;
+}
+.sidebar-login-notice .sidebar-login-notice__icon {
+	margin-bottom: 0.35rem;
+	line-height: 1;
+}
+.sidebar-login-notice .sidebar-login-notice__icon i {
+	font-size: 1.35rem;
+	color: #64748b;
+	opacity: 0.92;
+}
+.sidebar-login-notice .sidebar-login-notice__cn {
+	margin: 0;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: #334155;
+	line-height: 1.35;
+	letter-spacing: 0.02em;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+	text-wrap: balance;
+	text-wrap: pretty;
+}
+.sidebar-login-notice .sidebar-login-notice__en {
+	margin: 0.35rem 0 0;
+	font-size: 0.7rem;
+	font-weight: 400;
+	font-style: normal;
+	color: #64748b;
+	line-height: 1.35;
+	hyphens: none;
+	overflow-wrap: break-word;
+	text-wrap: balance;
+	text-wrap: pretty;
+}
+
+/* ==================== 用户面板容器样式 ==================== */
+#user_panel {
+    padding: 0;
+    margin-bottom: 0.5rem;
+    background-color: transparent;
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==================== 登录/登出框基础样式 ==================== */
+/* 统一的基础容器样式，确保登录和登出框布局一致 */
+/* 注意：不要设置 width: 100%，因为 margin 会导致超出父容器 */
+.login_div, .logout_div {
+	margin: 0 0.5rem;
+	padding: 0 0.75rem;
+	background-color: transparent;
+	border-radius: 0;
+	border: none;
+	box-shadow: none;
+	transition: none;
+	box-sizing: border-box;
+	/* 不设置 width，让元素自然适应父容器，避免 margin 导致溢出 */
+}
+
+/* 统一内部内容区域样式 */
+.login_div > form,
+.login_div > .d-grid,
+.logout_div > .mb-2,
+.logout_div > .d-grid {
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
+}
+
+/* 确保表单和内容区域有统一的间距 */
+.login_div .form-signin {
+	margin: 0;
+	padding: 0;
+}
+
+/* 登出框的用户信息区域 */
+.logout_div .mb-2 {
+	margin-bottom: 0.75rem !important;
+	padding: 0;
+}
+
+/* 悬停效果 - 移除 */
+.login_div:hover,
+.logout_div:hover {
+	box-shadow: none;
+	transform: none;
+}
+
+/* 按钮尺寸优化 - 仅针对 btn-sm，让按钮更饱满 */
+.login_div .btn.btn-sm,
+.logout_div .btn.btn-sm {
+	padding: 0.5rem 0.875rem;
+}
+
+/* 单个按钮时的优化样式 - 增加视觉重量和图标间距 */
+/* 登录区域：排除 flex 布局（两个按钮的情况），只优化单个按钮 */
+.login_div .d-grid:not(.d-flex) > button:only-child,
+.login_div .d-grid:not(.d-flex) > a:only-child > button,
+.login_div .d-grid:not(.d-flex) > a:first-child:last-child > button {
+	padding: 0.65rem 1.2rem;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	transition: all 0.2s ease;
+}
+
+/* 登出区域：优化所有按钮（无论是否有修改密码链接） */
+.logout_div .d-grid > button:first-child,
+.logout_div .d-grid > a:first-child > button {
+	padding: 0.65rem 1.2rem;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	transition: all 0.2s ease;
+}
+
+/* 单个按钮内图标样式优化 */
+.login_div .d-grid:not(.d-flex) > button:only-child i,
+.login_div .d-grid:not(.d-flex) > a:only-child > button i,
+.login_div .d-grid:not(.d-flex) > a:first-child:last-child > button i,
+.logout_div .d-grid > button:first-child i,
+.logout_div .d-grid > a:first-child > button i {
+	font-size: 1.05rem;
+	margin: 0;
+}
+
+/* 登录框中的图标按钮样式 - 当登录和注册按钮同时存在时使用 */
+.login_div .login-btn-icon-only {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5rem;
+	min-width: 38px;
+}
+
+.login_div .login-btn-icon-only i {
+	font-size: 1rem;
+	margin: 0;
+}
+
+/* 确保 flex 布局中的图标按钮正确显示 */
+.login_div .d-flex .login-btn-icon-only {
+	width: auto;
+	flex: 1 1 0;
+}
+
+/* 确保 flex 布局中的链接正确显示 */
+.login_div .d-flex .a_noline.flex-fill {
+	display: flex;
+	flex: 1 1 0;
+}
+
+/* 登出区域优化 - 修改密码链接的排版 */
+.logout_div .d-grid .text-center {
+	margin-top: 0.25rem;
+	padding-top: 0.25rem;
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* 登录/登出按钮双语布局优化 - 覆盖 bilingual-inline 的默认样式 */
+/* 确保按钮占满宽度，中英双语在一行显示 */
+.login_div .btn.bilingual-inline:has(.en-text),
+.login_div .bilingual-inline.btn:has(.en-text),
+.logout_div .btn.bilingual-inline:has(.en-text),
+.logout_div .bilingual-inline.btn:has(.en-text) {
+	display: flex !important; /* 覆盖 bilingual.css 中的 grid 布局 */
+	flex-direction: row !important; /* 强制水平布局 */
+	align-items: center !important; /* 垂直居中 */
+	justify-content: center !important; /* 水平居中 */
+	padding: 0.65rem 1.2rem !important; /* 恢复正常的 padding */
+	gap: 0.4rem !important; /* 图标、中文、英文之间的间距 */
+	width: 100% !important; /* 占满侧边栏宽度 */
+}
+
+/* 登录/登出按钮中的中文文本样式 */
+.login_div .btn.bilingual-inline .cn-text,
+.logout_div .btn.bilingual-inline .cn-text {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem; /* 图标和文字之间的间距 */
+}
+
+/* 登录/登出按钮中的英文文本样式优化 */
+.login_div .btn.bilingual-inline .en-text,
+.logout_div .btn.bilingual-inline .en-text {
+	display: inline !important; /* 强制 inline，与中文在同一行 */
+	font-size: 0.75em !important; /* 稍微大一点，更易读 */
+	margin-left: 0 !important; /* 分隔符会处理间距 */
+	margin-top: 0 !important;
+	line-height: 1 !important;
+	font-weight: normal !important;
+	font-style: normal !important;
+	color: inherit !important;
+	opacity: 0.75 !important; /* 稍微提高不透明度 */
+	white-space: nowrap !important; /* 防止换行 */
+}
+
+/* 在中文和英文之间添加分隔符（使用英文文本的伪元素） */
+.login_div .btn.bilingual-inline .en-text::before,
+.logout_div .btn.bilingual-inline .en-text::before {
+	content: '/';
+	margin-left: 0.35rem;
+	margin-right: 0.35rem;
+	opacity: 0.5;
+	font-weight: normal;
+	font-size: 0.85em;
+}
+
+/* 确保图标样式正确 */
+.login_div .btn.bilingual-inline .cn-text i,
+.logout_div .btn.bilingual-inline .cn-text i {
+	margin: 0;
+	font-size: 1.05rem;
+}
+
+/* 齿轮图标和钥匙图标悬停效果 */
+.logout_div .gear-icon {
+	position: relative;
+	transition: all 0.15s ease-in-out;
+	z-index: 1040; /* 降低z-index，避免与Bootstrap modal backdrop (1050) 冲突 */
+}
+
+/* 齿轮图标悬停效果 */
+.logout_div .gear-icon:hover {
+	opacity: 1 !important;
+}
+
+.logout_div .gear-icon:hover i.bi-gear-fill {
+	color: #6c757d !important;
+	transform: rotate(15deg);
+}
+
+/* 钥匙图标悬停效果 */
+.logout_div .gear-icon:hover i.bi-key-fill {
+	color: #6c757d !important;
+	opacity: 1 !important;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+	.login_div, .logout_div {
+		margin: 0.25rem;
+		padding: 0.5rem;
+		box-sizing: border-box;
+		/* 移动端也不设置 width: 100%，避免 margin 导致溢出 */
+	}
+	
+	/* 移动端确保内部内容区域也保持一致的边距 */
+	.login_div > form,
+	.login_div > .d-grid,
+	.logout_div > .mb-2,
+	.logout_div > .d-grid {
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
+}
+
+/* ==================== 登录表单验证样式 ==================== */
+/* 登录表单容器 */
+.login_div .form-signin {
+    position: relative;
+}
+
+/* 统一错误提示区域样式 */
+#login_error_alert {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 登录框错误 Tooltip 样式 */
+.login-tooltip-error .tooltip-inner {
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.875rem;
+    max-width: 250px;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.login-tooltip-error .tooltip-arrow::before {
+    border-top-color: #dc3545;
+}
+
+/* 输入框验证状态样式优化 */
+.login_div .form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.5rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6 .4.4.4-.4m0 4.8-.4-.4-.4.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.125rem) center;
+    background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem);
+}
+
+.login_div .form-control.is-valid {
+    border-color: #198754;
+    padding-right: calc(1.5em + 0.5rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.98-.98-.98-.98-.98.98.98.98zm3.4-4.77L5.5 3.5l-1.2-1.2-1.2 1.2 1.2 1.2 1.2-1.2z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.125rem) center;
+    background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem);
+}
+
+/* 确保错误提示不影响布局 */
+#login_error_alert .alert {
+    margin-bottom: 0;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+

@@ -1,0 +1,269 @@
+/* 比赛后台次级导航：紧凑工具条，Bootstrap 5 + 竞赛场控风格 */
+.admin-menu-pills {
+    --admin-subnav-accent: var(--bs-primary, #0d6efd);
+
+    list-style: none;
+    border-bottom: none;
+    margin: 0.35rem 0 0.5rem;
+    padding: 0.3rem 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    background: color-mix(in srgb, var(--admin-subnav-accent) 6%, var(--bs-body-bg, #fff) 94%);
+    border: 1px solid color-mix(in srgb, var(--admin-subnav-accent) 18%, transparent);
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.admin-menu-pills .nav-item {
+    margin: 0;
+}
+
+/* 主链接：[图标 | 中/英纵排 | 下拉三角]，三角与整块垂直居中 */
+.admin-menu-pills .nav-item .nav-link {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 0.26rem 0.45rem 0.26rem 0.4rem;
+    min-height: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.75);
+    color: var(--bs-body-color, #212529);
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.38rem;
+}
+
+.admin-menu-pills .nav-item .nav-link:hover {
+    background-color: #fff;
+    border-color: color-mix(in srgb, var(--admin-subnav-accent) 38%, var(--bs-secondary-color, #6c757d) 62%);
+    color: var(--bs-body-color, #212529);
+}
+
+.admin-menu-pills .nav-item .nav-link:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--admin-subnav-accent) 50%, transparent);
+    outline-offset: 1px;
+}
+
+.admin-menu-pills .nav-item .nav-link.active {
+    background-color: var(--admin-subnav-accent);
+    border-color: color-mix(in srgb, var(--admin-subnav-accent) 85%, #000 15%);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.admin-menu-pills .admin-subnav-icon {
+    flex-shrink: 0;
+    align-self: center;
+    font-size: 1rem;
+    opacity: 0.82;
+    line-height: 1;
+}
+
+.admin-menu-pills .dropdown-item .admin-subnav-icon {
+    font-size: 0.9rem;
+    opacity: 0.78;
+}
+
+.admin-menu-pills .nav-item .nav-link.active .admin-subnav-icon {
+    opacity: 1;
+    color: inherit;
+}
+
+/* 中文上、英文下；与左侧图标纵向居中对齐 */
+.admin-menu-pills .admin-subnav-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.06rem;
+    min-width: 0;
+    line-height: 1.15;
+}
+
+.admin-menu-pills .admin-subnav-cn {
+    display: block;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.admin-menu-pills .nav-item .nav-link .admin-subnav-stack .en-text {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 400;
+    font-style: normal;
+    opacity: 0.58;
+    margin-left: 0;
+    margin-top: 0;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.admin-menu-pills .nav-item .nav-link.active .en-text {
+    color: rgba(255, 255, 255, 0.88) !important;
+    opacity: 1;
+}
+
+/* 下拉触发：保留小三角，便于识别 */
+.admin-menu-pills .nav-item.dropdown .nav-link.dropdown-toggle {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.admin-menu-pills .nav-item.dropdown .nav-link.dropdown-toggle {
+    padding-right: 0.38rem;
+}
+
+.admin-menu-pills .nav-item.dropdown .nav-link.dropdown-toggle::after {
+    display: inline-block;
+    flex-shrink: 0;
+    align-self: center;
+    margin-left: 0.12rem;
+    margin-top: 0;
+    vertical-align: middle;
+    border-top: 0.26em solid;
+    border-right: 0.2em solid transparent;
+    border-left: 0.2em solid transparent;
+    opacity: 0.42;
+}
+
+.admin-menu-pills .nav-item.dropdown .nav-link.dropdown-toggle.active::after {
+    opacity: 0.85;
+    border-top-color: #fff;
+}
+
+.admin-menu-pills .nav-item.dropdown {
+    position: relative;
+}
+
+.admin-menu-pills .dropdown-menu {
+    margin-top: 0.25rem;
+    border-radius: 0.4rem;
+    box-shadow: 0 0.35rem 0.85rem rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0.25rem;
+    background-color: var(--bs-body-bg, #fff);
+    min-width: 10.5rem;
+}
+
+.admin-menu-pills .dropdown-item {
+    font-size: 0.8125rem;
+    padding: 0.32rem 0.5rem;
+    border-radius: 0.3rem;
+    transition: background-color 0.12s ease, color 0.12s ease;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.38rem;
+    margin-bottom: 0.1rem;
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.admin-menu-pills .dropdown-item:last-child {
+    margin-bottom: 0;
+}
+
+.admin-menu-pills .dropdown-item:hover {
+    background-color: color-mix(in srgb, var(--admin-subnav-accent) 10%, transparent);
+}
+
+.admin-menu-pills .dropdown-item.active {
+    background-color: var(--admin-subnav-accent);
+    color: #fff;
+}
+
+.admin-menu-pills .dropdown-item .admin-subnav-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.05rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.admin-menu-pills .dropdown-item .admin-subnav-cn {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.admin-menu-pills .dropdown-item .en-text {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 400;
+    font-style: normal;
+    opacity: 0.62;
+    margin-left: 0;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+}
+
+.admin-menu-pills .dropdown-item.active .en-text {
+    color: rgba(255, 255, 255, 0.9) !important;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .admin-menu-pills {
+        gap: 0.25rem;
+        padding: 0.28rem 0.32rem;
+    }
+
+    .admin-menu-pills .nav-item .nav-link {
+        font-size: 0.76rem;
+        padding: 0.22rem 0.38rem 0.22rem 0.35rem;
+        gap: 0.32rem;
+    }
+
+    .admin-menu-pills .admin-subnav-cn {
+        font-size: 0.76rem;
+    }
+
+    .admin-menu-pills .nav-item .nav-link .admin-subnav-stack .en-text {
+        font-size: 0.58rem;
+    }
+
+    .admin-menu-pills .admin-subnav-icon {
+        font-size: 0.92rem;
+    }
+
+    .admin-menu-pills .dropdown-menu {
+        min-width: 9.5rem;
+    }
+}
+
+/* 无 color-mix 的浏览器：回退 */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+    .admin-menu-pills {
+        background: #f4f8ff;
+        border-color: rgba(13, 110, 253, 0.18);
+    }
+
+    .admin-menu-pills .nav-item .nav-link:hover {
+        border-color: rgba(13, 110, 253, 0.45);
+    }
+
+    .admin-menu-pills .nav-item .nav-link.active {
+        border-color: #0a58ca;
+    }
+
+    .admin-menu-pills .dropdown-item:hover {
+        background-color: rgba(13, 110, 253, 0.08);
+    }
+}

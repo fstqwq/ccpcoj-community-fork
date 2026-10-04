@@ -1,0 +1,165 @@
+/* 消息列表样式 */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.list-group-item:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* 消息内容样式 */
+.message-content {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+.message-content p {
+    margin-bottom: 0.75rem;
+}
+
+.message-content code {
+    background-color: #f8f9fa;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    color: #e83e8c;
+}
+
+.message-content pre {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.message-content blockquote {
+    border-left: 4px solid #dee2e6;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #6c757d;
+}
+
+/* 新消息高亮样式 */
+.border-danger {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+/* 空状态样式 */
+#noMessages {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 2px dashed #dee2e6;
+}
+
+/* 徽章样式优化 */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .message-content {
+        font-size: 0.9rem;
+    }
+    
+    .d-flex.align-items-center.text-muted.small {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .d-flex.align-items-center.text-muted.small > * {
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* 消息管理页面样式 */
+.limit_span {
+    display: inline-block;
+    max-width: 550px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 表格按钮样式 */
+.btn-sm .en-text {
+    font-size: 0.6em;
+    margin-left: 4px;
+}
+
+/* Modal样式优化 */
+/* 遵循 Bootstrap 5.3 官方文档规范：
+ * https://getbootstrap.com/docs/5.3/components/modal/
+ * 
+ * 1. Modal HTML 已放在 top-level 位置（body 的直接子元素）
+ * 2. 不覆盖 Bootstrap 的默认 z-index（backdrop: 1050, modal: 1055）
+ * 3. 使用 CSS 类而不是内联样式
+ */
+
+/* Modal 宽度优化：使用 CSS 类而不是内联样式 */
+.modal-max-width-900 {
+    max-width: 900px;
+}
+
+/* Vditor编辑器样式 */
+#vditor {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+#vditor:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Bootstrap Table 工具栏样式 */
+.fixed-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fixed-table-toolbar .columns {
+    order: -1;
+}
+
+.bootstrap-table .fixed-table-toolbar {
+    padding: 0.5rem 0;
+}
+

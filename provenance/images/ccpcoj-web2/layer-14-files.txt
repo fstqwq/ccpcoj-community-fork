@@ -1,0 +1,11 @@
+usr
+usr/local
+usr/local/build_scripts
+usr/local/build_scripts/10_php_gd_zip.sh
+usr/local/build_scripts/20_download_deps.sh
+usr/local/build_scripts/30_install_pandoc.sh
+usr/local/build_scripts/40_python_build.sh
+usr/local/build_scripts/50_php_exts.sh
+usr/local/build_scripts/60_python_requirements.sh
+usr/local/build_scripts/70_fpm_tuning.sh
+usr/local/build_scripts/80_misc.sh

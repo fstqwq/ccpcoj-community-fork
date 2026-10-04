@@ -1,0 +1,16 @@
+services:
+  judge-2:
+    extends:
+      file: compose.yaml
+      service: judge
+    volumes:
+      - judge-work-2:/judge
+  judge-3:
+    extends:
+      file: compose.yaml
+      service: judge
+    volumes:
+      - judge-work-3:/judge
+volumes:
+  judge-work-2:
+  judge-work-3:

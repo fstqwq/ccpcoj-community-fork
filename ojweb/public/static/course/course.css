@@ -1,0 +1,1210 @@
+/* 课程选择页面样式 - Bootstrap 5 优化 */
+
+.course-container {
+    padding: 1.5rem 0;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* 课程列表卡片 */
+.course-list-card {
+    height: calc(100vh - 200px);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-list-card .card-body {
+    flex: 1;
+    overflow: hidden;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 350px);
+}
+
+/* 课程列表容器：禁止横向滚动，锁定宽度 */
+.card-body > .flex-grow-1.overflow-auto {
+    overflow-x: hidden !important;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0; /* 允许 flex 子元素收缩 */
+    box-sizing: border-box;
+}
+
+/* 课程列表组样式 */
+#course_list {
+    margin: 0;
+    border-radius: 0.375rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.course-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.75rem 1rem; /* 更紧凑的padding */
+    line-height: 1.5;
+    position: relative; /* 作为"进入"贴边滑出 tab 的定位上下文（占满整个 list-item 高度） */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 课程项内容容器 */
+.course-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* 更紧凑的间距 */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* 不在这里做定位上下文：否则 enter-tab 的 height:100% 只能撑满内容区而不是整条 list-item */
+}
+
+/* 课程信息区域 - 与左侧序号区域对齐 */
+.course-item-info {
+    min-width: 0; /* 允许 flex 子元素收缩 */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem; /* 标题和单位之间的紧凑间距 */
+    align-items: flex-start; /* 左对齐 */
+}
+
+/* 当没有单位时，标题垂直居中 */
+.course-item-info.no-unit {
+    justify-content: center;
+}
+
+/* 当有单位时，顶部对齐 */
+.course-item-info.has-unit {
+    justify-content: flex-start;
+}
+
+.course-item:hover {
+    background-color: #f8f9fa;
+}
+
+.course-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.course-item.active:hover {
+    background-color: #0b5ed7;
+}
+
+/* 序号和course_key组合容器 */
+.course-item-number-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 56px;     /* 宽度定死：序号 + course_key 列 */
+    min-width: 56px;
+    max-width: 56px;
+    margin-right: 0.875rem; /* 与右侧内容的间距 */
+}
+
+.course-item-number {
+    width: 32px; /* 缩小序号框 */
+    height: 32px; /* 缩小序号框 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef;
+    border-radius: 6px; /* 圆角矩形 */
+    font-weight: 700;
+    font-size: 0.85rem; /* 稍微减小字体 */
+    color: #495057;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+    transition: all 0.2s ease;
+}
+
+.course-item.active .course-item-number {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    font-weight: 700;
+}
+
+/* course_key 显示在序号下方 */
+.course-item-key {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6c757d;
+    letter-spacing: 0.05em;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-align: center;
+    padding: 0.1rem 0.25rem;
+    background-color: #f0f0f0;
+    border-radius: 0.2rem;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+/* course_key 内层文本：用于跑马灯动画 */
+.course-item-key .course-item-key-text {
+    display: inline-block;
+    will-change: transform;
+    transform: translateX(0);
+}
+
+/* 只在溢出且 hover 时启用跑马灯（来回滚动，避免瞬间回跳） */
+.course-item:hover .course-item-key.is-overflow .course-item-key-text {
+    text-overflow: clip;
+    animation: courseKeyMarquee var(--marquee-duration, 4s) linear infinite;
+    animation-direction: alternate;
+}
+
+@keyframes courseKeyMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-1 * var(--marquee-distance, 0px))); }
+}
+
+.course-item:hover .course-item-key {
+    background-color: #e7f1ff;
+    border-color: #b3d4fc;
+    color: #0d6efd;
+}
+
+.course-item.active .course-item-key {
+    color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* 课程标题 - 主要文字，最醒目 */
+/* 允许换行，英文单词强制折行 */
+#course_list .course-item-title,
+#course_list .course-item .course-item-title,
+#course_list .course-item .course-text-title,
+.course-item-title,
+.course-item .course-item-title,
+.course-item .course-text-title {
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    margin-bottom: 0 !important; /* 移除底部间距，由父容器gap控制 */
+    color: #1a1a1a !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.01em !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    transition: color 0.2s ease !important;
+    white-space: normal !important; /* 允许换行 */
+    word-wrap: break-word !important; /* 允许在单词内换行 */
+    word-break: break-word !important; /* 英文单词强制折行 */
+    overflow-wrap: break-word !important; /* 现代浏览器支持 */
+    max-width: 100% !important;
+}
+
+#course_list .course-item:hover .course-item-title,
+#course_list .course-item:hover .course-text-title,
+.course-item:hover .course-item-title,
+.course-item:hover .course-text-title {
+    color: #0d6efd !important;
+}
+
+#course_list .course-item.active .course-item-title,
+#course_list .course-item.active .course-text-title,
+.course-item.active .course-item-title,
+.course-item.active .course-text-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 课程单位 - 次要信息，使用柔和的颜色 */
+#course_list .course-item-unit,
+#course_list .course-item .course-item-unit,
+.course-item-unit,
+.course-item .course-item-unit {
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #0d6efd !important; /* 使用主题蓝色，更醒目 */
+    margin-bottom: 0 !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0.01em !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    opacity: 0.9; /* 提高不透明度，更清晰 */
+    margin-top: 0.05rem; /* 与标题的间距 */
+}
+
+#course_list .course-item-unit .course-unit-icon,
+.course-item-unit .course-unit-icon {
+    opacity: 0.7;
+    line-height: 1;
+    display: inline-block;
+}
+
+#course_list .course-item-unit .course-unit-logo,
+.course-item-unit .course-unit-logo {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+#course_list .course-item.active .course-item-unit .course-unit-icon,
+.course-item.active .course-item-unit .course-unit-icon {
+    opacity: 0.9;
+}
+
+#course_list .course-item-unit::before,
+#course_list .course-item .course-item-unit::before,
+.course-item-unit::before,
+.course-item .course-item-unit::before {
+    content: '' !important; /* 不使用 emoji 图标 */
+    display: none !important;
+}
+
+#course_list .course-item.active .course-item-unit,
+.course-item.active .course-item-unit {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+
+/* 课程单位悬停效果 */
+#course_list .course-item:hover .course-item-unit,
+.course-item:hover .course-item-unit {
+    color: #0a58ca !important; /* 悬停时更深的蓝色 */
+}
+
+/* active 状态的 icon 透明度在 .course-unit-icon 控制 */
+
+/* 移除单独的 course-text-key 样式，因为已经合并到序号区域 */
+
+/* “进入”右侧贴边纵向 tab：默认藏在右侧外面，hover/focus 时从右向左滑出；不挤占布局（覆盖在内容上方） */
+#course_list .course-item .course-item-enter-tab,
+.course-item .course-item-enter-tab {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 40px;
+    display: flex;                 /* 不用 display:none，避免被其它样式覆盖导致常显 */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    user-select: none;
+
+    /* 纵向排列“进入” */
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 0.06em;
+    font-size: 13px;
+    font-weight: 700;
+
+    /* 融为一体：弱边界 + 玻璃感 + 轻高光 */
+    color: #0d6efd;
+    background: linear-gradient(
+        180deg,
+        rgba(13, 110, 253, 0.06) 0%,
+        rgba(13, 110, 253, 0.10) 50%,
+        rgba(13, 110, 253, 0.06) 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-left: 1px solid rgba(13, 110, 253, 0.18);
+    box-shadow: -10px 0 24px rgba(13, 110, 253, 0.10);
+
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    /* 关键：从右侧“滑出来” */
+    transform: translateX(100%);
+    transition:
+        transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.16s ease,
+        background 0.20s ease,
+        border-color 0.20s ease,
+        box-shadow 0.20s ease;
+}
+
+/* 高光细线，让它更“高级” */
+#course_list .course-item .course-item-enter-tab::before,
+.course-item .course-item-enter-tab::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    opacity: 0.55;
+}
+
+/* 悬停/键盘聚焦时显示（覆盖滑出，不挤压布局） */
+#course_list .course-item:hover .course-item-enter-tab,
+#course_list .course-item:focus-within .course-item-enter-tab,
+.course-item:hover .course-item-enter-tab,
+.course-item:focus-within .course-item-enter-tab {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+/* 悬停 tab 自身的反馈 */
+#course_list .course-item .course-item-enter-tab:hover,
+.course-item .course-item-enter-tab:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(13, 110, 253, 0.10) 0%,
+        rgba(13, 110, 253, 0.16) 50%,
+        rgba(13, 110, 253, 0.10) 100%
+    );
+    border-left-color: rgba(13, 110, 253, 0.28);
+    box-shadow:
+        -14px 0 30px rgba(13, 110, 253, 0.16),
+        -3px 0 10px rgba(0, 0, 0, 0.08);
+}
+
+/* active 状态：与蓝底融合 */
+#course_list .course-item.active .course-item-enter-tab,
+.course-item.active .course-item-enter-tab {
+    color: rgba(255, 255, 255, 0.96);
+    border-left-color: rgba(255, 255, 255, 0.22);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.20) 50%,
+        rgba(255, 255, 255, 0.14) 100%
+    );
+    box-shadow:
+        -14px 0 30px rgba(0, 0, 0, 0.18),
+        -3px 0 10px rgba(0, 0, 0, 0.10);
+}
+
+/* 触屏设备无 hover：至少在选中项上显示，避免“找不到入口” */
+@media (hover: none) {
+    #course_list .course-item.active .course-item-enter-tab,
+    .course-item.active .course-item-enter-tab {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+}
+
+/* 搜索框样式 */
+#course_search {
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#course_search:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+}
+
+/* 加载状态 */
+#course_list_loading {
+    min-height: 200px;
+}
+
+/* 空状态 */
+#course_list_empty {
+    min-height: 200px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 只在显示时（有 d-flex 类）才应用 flex 布局居中 */
+#course_list_empty.d-flex {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* 确保空状态内容居中 */
+#course_list_empty > * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 课程介绍卡片 */
+.course-info-card {
+    min-height: 600px;
+    height: calc(100vh - 200px);
+}
+
+.course-info-card .card-body {
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+}
+
+/* 课程介绍内容样式 */
+.course-detail {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.course-content {
+    line-height: 1.8;
+    color: #495057;
+}
+
+.course-content h1,
+.course-content h2,
+.course-content h3,
+.course-content h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #212529;
+    font-weight: 600;
+}
+
+.course-content h2 {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+}
+
+.course-content p {
+    margin-bottom: 1rem;
+}
+
+.course-content ul,
+.course-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.course-content code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    color: #d63384;
+}
+
+.course-content pre {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #0d6efd;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.course-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+.course-content blockquote {
+    border-left: 4px solid #0dcaf0;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.course-content table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.course-content table th,
+.course-content table td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+}
+
+.course-content table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.course-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+/* 系统介绍样式 - 特化UI */
+.system-about {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.system-about-header {
+    padding: 0.5rem 0 1rem 0; /* 减少顶部和底部间距 */
+    margin-bottom: 1.5rem; /* 减少底部外边距 */
+    /* 移除边框和背景色，保持简洁 */
+}
+
+/* 当card-header隐藏时，调整card-body的padding */
+.card-body.header-hidden {
+    padding-top: 0 !important;
+}
+
+/* 当card-header隐藏时，系统介绍需要调整顶部间距 */
+.card-body.header-hidden .system-about-header {
+    margin-top: 0;
+    padding-top: 0.5rem; /* 减少顶部间距，让标题更靠顶 */
+}
+
+.system-about-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+    /* 移除渐变文字效果，使用简洁的深色 */
+}
+
+.system-about-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6c757d;
+    letter-spacing: 0.01em;
+    margin-bottom: 0;
+    /* 移除斜体，更简洁 */
+}
+
+.system-about-content {
+    line-height: 1.8;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.system-about-content h1,
+.system-about-content h2,
+.system-about-content h3,
+.system-about-content h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #212529;
+    font-weight: 600;
+}
+
+.system-about-content h2 {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+}
+
+.system-about-content p {
+    margin-bottom: 1rem;
+}
+
+.system-about-content ul,
+.system-about-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.system-about-content code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    color: #d63384;
+}
+
+.system-about-content pre {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #667eea;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.system-about-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+.system-about-content blockquote {
+    border-left: 4px solid #0dcaf0;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.system-about-content table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.system-about-content table th,
+.system-about-content table td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+}
+
+.system-about-content table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.system-about-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+/* 系统介绍面板header渐变样式 */
+#course_info_header.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+}
+
+#course_info_header.bg-gradient h5,
+#course_info_header.bg-gradient .bi {
+    color: white !important;
+}
+
+/* 课程介绍样式（保持原有样式） */
+.course-about {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.course-about .course-content {
+    margin-top: 1.5rem;
+}
+
+/* 空状态样式 */
+.text-center.text-muted {
+    opacity: 0.6;
+}
+
+.text-center.text-muted i {
+    opacity: 0.4;
+}
+
+/* 响应式设计 */
+@media (max-width: 991.98px) {
+    .course-container {
+        padding: 1rem 0;
+    }
+    
+    .course-list-card,
+    .course-info-card {
+        height: auto;
+        min-height: 400px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .course-list-wrapper {
+        max-height: 500px;
+    }
+    
+    .course-info-card .card-body {
+        max-height: 600px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .course-list-card .card-header h5,
+    .course-info-card .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    .course-item {
+        padding: 0.65rem 0.75rem; /* 移动端更紧凑 */
+    }
+    
+    .course-item-content {
+        gap: 0.45rem; /* 移动端更紧凑 */
+    }
+    
+    .course-item-number-wrapper {
+        width: 52px;     /* 移动端也定死宽度（稍微缩小） */
+        min-width: 52px;
+        max-width: 52px;
+        margin-right: 0.75rem;
+    }
+    
+    .course-item-number {
+        width: 30px; /* 移动端更小 */
+        height: 30px; /* 移动端更小 */
+        font-size: 0.8rem;
+    }
+    
+    .course-item-key {
+        font-size: 0.6rem;
+        padding: 0.08rem 0.2rem;
+    }
+    
+    #course_list .course-item-title,
+    #course_list .course-item .course-text-title,
+    .course-item-title,
+    .course-item .course-text-title {
+        font-size: 14px !important;
+    }
+    
+    /* 移动端：稍微缩窄右侧贴边 tab */
+    #course_list .course-item .course-item-enter-tab,
+    .course-item .course-item-enter-tab {
+        width: 34px;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+    }
+    
+    #course_list .course-item-title,
+    #course_list .course-item .course-text-title,
+    .course-item-title,
+    .course-item .course-text-title {
+        font-size: 14px !important;
+        margin-bottom: 0.35rem !important;
+        font-weight: 600 !important;
+    }
+    
+    #course_list .course-item-unit,
+    #course_list .course-item .course-item-unit,
+    .course-item-unit,
+    .course-item .course-item-unit {
+        font-size: 12px !important;
+        margin-bottom: 0.3rem !important;
+        font-weight: 500 !important;
+    }
+    
+    #course_list .course-item small,
+    #course_list .course-item .course-text-key,
+    .course-item small,
+    .course-item .course-text-key {
+        font-size: 10px !important;
+        padding: 0.12rem 0.35rem !important;
+    }
+    
+    /* （去重）上面已处理移动端 enter-tab 尺寸 */
+    
+    /* 移动端：标题允许换行，但尽量保持在一行 */
+    #course_list .course-item-title,
+    #course_list .course-item .course-text-title,
+    .course-item-title,
+    .course-item .course-text-title {
+        white-space: normal !important; /* 移动端允许换行 */
+        line-height: 1.3 !important;
+    }
+}
+
+/* 图标样式（如果使用 Bootstrap Icons） */
+.bi {
+    display: inline-block;
+    vertical-align: -0.125em;
+    margin-right: 0.25rem;
+}
+
+/* ==================== 课程标题左侧边栏样式 ==================== */
+
+/* 课程侧边栏容器 - 固定定位在 header 右侧，完全脱离文档流 */
+.course-sidebar {
+    position: fixed !important;
+    /* left 位置在媒体查询中设置，确保在菜单右边缘内外各占一半 */
+    top: 0;
+    width: 24px;
+    height: 100vh;
+    z-index: 1001; /* 高于 header (1000)，确保不被菜单遮挡 */
+    background: var(--course-sidebar-bg, linear-gradient(180deg, #0d6efd 0%, #0b5ed7 50%, #0a58ca 100%));
+    border-right: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        2px 0 12px rgba(13, 110, 253, 0.3),
+        inset -1px 0 0 rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* 确保完全脱离文档流，不影响布局 */
+    pointer-events: auto;
+    isolation: isolate;
+    /* 确保不占据文档流空间 */
+    float: none !important;
+    clear: none !important;
+    /* 确保不影响其他元素的布局 */
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 修正：全局 .bi 默认带 margin-right，会导致窄侧边栏(24px)图标溢出 */
+.course-sidebar .bi {
+    margin-right: 0 !important;
+}
+
+/* 进一步约束：侧边栏内图标不应有任何外边距，避免在 24px 窄条里溢出 */
+.course-sidebar .course-sidebar-icon,
+.course-sidebar .course-sidebar-arrow {
+    margin: 0 !important;
+}
+
+/* 确保课程栏不会影响 main 或其他元素的布局 */
+body > .course-sidebar {
+    position: fixed !important;
+}
+
+
+/* 装饰性背景元素 */
+.course-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.course-sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+/* 课程侧边栏链接 */
+.course-sidebar-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: var(--course-sidebar-fg, #ffffff);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.course-sidebar-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.course-sidebar-link:hover {
+    text-decoration: none;
+    color: #ffffff;
+    background: var(--course-sidebar-bg-hover, linear-gradient(180deg, #0b5ed7 0%, #0a58ca 50%, #084298 100%));
+    box-shadow: 
+        inset 0 0 20px rgba(255, 255, 255, 0.1),
+        2px 0 16px rgba(13, 110, 253, 0.4);
+}
+
+.course-sidebar-link:hover::before {
+    opacity: 1;
+}
+
+.course-sidebar-link:active {
+    background: var(--course-sidebar-bg-active, linear-gradient(180deg, #0a58ca 0%, #084298 50%, #06357a 100%));
+    transform: scale(0.98);
+}
+
+/* 课程侧边栏内容 - 竖排布局 */
+.course-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    /* 简单且稳定：容器保持正常纵向堆叠（icon→标题→单位→arrow）
+       仅对“文字”（标题/单位）做竖排，避免 icon 在 24px 窄条里跑偏/被裁剪 */
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    padding: 2rem 0;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+/* 桌面端：整体内容距离顶部 300px（不做任何定位，仍然是简单竖排顺序） */
+@media (min-width: 768px) {
+    .course-sidebar-content {
+        padding-top: 200px;
+        padding-bottom: 2rem;
+    }
+}
+
+/* 课程图标 */
+.course-sidebar-icon {
+    font-size: 1.2rem;
+    color: currentColor;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    position: relative;
+    /* 避免 icon 自己也被竖排书写模式影响外观 */
+    writing-mode: horizontal-tb;
+}
+
+.course-sidebar-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.course-sidebar-link:hover .course-sidebar-icon {
+    transform: scale(1.2) rotate(5deg);
+    color: rgba(255, 255, 255, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.course-sidebar-link:hover .course-sidebar-icon::after {
+    opacity: 1;
+}
+
+/* 课程标题文字 - 竖排 */
+.course-sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: currentColor;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 0.25em;
+    line-height: 1.5;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 8px rgba(255, 255, 255, 0.1);
+    word-break: keep-all;
+    white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    padding: 0.4rem 0;
+    /* 在竖排模式下，通过flex的align-items:center已经实现横向居中 */
+    /* 这里不需要额外的text-align或margin，因为父容器已经设置了align-items:center */
+    display: inline-block;
+    /* 确保文字在竖排模式下正确显示 */
+    text-align: start;
+    margin-left: 0;
+}
+
+/* 课程单位（竖排，弱化一点） */
+.course-sidebar-unit {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.9;
+    letter-spacing: 0.15em;
+    color: currentColor;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.course-sidebar-title::before,
+.course-sidebar-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.course-sidebar-title::before {
+    top: -0.5rem;
+}
+
+.course-sidebar-title::after {
+    bottom: -0.5rem;
+}
+
+.course-sidebar-link:hover .course-sidebar-title {
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 
+        0 3px 6px rgba(0, 0, 0, 0.4),
+        0 0 12px rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.3em;
+}
+
+.course-sidebar-link:hover .course-sidebar-title::before,
+.course-sidebar-link:hover .course-sidebar-title::after {
+    opacity: 1;
+}
+
+/* 箭头图标 - 竖排时向下 */
+.course-sidebar-arrow {
+    font-size: 1.1rem;
+    color: currentColor;
+    opacity: 0.8;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    writing-mode: horizontal-tb;
+}
+
+.course-sidebar-link:hover .course-sidebar-arrow {
+    opacity: 1;
+    color: currentColor;
+    transform: translateY(8px) scale(1.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* 课程栏浮在内容上方，不占据布局空间 */
+/* 课程侧边栏宽度 24px，在菜单右边缘内外各占一半（12px 内 + 12px 外） */
+/* 基础桌面端（屏幕宽度 < 1480px）：菜单在 left: 0, width: 200px */
+@media (min-width: 768px) {
+    .course-sidebar {
+        /* 菜单右边缘在 200px，课程栏左边缘应该在 200px - 12px = 188px */
+        left: 188px;
+    }
+}
+
+/* 屏幕宽度足够时（>= 1700px）：main 居中，菜单相对于 main 在左侧 */
+/* 菜单位置：left: calc(50% - 840px)，菜单右边缘：calc(50% - 840px + 200px) = calc(50% - 640px) */
+/* 课程栏左边缘：calc(50% - 640px - 12px) = calc(50% - 652px) */
+@media (min-width: 1700px) {
+    .course-sidebar {
+        left: calc(50% - 652px);
+    }
+}
+
+/* 移动端：隐藏课程侧边栏，改为顶部横幅，横向贴顶栏 */
+@media (max-width: 767.98px) {
+    .course-sidebar {
+        position: fixed;
+        left: 0;
+        top: 3.5rem; /* 顶栏高度，贴在顶栏下方 */
+        width: 100%;
+        height: auto;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 50%, #0a58ca 100%);
+        border-right: none;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 4px 12px rgba(13, 110, 253, 0.3),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+        z-index: 1001; /* 高于 header (1000)，确保不被顶栏遮挡 */
+        /* 课程标题栏高度变量（根据实际内容调整） */
+        --course-sidebar-height: 60px;
+        min-height: var(--course-sidebar-height);
+    }
+    
+    .course-sidebar::before {
+        height: 40px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    }
+    
+    .course-sidebar::after {
+        display: none;
+    }
+    
+    .course-sidebar-content {
+        writing-mode: horizontal-tb;
+        text-orientation: mixed;
+        flex-direction: row;
+        padding: 1rem 1.25rem;
+        gap: 0.875rem;
+        align-items: center;
+    }
+    
+    .course-sidebar-icon {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+        margin-right: 0.3rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    
+    .course-sidebar-link:hover .course-sidebar-icon {
+        transform: scale(1.15) rotate(5deg);
+    }
+    
+    .course-sidebar-title {
+        font-size: 1.05rem;
+        letter-spacing: 0.1em;
+        line-height: 1.5;
+        flex: 1;
+    }
+    
+    .course-sidebar-title::before,
+    .course-sidebar-title::after {
+        display: none;
+    }
+    
+    .course-sidebar-arrow {
+        font-size: 1.1rem;
+        margin-top: 0;
+        margin-left: 0.5rem;
+        transform: rotate(90deg);
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    }
+    
+    .course-sidebar-link:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 50%, #084298 100%);
+    }
+    
+    .course-sidebar-link:hover .course-sidebar-arrow {
+        transform: rotate(90deg) translateX(5px) scale(1.1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    
+    /* main 需要为课程标题栏留出空间 */
+    /* 注意：sidebarlayout.css 中移动端 main 已有 margin-top: 3.5rem（顶栏高度） */
+    /* 这里需要额外增加课程标题栏高度，让内容不被遮挡 */
+    main {
+        margin-top: calc(3.5rem + var(--course-sidebar-height, 60px)) !important;
+    }
+}
+

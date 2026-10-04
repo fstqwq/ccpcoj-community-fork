@@ -1,0 +1,659 @@
+/**
+ * expsys 比赛列表筛选样式
+ * 侧边栏筛选方案 - 简洁Bootstrap5风格
+ */
+
+/* 比赛/练习列表：标题列限 300px、折行；班级列可折行（覆盖 BT 单元格常见 nowrap） */
+#contest_list_table td[data-field="title"],
+#contest_table td[data-field="title"],
+#tpl_picker_table td[data-field="title"],
+#tpl_manage_table td[data-field="title"] {
+    max-width: 300px;
+    white-space: normal !important;
+    word-break: break-word;
+}
+
+#contest_list_table td[data-field="clss_title"],
+#contest_table td[data-field="clss_title"],
+#tpl_picker_table td[data-field="clss_title"],
+#tpl_manage_table td[data-field="clss_title"] {
+    white-space: normal !important;
+    word-break: break-word;
+}
+
+/* 年级/学期合并列：可双击填筛选的徽块 */
+.csg-yearsem-year,
+.csg-yearsem-sem {
+    cursor: pointer;
+}
+
+/* 练习模板选择 Modal 打开时，筛选侧栏需高于 Modal 遮罩 */
+body.modal-open #filterSidebar.show,
+body.modal-open #tpl_filter_sidebar.show {
+    z-index: 1060;
+}
+
+/* 页面标题区域样式 */
+.page-title.bilingual-inline {
+    flex: 1;
+}
+
+/* 标题右侧筛选区域响应式 */
+@media (max-width: 768px) {
+    .page-title.bilingual-inline + div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+    }
+    
+    .page-title.bilingual-inline + div .form-select,
+    .page-title.bilingual-inline + div .form-control {
+        width: 100% !important;
+    }
+}
+
+/* 教师列表样式 - 紧凑美观的显示 */
+.teacher-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.teacher-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.375rem;
+    background-color: #e7f1ff;
+    border: 1px solid #b3d7ff;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    color: #0d6efd;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.teacher-tag:hover {
+    background-color: #cfe2ff;
+    border-color: #86b7fe;
+    color: #0a58ca;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.15);
+}
+
+.teacher-name {
+    font-weight: 500;
+    margin-right: 0.125rem;
+}
+
+.teacher-id {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    font-family: 'Courier New', monospace;
+}
+
+/* 响应式：小屏幕时缩小字体 */
+@media (max-width: 576px) {
+    .teacher-tag {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.3rem;
+    }
+    
+    .teacher-id {
+        font-size: 0.65rem;
+    }
+}
+
+/* 「更多筛选」入口：练习列表 / 模板管理工具栏 / 模板选择 Modal 等统一用 .btn-csg-filter-more */
+.btn-csg-filter-more .badge {
+    font-size: 0.65rem;
+    vertical-align: middle;
+}
+
+/* 有额外筛选条件时（#toggleFilterSidebar、#tpl_toggle_filter_sidebar 等） */
+.btn-csg-filter-more.has-extra-filters {
+    position: relative;
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.btn-csg-filter-more.has-extra-filters::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    border-radius: inherit;
+    border: 2px solid #0d6efd;
+    opacity: 0.6;
+    animation: pulse-border 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 0 0.4rem rgba(13, 110, 253, 0.4);
+    }
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(1.05);
+    }
+}
+
+/* 悬停时增强特效 */
+.btn-csg-filter-more.has-extra-filters:hover {
+    background-color: #cfe2ff;
+    border-color: #0a58ca;
+    animation: none;
+    box-shadow: 0 0 0 0.3rem rgba(13, 110, 253, 0.5);
+}
+
+.btn-csg-filter-more.has-extra-filters:hover::before {
+    opacity: 0.8;
+    animation: none;
+}
+
+/* 侧边栏固定定位 - 位置由 JavaScript 动态计算 */
+#filterSidebar {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    max-height: 80vh;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: left 0.3s ease, right 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* 侧边栏显示状态 */
+#filterSidebar.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 收起状态 */
+#filterSidebar.collapsed {
+    width: 50px;
+}
+
+#filterSidebar.collapsed .filter-sidebar-body {
+    display: none;
+}
+
+#filterSidebar.collapsed .filter-sidebar-header {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    gap: 0.5rem;
+}
+
+#filterSidebar.collapsed .filter-sidebar-title {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    white-space: nowrap;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+#filterSidebar.collapsed .filter-sidebar-title i {
+    display: none;
+}
+
+#filterSidebar.collapsed .filter-sidebar-title .en-text {
+    display: none;
+}
+
+#filterSidebar.collapsed #filterSidebarToggle {
+    width: 100%;
+    margin-top: auto;
+}
+
+#filterSidebar.collapsed #filterSidebarToggle i {
+    transform: rotate(180deg);
+}
+
+/* 侧边栏头部 */
+.filter-sidebar-header {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-sidebar-header:hover {
+    background: #e9ecef;
+}
+
+.filter-sidebar-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212529;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.filter-sidebar-title i {
+    color: #6c757d;
+}
+
+#filterSidebarToggle {
+    color: #6c757d;
+    padding: 0.5rem;
+    line-height: 1;
+    min-width: 2rem;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s ease-in-out;
+}
+
+#filterSidebarToggle:hover {
+    color: #212529;
+    background-color: #e9ecef;
+}
+
+/* 侧边栏内容 */
+.filter-sidebar-body {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 筛选区块样式 */
+.filter-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.filter-section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.filter-section-title i {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* 表单标签样式 */
+.filter-section .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* 表单控件样式 */
+.filter-section .form-control,
+.filter-section .form-select {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.filter-section .form-control:focus,
+.filter-section .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 操作按钮区域 */
+.filter-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 10;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.filter-actions .btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+/* 筛选标签样式 */
+#filterTagsContainer {
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: #0d6efd;
+    color: white;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.filter-tag .filter-tag-label {
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.filter-tag .filter-tag-value {
+    opacity: 0.95;
+}
+
+.filter-tag .filter-tag-remove {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 0.25rem;
+}
+
+.filter-tag .filter-tag-remove:hover {
+    opacity: 1;
+}
+
+/* 筛选按钮徽章样式 */
+#filterBadge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+}
+
+/* 班级标题样式 - 紧凑醒目的设计（字号略小于正文，适配表格密度） */
+.clss_title {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+
+.clss_title:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 基于 Bootstrap 5 配色的 8 种颜色方案 */
+.clss-title-color-0 {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-color: #b3d7ff;
+}
+
+.clss-title-color-0:hover {
+    background-color: #cfe2ff;
+    border-color: #86b7fe;
+    color: #0a58ca;
+}
+
+.clss-title-color-1 {
+    background-color: #d1e7dd;
+    color: #198754;
+    border-color: #a3cfbb;
+}
+
+.clss-title-color-1:hover {
+    background-color: #badbcc;
+    border-color: #75b798;
+    color: #146c43;
+}
+
+.clss-title-color-2 {
+    background-color: #f8d7da;
+    color: #dc3545;
+    border-color: #f1aeb5;
+}
+
+.clss-title-color-2:hover {
+    background-color: #f5c2c7;
+    border-color: #ea868f;
+    color: #b02a37;
+}
+
+.clss-title-color-3 {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffe69c;
+}
+
+.clss-title-color-3:hover {
+    background-color: #ffecb5;
+    border-color: #ffd43b;
+    color: #664d03;
+}
+
+.clss-title-color-4 {
+    background-color: #cff4fc;
+    color: #055160;
+    border-color: #9eeaf9;
+}
+
+.clss-title-color-4:hover {
+    background-color: #b6effb;
+    border-color: #6edff6;
+    color: #04414d;
+}
+
+.clss-title-color-5 {
+    background-color: #e2e3e5;
+    color: #41464b;
+    border-color: #c4c6c8;
+}
+
+.clss-title-color-5:hover {
+    background-color: #d3d6d8;
+    border-color: #adb5bd;
+    color: #32383e;
+}
+
+.clss-title-color-6 {
+    background-color: #f3d9f5;
+    color: #6f42c1;
+    border-color: #e7b3eb;
+}
+
+.clss-title-color-6:hover {
+    background-color: #eebef2;
+    border-color: #d88de0;
+    color: #5a32a3;
+}
+
+.clss-title-color-7 {
+    background-color: #ffe5d0;
+    color: #fd7e14;
+    border-color: #ffc085;
+}
+
+.clss-title-color-7:hover {
+    background-color: #ffd4a3;
+    border-color: #ff9f4d;
+    color: #ca6510;
+}
+
+/* 响应式设计 */
+@media (max-width: 576px) {
+    #filterSidebar,
+    #tpl_filter_sidebar {
+        width: 100% !important;
+        right: 0 !important;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        transform: none;
+        max-height: 60vh;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .filter-section {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+}
+
+/* 滚动条样式 */
+.filter-sidebar-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-sidebar-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.filter-sidebar-body::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 3px;
+}
+
+.filter-sidebar-body::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+/* 练习模板管理：主表「更多筛选」侧栏（布局与 #filterSidebar 一致，由 contest_tpl_manage.js 定位） */
+#tpl_filter_sidebar {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    max-height: 80vh;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: left 0.3s ease, right 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+}
+
+#tpl_filter_sidebar.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#tpl_filter_sidebar.collapsed {
+    width: 50px;
+}
+
+#tpl_filter_sidebar.collapsed .filter-sidebar-body {
+    display: none;
+}
+
+#tpl_filter_sidebar.collapsed .filter-sidebar-header {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    gap: 0.5rem;
+}
+
+#tpl_filter_sidebar.collapsed .filter-sidebar-title {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    white-space: nowrap;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+#tpl_filter_sidebar.collapsed .filter-sidebar-title i {
+    display: none;
+}
+
+#tpl_filter_sidebar.collapsed .filter-sidebar-title .en-text {
+    display: none;
+}
+
+#tpl_filter_sidebar.collapsed #tpl_filter_sidebar_toggle {
+    width: 100%;
+    margin-top: auto;
+}
+
+#tpl_filter_sidebar.collapsed #tpl_filter_sidebar_toggle i {
+    transform: rotate(180deg);
+}
+
+#tpl_filter_sidebar_toggle {
+    color: #6c757d;
+    padding: 0.5rem;
+    line-height: 1;
+    min-width: 2rem;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s ease-in-out;
+}
+
+#tpl_filter_sidebar_toggle:hover {
+    color: #212529;
+    background-color: #e9ecef;
+}
+

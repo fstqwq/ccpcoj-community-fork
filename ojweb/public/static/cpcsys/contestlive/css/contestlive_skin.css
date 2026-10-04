@@ -1,0 +1,1149 @@
+/**
+ * 投屏页外观：与榜单三套方案对齐 — default / dark_stage / light_macaron
+ * 选择器：html[data-contestlive-skin="..."]（boot 抢先写入；快捷键 [ ] 经 ContestliveSkinLib.applySkinToDom 同步）
+ * 综合 HUD：左表 + 最新过题 + 右侧 rank-live-root 须同套变量与表头底色，避免只改局部导致对比度翻车。
+ *
+ * 「与 HUD 队列表同色」的非 HUD 页面：body 挂 contestlive-live-queue-skin-sync，与本文件内
+ * :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) … 共用表头 /  tbody 配色。
+ * 独立队列页表格若同时带 contestlive-queue-table--standalone（与 HUD 同源），则勿再走下方纯
+ * —queue 区块里针对表格的斑马与 th/td（已用 .contestlive-queue-table:not(...) 收窄）。
+ */
+
+/* 气球色条 / 题号 pill：与面板背景解耦的内外描边（黑、深蓝等仍可见） */
+html[data-contestlive-skin="default"],
+html[data-contestlive-skin="dark_stage"] {
+    --csg-balloon-ring-inner: rgba(255, 255, 255, 0.38);
+    --csg-balloon-ring-outer: rgba(0, 0, 0, 0.58);
+}
+
+html[data-contestlive-skin="light_macaron"] {
+    --csg-balloon-ring-inner: rgba(15, 23, 42, 0.42);
+    --csg-balloon-ring-outer: rgba(255, 255, 255, 0.92);
+}
+
+/* 暗场：warn（CE/RE/TLE 等）标签底偏黄，深色字对比不足 */
+html[data-contestlive-skin="default"] .contestlive-queue-res-pill[data-tone="warn"],
+html[data-contestlive-skin="dark_stage"] .contestlive-queue-res-pill[data-tone="warn"] {
+    color: rgba(255, 255, 255, 0.96);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/* ========== 评测队列独立页（与 HUD 数据源一致，皮膚對齊大屏字重） ========== */
+html[data-contestlive-skin="default"] .contestlive-display--queue .contestlive-queue-hero__title,
+html[data-contestlive-skin="default"] .contestlive-display--queue .contestlive-queue-hero__meta {
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--queue .contestlive-queue-hero__title {
+    font-size: clamp(1.35rem, 3.6vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--queue .contestlive-queue-hero__badge {
+    font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+    opacity: 0.95;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--queue {
+    /* 与单页统一：default 不铺整页底，便于叠在直播/OBS 下层画面上（须 !important 压过 contestlive.css .contestlive-display） */
+    background: transparent !important;
+    color: #e8e8f0;
+}
+
+/* default：压过 contestlive.css 内 `.contestlive-queue-page--standalone` 的装饰渐变，与 ac-only / 综合 HUD 左表透明底一致 */
+html[data-contestlive-skin="default"] .contestlive-display--queue .contestlive-queue-page--standalone {
+    background: transparent !important;
+}
+
+html[data-contestlive-skin="default"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    th,
+html[data-contestlive-skin="default"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    td {
+    font-size: clamp(1.05rem, 2.6vw, 2.05rem);
+    padding: clamp(0.5rem, 1.2vw, 0.85rem) clamp(0.55rem, 1.4vw, 1rem);
+    line-height: 1.25;
+}
+
+html[data-contestlive-skin="default"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    thead
+    th {
+    font-size: clamp(0.95rem, 2vw, 1.35rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+}
+
+html[data-contestlive-skin="default"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    tbody
+    tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ========== dark_stage（对齐榜单舞台暗色取向） ========== */
+html[data-contestlive-skin="dark_stage"] .contestlive-display--queue {
+    /* 与 .contestlive-display 底色的 !important 对齐，否则整页仍落回 #07070c */
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--queue .contestlive-queue-hero__title {
+    font-size: clamp(1.45rem, 3.8vw, 2.85rem);
+    font-weight: 700;
+    color: #f1f5f9;
+    text-shadow: 0 0 24px rgba(56, 189, 248, 0.12);
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--queue .contestlive-queue-hero__meta {
+    font-size: clamp(0.9rem, 2vw, 1.25rem);
+    color: rgba(147, 197, 253, 0.85);
+}
+
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone) {
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    th,
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    td {
+    font-size: clamp(1.1rem, 2.75vw, 2.15rem);
+    padding: clamp(0.55rem, 1.35vw, 0.95rem) clamp(0.6rem, 1.5vw, 1.05rem);
+    border-bottom-color: rgba(148, 163, 184, 0.22);
+}
+
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    thead
+    th {
+    color: rgba(125, 211, 252, 0.82);
+    font-size: clamp(1rem, 2.1vw, 1.45rem);
+}
+
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    tbody
+    tr:nth-child(even) {
+    background: rgba(15, 23, 42, 0.55);
+}
+
+html[data-contestlive-skin="dark_stage"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    tbody
+    tr:nth-child(odd) {
+    background: rgba(30, 41, 59, 0.35);
+}
+
+/* ========== light_macaron（对齐榜单马卡龙亮取向） ========== */
+html[data-contestlive-skin="light_macaron"] .contestlive-display--queue {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--queue .contestlive-queue-hero__title {
+    font-size: clamp(1.45rem, 3.8vw, 2.85rem);
+    font-weight: 700;
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--queue .contestlive-queue-hero__meta {
+    font-size: clamp(0.9rem, 2vw, 1.25rem);
+    color: #475569;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone) {
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    th,
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    td {
+    font-size: clamp(1.1rem, 2.75vw, 2.15rem);
+    padding: clamp(0.55rem, 1.35vw, 0.95rem) clamp(0.6rem, 1.5vw, 1.05rem);
+    border-bottom-color: rgba(100, 116, 139, 0.22);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    thead
+    th {
+    color: #475569;
+    font-size: clamp(1rem, 2.1vw, 1.45rem);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    tbody
+    tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    .contestlive-display--queue
+    .contestlive-queue-table:not(.contestlive-queue-table--standalone)
+    tbody
+    tr:nth-child(odd) {
+    background: rgba(241, 245, 249, 0.92);
+}
+
+/* ========== 综合 HUD（live）：整页底透明，叠在 OBS 下层视频上；层次由各块背板 + 快捷键 O 分档 ========== */
+html[data-contestlive-skin="default"] .contestlive-display--hud {
+    background: transparent;
+    color: #e8e8f0;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--hud {
+    background: transparent;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-clock {
+    color: #e0f2fe;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-ticker {
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+    border-color: rgba(56, 189, 248, 0.15);
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-ticker__inner {
+    color: #e0f2fe;
+}
+
+/* HUD 亮肤：勿把整页 color 设为深色（左侧 masthead 仍为深色背板，会整段不可读） */
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud {
+    background: transparent;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-clock {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-ticker {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(100, 116, 139, 0.25);
+    box-shadow: 0 0.2rem 1rem rgba(15, 23, 42, 0.08);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-ticker__inner {
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-ticker__inner:empty::before {
+    color: rgba(71, 85, 105, 0.55);
+}
+
+/* ========== 综合 HUD：三套皮肤与左表、最新过题、右侧嵌入榜统一（覆盖 contestlive.css 表头深色 sticky） ========== */
+
+/* —— default（与暗场左列一致） —— */
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th {
+    background: rgba(22, 24, 34, 0.97);
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+    color: #e8e8f0;
+}
+
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__cn {
+    color: #f1f5f9;
+}
+
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__en {
+    color: rgba(203, 213, 225, 0.88);
+    opacity: 1;
+}
+
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody td {
+    color: #e8e8f0;
+}
+
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__school,
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__name,
+html[data-contestlive-skin="default"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__en {
+    color: #e8e8f0;
+}
+
+html[data-contestlive-skin="default"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__main,
+html[data-contestlive-skin="default"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__date {
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="default"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root {
+    --rl-bg: rgb(18 21 32 / var(--hud-a-rl, 0.72));
+    --rl-head-bg: #b71c1c;
+    --rl-grid-odd: rgba(255, 255, 255, 0.05);
+    --rl-grid-even: rgba(255, 255, 255, 0.08);
+    color: #eceff4;
+}
+
+/* —— dark_stage —— */
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th {
+    background: rgba(15, 23, 42, 0.97);
+    border-bottom-color: rgba(56, 189, 248, 0.18);
+    color: #e0f2fe;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__cn {
+    color: #f0f9ff;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__en {
+    color: rgba(125, 211, 252, 0.88);
+    opacity: 1;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody td {
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__school,
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__name,
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__en {
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="dark_stage"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__main,
+html[data-contestlive-skin="dark_stage"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__date {
+    color: #e0f2fe;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root {
+    --rl-bg: rgb(15 23 42 / var(--hud-a-rl, 0.78));
+    --rl-head-bg: #0c4a6e;
+    --rl-grid-odd: rgba(30, 41, 59, 0.55);
+    --rl-grid-even: rgba(15, 23, 42, 0.65);
+    color: #e0f2fe;
+}
+
+html[data-contestlive-skin="dark_stage"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-head__problems {
+    background: rgba(2, 6, 23, 0.45);
+}
+
+/* —— light_macaron：区标题条与表头同为浅色底 + 深色字；表体斑马与队列表一致 —— */
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__panel-head {
+    background: rgba(248, 250, 252, 0.94);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__panel-head-cn {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__panel-head-en {
+    color: rgba(51, 65, 85, 0.9);
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th {
+    background: rgba(248, 250, 252, 0.98);
+    border-bottom-color: rgba(100, 116, 139, 0.35);
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__cn {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone thead th .contestlive-th-split__en {
+    color: rgba(51, 65, 85, 0.9);
+    opacity: 1;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody td {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.94);
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody tr:nth-child(even) {
+    background: rgba(241, 245, 249, 0.92);
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone tbody tr:hover {
+    background: rgba(226, 232, 240, 0.96);
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--standalone .col-time {
+    color: rgba(51, 65, 85, 0.95);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__date--muted {
+    color: rgba(71, 85, 105, 0.92);
+    opacity: 1;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-timecell__main {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__school,
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__name,
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-hud-team__en {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-queue-team__line2,
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-queue-team__line-en {
+    color: rgba(71, 85, 105, 0.95);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-queue-panel {
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(100, 116, 139, 0.28);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__panel {
+    background: rgb(255 255 255 / var(--hud-a-panel, 0.62));
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root {
+    --rl-bg: rgb(248 250 252 / var(--hud-a-rl, 0.82));
+    --rl-head-bg: #b91c1c;
+    --rl-grid-odd: rgba(255, 255, 255, 0.94);
+    --rl-grid-even: rgba(241, 245, 249, 0.98);
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-row {
+    border-bottom-color: rgba(148, 163, 184, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-head__problems {
+    background: rgba(241, 245, 249, 0.96);
+}
+
+/* HUD 内嵌榜顶色条：半透明 + 随 O 档 `--hud-a-rank-head`（须写在本肤色 `.rank-live-root` 赋值之后，`live_rank` 单页保持实色） */
+html[data-contestlive-skin="default"] .contestlive-hud .rank-live-root {
+    --rl-head-bg: rgb(183 28 28 / var(--hud-a-rank-head));
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-hud .rank-live-root {
+    --rl-head-bg: rgb(12 74 110 / var(--hud-a-rank-head));
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-hud .rank-live-root {
+    --rl-head-bg: rgb(185 28 28 / var(--hud-a-rank-head));
+}
+
+/* 独立 live_rank：`html.contestlive-page-opacity` 时顶色条与 HUD 同档随 O（单页挂载 contestlive_page_opacity） */
+html.contestlive-page-opacity[data-contestlive-skin="default"] body.contestlive-display--rank-live .rank-live-root {
+    --rl-head-bg: rgb(183 28 28 / var(--hud-a-rank-head));
+}
+
+html.contestlive-page-opacity[data-contestlive-skin="dark_stage"] body.contestlive-display--rank-live .rank-live-root {
+    --rl-head-bg: rgb(12 74 110 / var(--hud-a-rank-head));
+}
+
+html.contestlive-page-opacity[data-contestlive-skin="light_macaron"] body.contestlive-display--rank-live .rank-live-root {
+    --rl-head-bg: rgb(185 28 28 / var(--hud-a-rank-head));
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-prob-th {
+    background: rgba(255, 255, 255, 0.88);
+    color: #0f172a;
+    /* 保留底边 var(--rl-p) 气球色，仅用变量描边与题头底分隔，勿改成统一灰条 */
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-name__school,
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-name__en {
+    color: #334155;
+}
+
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-cell--solv,
+html[data-contestlive-skin="light_macaron"] :is(.contestlive-hud, .contestlive-display--rank-live) .rank-live-root .rl-cell--pen {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-pending,
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-none {
+    background: rgba(226, 232, 240, 0.98);
+    color: #1e293b;
+    border-color: rgba(148, 163, 184, 0.55);
+}
+
+/* rank_live.css 对 .problem-content 写了 color:#fff，会盖住父级；须显式改子节点（未提交格内为题号字母） */
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-none
+    .problem-content,
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-pending
+    .problem-content {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-none
+    .pro-submit-cnt,
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-pending
+    .pro-submit-cnt {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-none
+    .time-brief,
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rl-row__problems
+    .problem-item.pro-pending
+    .time-brief {
+    color: #334155;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rank-item.silver
+    .rank-number {
+    color: #475569;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rank-item.gold
+    .rank-number {
+    color: #a16207;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-hud, .contestlive-display--rank-live)
+    .rank-live-root
+    .rank-item.bronze
+    .rank-number {
+    color: #c2410c;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-hud__rank-host .rank-live-embed {
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__ticker,
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__ticker-fixed-slot {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__ticker {
+    background: rgba(255, 255, 255, 0.88);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .contestlive-hud__ticker-sep {
+    background: rgba(15, 23, 42, 0.22);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-pr__letter {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .csg-hud-statchart__legend {
+    border-bottom-color: rgba(148, 163, 184, 0.32);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .csg-hud-statchart__legtext {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .csg-hud-statchart__letter {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .csg-hud-statchart__bar {
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--hud .csg-hud-statchart__bar--empty {
+    background: rgba(241, 245, 249, 0.75);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"]
+    :is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync)
+    .contestlive-hud-rankcell {
+    color: #0f172a;
+}
+
+/* ========== 校徽墙 ========== */
+/* default 与其他单页（balloon / rank / queue / timer / probstats / ac）一致：整页底透明，叠在 OBS 下层视频上；
+   校徽自带彩色 webp 在亮场底上仍然可辨。dark/light 是显式选择的舞台皮肤，保留各自铺底。 */
+html[data-contestlive-skin="default"] .contestlive-display--schoolwall {
+    background: transparent !important;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--schoolwall {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--schoolwall {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-schoolwall__ph--label {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+/* ========== 气球占位页 ========== */
+html[data-contestlive-skin="default"] .contestlive-display--balloon {
+    background: transparent !important;
+    /* body 级浅色字会被 .contestlive-balloon-page 白字覆盖；整页透明底须改由页根用深色字（I 占位与 bi 同继承） */
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--balloon .contestlive-balloon-page {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__icon,
+html[data-contestlive-skin="default"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint,
+html[data-contestlive-skin="default"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint .cn-text,
+html[data-contestlive-skin="default"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint .en-text {
+    color: #0a0a0a;
+    opacity: 1;
+    text-shadow:
+        0 0 1px #fff,
+        0 1px 0 #fff,
+        0 -1px 0 #fff,
+        1px 0 0 #fff,
+        -1px 0 0 #fff,
+        1px 1px 0 #fff,
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--balloon {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+/* contestlive.css 的 .contestlive-balloon-page 白字会盖住 body 继承；占位与图标须深色 */
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-page {
+    color: #0f172a;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__icon,
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint,
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint .cn-text,
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-page__chrome .contestlive-balloon-page__hint .en-text {
+    color: #0f172a;
+    opacity: 1;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-fx__string-path {
+    stroke: rgba(51, 65, 85, 0.58);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-fx__string-path--lower {
+    stroke: rgba(51, 65, 85, 0.5);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--balloon .contestlive-balloon-fx__string-svg {
+    filter: drop-shadow(0 0 0.55px rgba(255, 255, 255, 0.85));
+}
+
+/* ========== 合页 live_combo：整页底与榜单整页对齐；列卡底色≈ HUD 默认档 .contestlive-hud__panel（无 O 分档） ========== */
+html[data-contestlive-skin="default"] .contestlive-display--combo {
+    background: transparent !important;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--combo {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--combo {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="default"] .contestlive-display--combo .contestlive-combo-panel {
+    background: rgb(15 18 28 / 0.62);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--combo .contestlive-combo-panel {
+    background: rgb(15 18 28 / 0.62);
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.14);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--combo .contestlive-combo-panel {
+    background: rgb(255 255 255 / 0.62);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28);
+}
+
+/* 合页 live_combo 顶层气球绑线（明亮肤与独立气球页一致） */
+html[data-contestlive-skin="light_macaron"] .contestlive-display--combo .contestlive-balloon-fx__string-path {
+    stroke: rgba(51, 65, 85, 0.58);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--combo .contestlive-balloon-fx__string-path--lower {
+    stroke: rgba(51, 65, 85, 0.5);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--combo .contestlive-balloon-fx__string-svg {
+    filter: drop-shadow(0 0 0.55px rgba(255, 255, 255, 0.85));
+}
+
+/* 直播榜单整页 live_rank：default 不铺底；dark/light 须 !important 压过 contestlive.css .contestlive-display */
+html[data-contestlive-skin="default"] .contestlive-display--rank-live {
+    background: transparent !important;
+}
+
+html[data-contestlive-skin="dark_stage"] .contestlive-display--rank-live {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-display--rank-live {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+/* ========== 榜单 iframe 条 ========== */
+html[data-contestlive-skin="dark_stage"] .contestlive-rank-hint {
+    background: rgba(15, 23, 42, 0.88);
+    color: #cbd5e1;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-rank-hint {
+    background: rgba(241, 245, 249, 0.96);
+    color: #475569;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* 从服务器同步外观（快捷键 G）短暂提示 */
+.contestlive-skin-sync-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    z-index: 11000;
+    max-width: min(22rem, calc(100vw - 2rem));
+    padding: 0.55rem 1rem 0.6rem;
+    border-radius: 0.4rem;
+    background: rgba(16, 18, 28, 0.92);
+    color: #f1f5f9;
+    box-shadow: 0 0.35rem 1.2rem rgba(0, 0, 0, 0.35);
+    text-align: center;
+    line-height: 1.35;
+    pointer-events: none;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-sync-toast {
+    background: rgba(255, 255, 255, 0.96);
+    color: #1e293b;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* ========== 皮肤控制台（浮层） ========== */
+.contestlive-skin-dock {
+    position: fixed;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 1000;
+    max-width: min(22rem, calc(100vw - 1.5rem));
+    font-family: system-ui, sans-serif;
+}
+
+/* 帮助层在亮肤下的可读性 */
+html[data-contestlive-skin="light_macaron"] .contestlive-help-layer__panel {
+    background: #ffffff;
+    border-color: rgba(100, 116, 139, 0.28);
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-help-layer__body {
+    color: #334155;
+}
+
+.contestlive-skin-dock__panel {
+    background: rgba(16, 18, 28, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.65rem;
+    box-shadow: 0 0.35rem 1.5rem rgba(0, 0, 0, 0.45);
+    color: #e8e8f0;
+    padding: 0.65rem 0.75rem;
+    backdrop-filter: blur(8px);
+    max-height: min(92vh, 44rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    transform-origin: bottom right;
+    transition:
+        max-height 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.32s ease,
+        transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.36s ease,
+        border-color 0.28s ease,
+        box-shadow 0.35s ease;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-dock__panel {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(100, 116, 139, 0.28);
+    color: #1e293b;
+    box-shadow: 0 0.35rem 1.2rem rgba(15, 23, 42, 0.12);
+}
+
+.contestlive-skin-dock__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 0.45rem;
+}
+
+.contestlive-skin-dock__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.contestlive-skin-dock__btn {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #f1f5f9;
+    border-radius: 0.4rem;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-dock__btn {
+    border-color: rgba(100, 116, 139, 0.35);
+    background: rgba(241, 245, 249, 0.9);
+    color: #334155;
+}
+
+.contestlive-skin-dock__btn.is-active {
+    border-color: rgba(56, 189, 248, 0.65);
+    background: rgba(56, 189, 248, 0.18);
+    color: #e0f2fe;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-dock__btn.is-active {
+    border-color: rgba(59, 130, 246, 0.55);
+    background: rgba(219, 234, 254, 0.85);
+    color: #1e3a8a;
+}
+
+.contestlive-skin-dock__btn:focus-visible {
+    outline: 2px solid rgba(56, 189, 248, 0.55);
+    outline-offset: 1px;
+}
+
+.contestlive-skin-dock__hint {
+    font-size: 0.68rem;
+    line-height: 1.35;
+    opacity: 0.72;
+    margin: 0;
+}
+
+.contestlive-skin-dock__chk {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.contestlive-skin-dock__sync {
+    width: 100%;
+    margin-top: 0.35rem;
+    border-radius: 0.4rem;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    padding: 0.35rem;
+    cursor: pointer;
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-dock__sync {
+    border-color: rgba(100, 116, 139, 0.35);
+    color: #64748b;
+}
+
+.contestlive-skin-dock__toggle {
+    position: absolute;
+    right: 0.85rem;
+    bottom: 100%;
+    margin-bottom: 0.35rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(16, 18, 28, 0.92);
+    color: #e8e8f0;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.35);
+}
+
+html[data-contestlive-skin="light_macaron"] .contestlive-skin-dock__toggle {
+    background: rgba(255, 255, 255, 0.95);
+    color: #334155;
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+.contestlive-skin-dock.collapsed .contestlive-skin-dock__panel {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(0.45rem) scale(0.97);
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    border-color: transparent;
+    box-shadow: none;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contestlive-skin-dock__panel {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========== 各题统计独立页 live_probstats：default / light_macaron 为浅色读法（深色字）；dark_stage 暗场亮色字 ========== */
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only {
+    background: transparent !important;
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .contestlive-probstats-page,
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .contestlive-probstats-page,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .contestlive-probstats-page {
+    background: transparent;
+}
+
+/* dark_stage：图例分隔、题号、图例字与堆叠柱描边（浅色字） */
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__legend {
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__legtext {
+    color: #f1f5f9;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__letter {
+    color: rgba(248, 250, 255, 0.96);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__letter:not([style*="--contestlive-pr-color"]) {
+    border-top-color: rgba(255, 255, 255, 0.32);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__bar {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .contestlive-hud-prob-stats__empty {
+    color: rgba(226, 232, 240, 0.88);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--probstats-only .csg-hud-statchart__sw {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* default · light_macaron：图例与题号深色字，分隔与柱框适配浅底 / 透明叠层 */
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__legend,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__legend {
+    border-bottom-color: rgba(15, 23, 42, 0.14);
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__legtext,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__legtext {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__letter,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__letter {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__letter:not([style*="--contestlive-pr-color"]),
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__letter:not([style*="--contestlive-pr-color"]) {
+    border-top-color: rgba(15, 23, 42, 0.35);
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__sw,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__sw {
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.18);
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .csg-hud-statchart__bar,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .csg-hud-statchart__bar {
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--probstats-only .contestlive-hud-prob-stats__empty,
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--probstats-only .contestlive-hud-prob-stats__empty {
+    color: rgba(51, 65, 85, 0.92);
+}
+
+/* ========== 最新过题独立页 live_ac：与上同类（body 不再被 HUD transparent !important 覆盖，见 contestlive.css） ========== */
+
+html[data-contestlive-skin="default"] body.contestlive-display--ac-only {
+    background: transparent !important;
+    color: #e8e8f0;
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--ac-only {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--ac-only {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+/* ========== 比赛计时独立页 live_timer：整页底与亮色下大号数字可读性 ========== */
+
+html[data-contestlive-skin="default"] body.contestlive-display--timer {
+    background: transparent !important;
+    color: #0f172a;
+}
+
+/* default：叠 OBS 时下层可能较亮，大号数字用黑字 + 白晕描边保证可读 */
+html[data-contestlive-skin="default"] body.contestlive-display--timer .contestlive-timer-page__title,
+html[data-contestlive-skin="default"] body.contestlive-display--timer .contestlive-timer-page__state {
+    color: #0a0a0a;
+    text-shadow:
+        0 0 clamp(0.3rem, 1vmin, 0.75rem) rgba(255, 255, 255, 0.95),
+        0 1px 0 rgba(255, 255, 255, 0.98),
+        0 2px 8px rgba(255, 255, 255, 0.8);
+}
+
+html[data-contestlive-skin="default"] body.contestlive-display--timer .contestlive-timer-page__remain {
+    color: #0a0a0a;
+    text-shadow:
+        0 0 clamp(0.5rem, 2vmin, 1.5rem) rgba(255, 255, 255, 0.95),
+        0 0 clamp(1rem, 4vmin, 2.75rem) rgba(255, 255, 255, 0.65),
+        0 1px 0 rgba(255, 255, 255, 1),
+        0 2px 14px rgba(255, 255, 255, 0.75);
+}
+
+html[data-contestlive-skin="dark_stage"] body.contestlive-display--timer {
+    background: radial-gradient(circle at 20% 10%, #1f2937 0%, #0b1220 45%, #05080f 100%) !important;
+    color: #dbe5f5;
+}
+
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--timer {
+    background: linear-gradient(165deg, #f1f5f9 0%, #e8edf3 45%, #f4f6f8 100%) !important;
+    color: #1e293b;
+}
+
+html[data-contestlive-skin="light_macaron"] body.contestlive-display--timer .contestlive-timer-page__remain {
+    color: #0f172a;
+    text-shadow: 0 0 clamp(1rem, 4.5vmin, 3rem) rgba(59, 130, 246, 0.22),
+        0 2px 14px rgba(15, 23, 42, 0.1);
+}

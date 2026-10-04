@@ -1,0 +1,166 @@
+/* CCS API 控制台：紧凑布局，与 Bootstrap 5 后台一致 */
+.ccs-api-console {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.ccs-api-console-row {
+    /* 左侧列表 + 右侧详情共用的可视高度锚点 */
+    min-height: min(72vh, 760px);
+    align-items: stretch;
+}
+
+.ccs-api-console .min-h-0 {
+    min-height: 0;
+}
+
+/* 占满卡片内剩余高度（勿设 max-height，否则会留出大块空白） */
+.ccs-api-endpoint-list {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.ccs-api-list-item {
+    border-left: 3px solid transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ccs-api-list-item:hover {
+    border-left-color: color-mix(in srgb, var(--bs-primary) 45%, transparent);
+}
+
+.ccs-api-list-item.active {
+    border-left-color: var(--bs-primary);
+}
+
+.ccs-api-path-peek {
+    font-size: 0.7rem;
+}
+
+.ccs-api-meta-table th {
+    background: color-mix(in srgb, var(--bs-secondary-bg) 88%, var(--bs-body-bg) 12%);
+    font-weight: 600;
+    vertical-align: top;
+}
+
+.ccs-api-response {
+    max-height: min(45vh, 420px);
+    overflow: auto;
+    word-break: break-word;
+    background: var(--bs-tertiary-bg);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+/* 简短提示（加载/错误文案） */
+.ccs-api-response.ccs-api-response--msg {
+    white-space: normal;
+}
+
+/* highlight.js：JSON / 纯文本正文 */
+.ccs-api-response:not(.ccs-api-response--msg) .ccs-api-res-pre {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    white-space: pre;
+    overflow-x: auto;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.ccs-api-response:not(.ccs-api-response--msg) .ccs-api-res-pre code {
+    display: block;
+    padding: 0.25rem 0;
+}
+
+.ccs-api-console .form-label-sm {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+/* 路径参数标签：中文标题与必填 * 同组不换行，避免 * 单独掉到下一行、与输入框脱节 */
+.ccs-sub-param-label .ccs-sub-param-label-cn-req {
+    white-space: nowrap;
+}
+
+.ccs-api-console .card-header {
+    font-size: 0.875rem;
+}
+
+.ccs-api-console .alert-sm {
+    font-size: 0.8125rem;
+}
+
+/* 导出到其他工具：极紧凑按钮组 */
+.ccs-export-toolbar .btn-group-sm > .btn {
+    padding: 0.1rem 0.32rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+
+.ccs-export-toolbar .btn-group-sm > .btn:focus {
+    z-index: 2;
+}
+
+.ccs-export-toolbar .d-flex.gap-1 {
+    gap: 0.25rem !important;
+}
+
+/*
+ * 响应区复制：勿用全局 .btn-copied —— pkg_code_highlight 会引入 code_show.css，
+ * 其中 .btn-copied 为实心绿按钮，套在 btn-link 上会缩成难看的小绿块。
+ */
+.ccs-res-copy-btn {
+    min-width: 1.35rem;
+    min-height: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    opacity: 0.82;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.12rem 0.28rem;
+    border-radius: 0.3rem;
+    color: var(--bs-secondary-color, #6c757d);
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.ccs-res-copy-btn:hover {
+    opacity: 1;
+    color: var(--bs-primary, #0d6efd);
+}
+
+.ccs-res-copy-btn:focus {
+    box-shadow: none !important;
+}
+
+.ccs-res-copy-btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 42%, transparent);
+    outline-offset: 2px;
+}
+
+.ccs-res-copy-btn--done {
+    color: var(--bs-success, #198754) !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    animation: ccs-res-copy-done 0.55s ease;
+}
+
+@keyframes ccs-res-copy-done {
+    0% {
+        transform: scale(0.88);
+    }
+    35% {
+        transform: scale(1.14);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

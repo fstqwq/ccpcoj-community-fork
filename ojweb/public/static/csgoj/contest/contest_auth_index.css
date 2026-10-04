@@ -1,0 +1,568 @@
+/**
+ * 考试登录页面样式
+ * 复用 login_out.css 的样式，与登录页面风格保持一致
+ */
+
+/* 引入登录页面的样式（复用） */
+/* 统一错误提示区域样式 - 复用 login_out.css */
+#exam_auth_error_alert,
+#contest_auth_error_alert {
+    animation: slideDown 0.3s ease-out;
+    margin-bottom: 0.75rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== 完全复用 login_out.css 的样式 ==================== */
+/* 登录框错误 Tooltip 样式 - 与 login_div 完全一致 */
+.login-tooltip-error .tooltip-inner {
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.875rem;
+    max-width: 250px;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.login-tooltip-error .tooltip-arrow::before {
+    border-top-color: #dc3545;
+}
+
+/* 输入框验证状态样式 - 与 login_div 完全一致 */
+.contest-announcement-content .form-control.is-invalid,
+#contest_auth_form .form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.5rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6 .4.4.4-.4m0 4.8-.4-.4-.4.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.125rem) center;
+    background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem);
+}
+
+.contest-announcement-content .form-control.is-valid,
+#contest_auth_form .form-control.is-valid {
+    border-color: #198754;
+    padding-right: calc(1.5em + 0.5rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.98-.98-.98-.98-.98.98.98.98zm3.4-4.77L5.5 3.5l-1.2-1.2-1.2 1.2 1.2 1.2 1.2-1.2z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.125rem) center;
+    background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem);
+}
+
+/* 确保错误提示不影响布局 - 完全复用 login_out.css 的样式 */
+/* 使用与 login_div 相同的选择器模式 */
+#exam_auth_error_alert .alert,
+#contest_auth_error_alert .alert,
+#login_error_alert .alert {
+    margin-bottom: 0;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* 考试认证表单容器 */
+.contest-announcement-content .alert {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* 表单布局优化 - 紧凑美观 */
+.contest-auth-form,
+#contest_auth_form {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* 更紧凑，避免与 basecss 的 form-group margin 叠加导致间距过大 */
+    max-width: 100%;
+}
+
+.contest-auth-form .form-group,
+#contest_auth_form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    width: 100%;
+    /* basecss.css 全局定义了 .form-group { margin-bottom: 1.5rem; }
+       这里属于比赛/考试登录表单的特殊布局，使用 flex gap 控制间距更一致 */
+    margin-bottom: 0;
+}
+
+.contest-auth-form .form-label,
+#contest_auth_form .form-label {
+    font-weight: 500;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.contest-auth-form .form-control,
+#contest_auth_form .form-control {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+
+#contest_auth_form .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+/* 按钮样式 - 使用上下结构的双语显示 */
+.contest-auth-form .btn,
+#contest_auth_form .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.contest-auth-form .btn:hover,
+#contest_auth_form .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contest-auth-form .btn:disabled,
+#contest_auth_form .btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 确保登录按钮使用上下结构的双语显示（移除 bilingual-inline 的影响） */
+.contest-auth-form .btn:not(.bilingual-inline),
+#contest_auth_form .btn:not(.bilingual-inline) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.contest-auth-form .btn:not(.bilingual-inline) .en-text,
+#contest_auth_form .btn:not(.bilingual-inline) .en-text {
+    display: block;
+    font-size: 0.65em;
+    margin-left: 0;
+    margin-top: 1px;
+    line-height: 1.0em;
+    color: inherit;
+    opacity: 1;
+}
+
+/* 密码输入框行动画 */
+#cpc_password_row {
+    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+#cpc_password_row[style*="display: none"] {
+    display: none !important;
+}
+
+/* 密码框等待状态样式（启用但提示用户先输入用户名） */
+#contest_auth_form .form-control.password-waiting {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+    cursor: text;
+}
+
+#contest_auth_form .form-control.password-waiting::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* 密码框禁用状态样式（系统账号） */
+#contest_auth_form .form-control.password-disabled {
+    background-color: #e7f3ff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+    cursor: not-allowed;
+}
+
+#contest_auth_form .form-control.password-disabled::placeholder {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+/* 密码提示文字样式 */
+#password_hint {
+    font-size: 0.75rem;
+    font-weight: normal;
+    margin-left: 0.5rem;
+}
+
+#password_hint i {
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+}
+
+/* 系统登录提示动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#exam_auth_error_alert .alert-success {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes authBtnPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(25, 135, 84, 0); }
+}
+
+.btn-auth-ready {
+    animation: authBtnPulse 0.5s ease-in-out 2;
+}
+
+@keyframes panelHighlight {
+    0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
+    40% { box-shadow: 0 0 0 6px rgba(13, 110, 253, 0.15); }
+    100% { box-shadow: none; }
+}
+
+.panel-highlight {
+    animation: panelHighlight 0.8s ease-out;
+}
+
+/* 考试登录：标题与提示同一行，中英双语上下结构 */
+.exam-auth-header-row {
+    align-items: flex-start;
+}
+
+.exam-auth-title-stack .bilingual-stack {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.exam-auth-title-stack .bilingual-stack .en-text {
+    display: block;
+    font-size: 0.75em;
+    margin-top: 0.15em;
+    line-height: 1.2;
+    color: inherit;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+.exam-auth-hint-box {
+    min-width: 0;
+}
+
+.exam-auth-hint-box .alert {
+    margin-bottom: 0;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.exam-auth-hint-box .bilingual-inline,
+.exam-auth-hint-box .flex-grow-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 中文整句包成一块，避免 flex 把中间 span 单独成行 */
+.exam-auth-hint-box .bilingual-inline > .zh-text {
+    display: block;
+}
+
+.exam-auth-hint-box .en-text {
+    display: block !important;
+    margin-top: 0.2em;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.exam-auth-hint-box .d-flex.align-items-start .flex-grow-1 {
+    display: flex;
+    flex-direction: column;
+}
+
+.exam-auth-hint-box .d-flex.align-items-start .en-text {
+    display: block !important;
+    margin-top: 0.25rem;
+    font-size: 0.9em;
+    opacity: 0.85;
+}
+
+.exam-auth-hint-box .flex-grow-1 > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 防止“账号 20200882”被拆成两行，避免账号单独换行 */
+.exam-auth-hint-box .auth-hint-keep-together {
+    white-space: nowrap;
+}
+
+/* 多个按钮时的布局 */
+.contest-auth-form .form-group .d-flex.gap-2,
+#contest_auth_form .form-group .d-flex.gap-2 {
+    width: 100%;
+}
+
+.contest-auth-form .form-group .d-flex.gap-2 .btn,
+#contest_auth_form .form-group .d-flex.gap-2 .btn {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ==================== 考试登录表单 table 布局样式 ==================== */
+/* 表单行：左侧用户名+密码（max 宽度），右侧登录按钮等高 */
+.exam-auth-form-row {
+    align-items: stretch;
+}
+
+.exam-auth-form-row .exam-auth-table {
+    flex: 0 1 auto;
+    width: auto;
+    max-width: 100%; /* 窄屏时表格不超出容器，列宽随之收缩 */
+}
+
+.exam-auth-btn-cell {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    padding-left: 0.25rem;
+}
+
+.exam-auth-btn-cell .btn {
+    align-self: stretch;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    min-width: 7rem;
+    min-height: 4.5rem;
+}
+
+/* 紧凑的 table 布局，label 和 input 左右对齐 */
+.exam-auth-container {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.exam-auth-form {
+    margin-top: 0.5rem;
+}
+
+.exam-auth-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.exam-auth-form-row .exam-auth-table {
+    width: auto;
+}
+
+.exam-auth-table tr {
+    vertical-align: top;
+}
+
+.exam-auth-table tr:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+
+.exam-auth-table .label-cell {
+    padding: 0.375rem 0.75rem 0.375rem 0;
+    width: 1%;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: right;
+}
+
+.exam-auth-table .input-cell {
+    padding: 0.375rem 0;
+    width: 420px; /* 宽屏下稳定列宽，不随 password-hint 文案变化；窄屏由表格 max-width:100% 收缩 */
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.exam-auth-table .form-label {
+    margin-bottom: 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    /* label 信息不折行（例如：队伍ID/用户名/密码） */
+    white-space: nowrap;
+    display: block;
+}
+
+/* label 中的英文文本使用上下布局 */
+.exam-auth-table .form-label .en-text {
+    display: block;
+    font-size: 0.7em;
+    margin-left: 0;
+    margin-top: 1px;
+    line-height: 1.0em;
+    color: inherit;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.exam-auth-table .form-control {
+    font-size: 0.9rem;
+    padding: 0.375rem 0.75rem;
+    width: 100%;
+    min-width: 0; /* 允许在窄屏随列收缩 */
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 密码输入框包装器：min-width:0 使 hint 换行而不撑大列，列宽由 input-cell 决定 */
+.password-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.password-input-wrapper .form-control {
+    margin-bottom: 0;
+}
+
+.password-hint {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: normal;
+    margin-top: 0;
+    margin-left: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.password-hint i {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+/* 下方说明：中英上下结构（不用 bilingual-inline，用默认 .en-text 块级） */
+.password-hint .en-text {
+    display: block;
+    font-size: 0.9em;
+    margin-top: 0.15em;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+
+/* 错误提示区域 */
+#exam_auth_error_alert {
+    margin-bottom: 0.5rem;
+}
+
+/* 响应式优化 */
+@media (max-width: 576px) {
+    .exam-auth-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .exam-auth-btn-cell {
+        padding-left: 0;
+        padding-top: 0.5rem;
+    }
+
+    .exam-auth-btn-cell .btn {
+        width: 100%;
+        min-height: 2.75rem;
+    }
+
+    .exam-auth-table {
+        display: block;
+    }
+    
+    .exam-auth-table tr {
+        display: block;
+        margin-bottom: 0.75rem;
+    }
+    
+    .exam-auth-table .label-cell,
+    .exam-auth-table .input-cell {
+        display: block;
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        text-align: left;
+    }
+    
+    .exam-auth-table .input-cell {
+        max-width: none;
+    }
+    
+    .exam-auth-table .label-cell {
+        margin-bottom: 0.25rem;
+    }
+    
+    .exam-auth-table .form-control {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* 通用响应式优化 */
+@media (max-width: 576px) {
+    .contest-auth-form .form-control,
+    #contest_auth_form .form-control {
+        max-width: 100% !important;
+    }
+    
+    .contest-auth-form .btn,
+    #contest_auth_form .btn {
+        width: 100%;
+    }
+    
+    .contest-auth-form .form-group .d-flex.gap-2,
+    #contest_auth_form .form-group .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    .contest-auth-form .form-group .d-flex.gap-2 .btn,
+    #contest_auth_form .form-group .d-flex.gap-2 .btn {
+        width: 100%;
+    }
+}
+
+/* 比赛免密登录优先：绑定提示 + 主按钮 */
+.contest-passwordless-panel .contest-passwordless-hint {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.contest-passwordless-panel .btn-success {
+    min-width: 8rem;
+}
+
+#contest_back_passwordless_btn {
+    text-decoration: none;
+}
+

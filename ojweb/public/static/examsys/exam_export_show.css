@@ -1,0 +1,817 @@
+/* 用于导出的考试html页面引用的css */
+/* 全局标题样式（传统大学考试卷标准） */
+h1 {
+    font-size: 16pt; /* 小二号 */
+    margin: 10pt 0 8pt 0;
+    line-height: 1.4;
+}
+h2 {
+    font-size: 15pt; /* 小三号 */
+    margin: 8pt 0 6pt 0;
+    line-height: 1.4;
+}
+h3 {
+    font-size: 14pt; /* 四号 */
+    margin: 6pt 0 4pt 0;
+    line-height: 1.4;
+}
+h4 {
+    font-size: 12pt; /* 小四号 */
+    margin: 5pt 0 3pt 0;
+    line-height: 1.4;
+}
+h5 {
+    font-size: 11pt;
+    margin: 4pt 0 2pt 0;
+    line-height: 1.4;
+}
+table td,
+table th {
+    border: 1px solid;
+    padding: 6pt 8pt; /* 使用pt单位，与整体样式一致 */
+    line-height: 1.5;
+}
+table {
+    border-collapse: collapse;
+}
+.text-red {
+    color: red !important;
+}
+/* 样卷（带答案）中，答案和解析区域内的所有内容都应该是红色 */
+.text-red * {
+    color: red !important;
+}
+/* 确保 h4 标题也是红色 */
+h4.text-red {
+    color: red !important;
+}
+/* 代码块内的文本也设为红色 */
+.text-red pre,
+.text-red code,
+.text-red pre code {
+    color: red !important;
+}
+/* 题号表格样式：撑满容器宽度，题号、基本题总分、附加题固定宽度，其它列平分剩余宽度 */
+.score_table {
+    border-collapse: collapse;
+    width: 100% !important;
+    table-layout: fixed !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box;
+}
+/* 确保 score_table 在 md_display_div 中也能撑满宽度 */
+.md_display_div .score_table {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+}
+/* 题号表格单元格样式 */
+.score_table td,
+.score_table th {
+    border: 1px solid black;
+    margin: 0;
+    padding: 6pt 8pt;
+    line-height: 1.5;
+    text-align: center; /* 默认居中 */
+}
+/* 题号列 - 固定宽度，文字居中 */
+.score_table .score-col-qid {
+    width: 50px; /* 固定宽度，够"题号"、"得分"、"评卷人"文字宽度即可 */
+}
+/* 基本题总分列 - 固定宽度 */
+.score_table .score-col-basic-total {
+    width: 60px;
+}
+/* 附加题列 - 固定宽度 */
+.score_table .score-col-extra {
+    width: 60px;
+}
+/* 大题题号列（一、二、三等）：平分剩余宽度 */
+/* 在 table-layout: fixed 模式下，将宽度设置为 0 可以让浏览器自动分配剩余空间 */
+.score_table .score-col-pkind {
+    width: auto !important; /* 设置为 0 让浏览器自动分配剩余空间 */
+    min-width: 0 !important;
+}
+.sealline_line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 垂直居中子元素（文字与虚线） */
+    width: 297mm; /* 旋转前是横向宽度，旋转后成为竖向高度（≈页面高度） */
+    position: relative;
+    font-size: 11pt;
+}
+.sealline_line>div {
+    position: relative;
+    display: flex;
+    align-items: center; /* 确保每个子容器内部也垂直居中 */
+}
+.sealline_dots {
+    /* 将虚线由绝对定位改为弹性伸展项，使其与文本在同一基线居中 */
+    position: static;
+    flex: 1 1 auto;
+    margin: 0 4pt;
+    height: 0; /* 使用 border-bottom 画线，元素本身高度为 0 */
+    border-bottom: 2pt dotted black;
+    font-size: 11pt;
+    text-align: justify;
+    text-align-last: justify;
+}
+.sealline_dots_ex {
+    position: static;
+    flex: 0 0 auto;
+    margin: 0 4pt;
+    height: 0;
+    border-bottom: 2pt dotted black;
+    font-size: 11pt;
+    width: 100px;
+}
+.sealline_text {
+    width: auto;
+    display: flex;
+    align-items: center; /* 垂直居中文字内容 */
+    justify-content: center;
+    padding: 0 2pt;
+}
+.score_table pre {
+    margin: auto;
+}
+
+/* 样例表格样式：撑满容器宽度，序列固定宽度，输入和输出样例列平分剩余宽度 */
+.sample_table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+/* 确保 sample_table 在 md_display_div 中也能撑满宽度 */
+.md_display_div .sample_table {
+    width: 100%;
+}
+.sample_table td,
+.sample_table th {
+    border: 1px solid black;
+    margin: 0;
+    text-align: left;
+    padding: 6pt 8pt; /* 使用pt单位，与整体样式一致 */
+    vertical-align: top;
+    line-height: 1.5;
+}
+.sample_table th {
+    text-align: center;
+}
+/* 序列固定宽度 - 使用 class 选择器 */
+.sample_table .sample-col-index {
+    width: 25px; /* 固定宽度 */
+    text-align: center;
+    vertical-align: middle; /* 垂直居中 */
+}
+/* 输入和输出样例列平分剩余宽度 */
+.sample_table th:not(:first-child),
+.sample_table td:not(:first-child) {
+    width: 50%;
+}
+.sample_table .sample_td {
+    width: 50%;
+    vertical-align: top;
+    overflow: visible;
+    text-overflow: clip;
+}
+.sample_table .sample_td>pre {
+    text-align: left;
+    color: black;
+    margin: 0;
+    white-space: pre;
+    overflow: visible;
+    text-overflow: clip;
+}
+.sample_table pre {
+    margin: 0;
+}
+/* 数学公式样式已移至 math.css */
+blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+}
+.global_score_table td,
+.global_score_table th {
+    border: 1px solid;
+    margin: 0;
+    padding: 5px;
+    min-width: 30px;
+}
+.global_score_table {
+    border-collapse: collapse;
+    /* 细分评分表：不限制横向滚动，内容可自然撑开 */
+    width: auto;
+    min-width: 100%;
+    table-layout: auto;
+    overflow: visible;
+}
+/* 细分评分表中，姓名列不换行 */
+.global_score_table th:nth-child(3),
+.global_score_table td:nth-child(3) {
+    white-space: nowrap;
+}
+blockquote {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    margin-left: 0;
+    font-size: .875em;
+    color: #6c757d;
+    border: none;
+}
+.sample_td {
+    width: 450px; 
+    vertical-align: top;
+    height: auto;
+    overflow: visible; /* 确保完整显示，无 ellipsis */
+    text-overflow: clip; /* 不使用 ellipsis */
+}
+.sample_td>pre {
+    text-align: left;
+    color: black;
+    margin: auto;
+    white-space: pre; /* 保留行首空格与换行，匹配题目预览 */
+    overflow: visible; /* 确保完整显示 */
+    text-overflow: clip;
+}
+
+/* page style - A4打印布局 */
+/* 设计目标：
+ * 1. 试卷主体严格 180mm 宽
+ * 2. 无密封线时，试卷主体在页面居中
+ * 3. 有密封线时，密封线放在主体左侧，相距 6mm，一起在页面居中
+ * 4. 密封线贯穿 A4 整个高度（297mm），无视页边距
+ * 5. 其他元素符合正常页边距（上下10mm，左右15mm）
+ * 
+ * 关键理解：
+ * - @page margin 定义页面边缘到内容区域的边距（打印时的物理边距）
+ * - body margin/padding 会与 @page margin 叠加，导致非预期的边距
+ * - 最佳实践：@page 设置页边距，body 在打印时 margin/padding 设为 0
+ * - 密封线使用 fixed 定位（打印时相对于页面），可以无视 @page margin
+ */
+@page {
+    size: A4;
+    /* 正常页边距：上下10mm，左右15mm */
+    margin: 10mm 15mm; /* 上右下左：上下10mm，左右15mm */
+}
+body {
+    /* 网页显示时：设置 padding 模拟页边距，保持与打印预览一致 */
+    padding: 10mm 15mm;
+    margin: 0 auto;
+    background-color: white;
+    font-family: "宋体", serif;
+    width: 100%;
+    max-width: 210mm; /* A4 宽度 */
+}
+
+/* 打印时：统一处理页面和打印样式 */
+@media print {
+    body {
+        /* 打印时，body 的 margin/padding 设为 0，避免与 @page margin 叠加
+         * @page margin 已经定义了页边距（上下10mm，左右15mm）
+         * body 内容区域会自动在 @page margin 定义的区域内显示
+         */
+        margin: 0;
+        padding: 0;
+        overflow: visible;
+    }
+    /* 打印时，密封线布局居中显示 */
+    .sealline_layout {
+        /* 密封线布局总宽度 204mm，在 @page margin 定义的区域内居中
+         * 内容区域宽度 = 210mm - 15mm - 15mm = 180mm
+         * 但密封线布局宽度是 204mm，所以需要超出内容区域
+         * 使用 margin: 0 auto 让它在 body 内居中（body 宽度是 210mm）
+         */
+        margin: 0 auto;
+        width: 204mm;
+        position: relative;
+    }
+    /* 密封线使用 fixed 定位，相对于页面定位，可以无视 @page margin */
+    .sealline_left {
+        /* fixed 定位在打印时相对于页面定位，可以贯穿整个页面高度
+         * 密封线布局总宽度 204mm，页面宽度 210mm
+         * 居中后，密封线布局从页面左边缘 (210-204)/2 = 3mm 开始
+         * 密封线在密封线布局内的 left: 0，所以密封线从页面左边缘 3mm 开始
+         */
+        position: fixed;
+        left: 3mm; /* 相对于页面左边缘，密封线布局居中后的位置 */
+        top: 0; /* 相对于页面上边缘，贯穿整个页面高度 */
+        width: 18mm;
+        height: 297mm; /* A4 完整高度，无视页边距 */
+    }
+    .sealline_left_content {
+        /* 密封线内容旋转后，高度应该是 297mm（A4 完整高度） */
+        position: absolute;
+        top: 50%;
+        height: 18mm;
+        width: 297mm; /* 旋转前是横向宽度，旋转后变成竖向高度（A4 完整高度） */
+        transform: rotate(-90deg) translate(-50%, -50%);
+        transform-origin: center center;
+    }
+    .sealline_right {
+        /* 打印时定位不变 */
+        position: absolute;
+        left: 24mm;
+        width: 180mm;
+    }
+}
+
+/* 全局图片样式：限制最大宽度，避免超出 A4 打印宽度 */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===========================================
+   examsys：导出页的"去 marker"兜底（导出页不一定加载 Bootstrap）
+   用于：填空题参考答案等带 list-unstyled 的结构
+   =========================================== */
+.list-unstyled {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+.answer-fill-list {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+/* Markdown 渲染内容样式（不再依赖 Vditor CSS） */
+/* 传统大学考试卷样式：小四号宋体，1.5倍行距 */
+.md_display_div {
+    font-family: "宋体", serif;
+    font-size: 12pt; /* 小四号 */
+    color: #000;
+    /* 试卷主体固定宽度：180mm */
+    width: 100%;
+    max-width: 180mm;
+    margin: 0 auto; /* 无密封线时居中 */
+}
+.md_display_div h1,
+.md_display_div h2,
+.md_display_div h3,
+.md_display_div h4,
+.md_display_div h5,
+.md_display_div h6 {
+    font-family: "宋体", serif;
+    font-weight: bold;
+    color: #000;
+    margin: 8pt 0 6pt 0; /* 标题上下间距稍大 */
+    line-height: 1.4; /* 标题行距稍紧 */
+}
+.md_display_div h1 { font-size: 16pt; } /* 小二号 */
+.md_display_div h2 { font-size: 15pt; } /* 小三号 */
+.md_display_div h3 { font-size: 12.5pt; } /* 四号 */
+.md_display_div h4 { font-size: 12pt; } /* 小四号 */
+.md_display_div h5 { font-size: 11pt; }
+.md_display_div h6 { font-size: 10.5pt; } /* 五号 */
+.md_display_div p,
+.md_display_div li {
+    font-family: "宋体", serif;
+    font-size: 12pt; /* Word 12 号字 = 12pt */
+    margin: 4pt 0; /* 段落间距适中 */
+    color: #000;
+    line-height: 1.6; /* 1.5倍行距 */
+}
+.md_display_div pre,
+.md_display_div code {
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 11pt;
+    line-height: 1.5; /* 代码行距稍紧 */
+}
+.md_display_div table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.md_display_div table th,
+.md_display_div table td {
+    border: 1px solid #000;
+    padding: 6pt 8pt; /* 表格内边距 */
+    line-height: 1.5;
+}
+.md_display_div blockquote {
+    border: 1px solid #999;
+    padding: 6pt 8pt;
+    margin: 6pt 0;
+    color: #000;
+    line-height: 1.6; /* 与正文行距一致 */
+}
+.md_display_div ul,
+.md_display_div ol {
+    margin: 6pt 0; /* 选项列表上下间距 */
+    padding-left: 0;
+    padding-inline-start: 0;
+    list-style: none;
+}
+/* 选择题选项样式：去掉圆点，左对齐，不缩进 */
+.md_display_div ul li,
+.md_display_div ol li {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+    margin-bottom: 3pt; /* 选项之间间距 */
+    text-align: left;
+    line-height: 1.6; /* 选项行距与正文一致 */
+}
+/* 内容区域：无密封线时，180mm 宽，居中 */
+.md_display_div {
+    width: 180mm;
+    max-width: 180mm;
+    margin: 0 auto; /* 居中 */
+}
+/* 确保表格能突破 md_display_div 的 max-width 限制 */
+.md_display_div .score_table,
+.md_display_div .sample_table {
+    width: 100%;
+}
+
+/* 导出页面：确保所有内容完整显示，无 overflow hidden/scroll/ellipsis */
+/* 修正 white-space 继承链：只在真正需要的地方应用 pre-wrap */
+pre, code, .code-block, .sample_td pre {
+    white-space: pre-wrap; /* 代码块需要保留空格和换行 */
+    word-wrap: break-word;
+}
+/* 其他内容区域使用 normal，避免影响 flex 布局 */
+.question_div, .md_display_div, .sample_div {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* 导出页面：参考答案代码容器必须完整显示，不能有滚动条 */
+.answer-code-container,
+.answer-code-container .code-viewer-container,
+.answer-code-container pre,
+.answer-code-fallback {
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
+}
+/* 选择题选项：左对齐，无缩进，无圆点 */
+ul, ol {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    padding-inline-start: 0 !important; /* 覆盖用户代理样式表的 padding-inline-start: 40px */
+}
+ul li, ol li {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 3pt !important; /* 选项之间间距 */
+    text-align: left !important;
+    display: block !important;
+    line-height: 1.6; /* 与正文行距一致 */
+}
+/* 确保选项序号和内容在同一行：移除选项中的 p 标签换行 */
+ul li p, ol li p {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* 确保题目标题和描述在同一行：移除 h3 内 p 标签的换行 */
+h3 p {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* 隐藏样卷中的交互元素 */
+.question_div input[type="radio"],
+.question_div input[type="checkbox"],
+.question_div .question_submit_container,
+.question_div .ans_review_div,
+.question_div .sample_copy,
+.question_div .prog-header,
+.question_div .prog-title,
+.question_div .prog-limits,
+.question_div .question_header_slot,
+.question_div .sample-section-header .sample_copy,
+.question_div .sample-controls {
+    display: none !important;
+}
+/* 样卷中选择题选项：提取选项文本，移除交互元素 */
+.question_div .list-group-item {
+    display: block !important;
+    padding: 0 !important;
+    margin: 3pt 0 !important; /* 选项之间间距 */
+    border: none !important;
+    background: transparent !important;
+    line-height: 1.6; /* 与正文行距一致 */
+}
+.question_div .choice-line {
+    display: inline !important;
+}
+.question_div .choice-label {
+    font-weight: bold;
+    margin-right: 4pt;
+}
+.question_div .choice-content {
+    display: inline;
+}
+/* 样卷中样例表格：移除交互元素，保持表格样式 */
+.question_div .sample-item .card {
+    border: none !important;
+    box-shadow: none !important;
+}
+.question_div .sample-section-header {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.question_div .sample-section-header h4 {
+    display: none !important;
+}
+.question_div .sample-index {
+    display: none !important;
+}
+/* 编程题标题样式修复 */
+.question_programming h4, .question_programming h5 {
+    font-size: 12pt !important;
+    margin: 4pt 0 !important;
+}
+.question_programming .prog-title {
+    font-size: 14pt !important;
+}
+.question_programming .prog-limits {
+    font-size: 11pt !important;
+}
+/* 确保编程题样例表格正确显示 */
+.sample_div table.score_table {
+    width: 100% !important;
+    table-layout: auto !important;
+}
+.sample_div table.score_table .sample_td {
+    width: auto !important;
+    min-width: 200px;
+}
+
+/* 细分评分表表头题目按钮样式（与后台查看页保持一致） */
+.question-header-qbtn{
+    border: 0;
+    background: transparent;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+}
+.question-header-qbadge{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    color: #ffffff;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.25);
+    transition: all .12s ease;
+    box-sizing: border-box;
+}
+.question-header-qbadge-2line{
+    flex-direction: column;
+    height: auto;
+    padding: 6px 8px 5px;
+    gap: 1px;
+    min-width: 44px;
+}
+.question-header-qbadge-2line .qid{
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 800;
+}
+.question-header-qbadge-2line .qid2{
+    font-size: 10px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: rgba(255,255,255,.85);
+}
+.question-header-qbtn:hover .question-header-qbadge{
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.35);
+    transform: translateY(-1px);
+}
+ul {
+    list-style:none;
+    list-style-position: inside;
+    padding: 0 !important;
+    margin: 5pt auto;
+}
+li {
+    padding: 1pt auto;
+    margin: 3pt auto;
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+    font-size: 12pt; /* Word 12 号字 = 12pt */
+}
+p {
+    margin: 4pt 0; /* 段落间距 */
+    line-height: 1.6; /* 1.5倍行距 */
+    font-size: 12pt; /* Word 12 号字 = 12pt */
+}
+h1,h2,h3,h4,h5 {
+    text-shadow: 0.1pt 0px 0px black, 0.1pt 0px 0px black, 0.2pt 0px 0px black, -0.1pt 0px 0px black, 0px 0.1pt 0px black, 0px -0.1pt 0px black;
+}
+.md_display_div {
+    font-family: "宋体", serif;
+    font-size: 12pt;
+}
+/* header */
+/* 关键：所有 flex 容器必须设置 white-space: normal，避免空白文本节点影响布局 */
+.header_line, .header_info, .hdiv_info, .hd_txt,
+.sealline_line, .sealline_txt_line, .sealline_line>div {
+    white-space: normal !important; /* 防止继承 pre-wrap，避免空白文本节点影响 flex 布局 */
+}
+.hdiv_info {
+    display: flex;
+    margin-right: 5pt;
+    margin-top: 0; /* 确保没有额外的上边距 */
+    margin-bottom: 0; /* 确保没有额外的下边距 */
+}
+.hdiv_info div:first-child {
+    margin-right: 5pt;
+}
+.hd_txt {
+    font-family: "楷体", "楷体_GB2312", serif;
+    font-size: 12pt;
+    flex: 0 1 auto;
+}
+.hd_underline {
+    border-bottom: 1px solid black;
+    flex: 1 1 auto;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+.header_global_title {
+    text-align: center;
+    font-family: "宋体", serif;
+    font-size: 22pt; /* Word 22 号字 = 22pt */
+    font-weight: bold;
+    text-shadow: 0.1px 0px 0px black, -0.1px 0px 0px black, 0px 0.1px 0px black, 0px -0.1px 0px black;
+    margin-top: 0; /* 确保没有额外的上边距 */
+    margin-bottom: 0; /* 确保没有额外的下边距 */
+}
+.header_global_subtitle {
+    /* 表示文件类型的 subtitle，靠左上角悬停，不挤占正文 */
+    position: absolute;
+    top: 0;
+    text-align: left;
+    font-family: "宋体", serif;
+    font-size: 12pt;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+.header_line {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5pt; /* 与旧版本保持一致 */
+    margin-bottom: 0; /* 确保没有额外的下边距 */
+}
+.header_info {
+    margin: 0; /* 确保没有额外的外边距 */
+    padding: 0; /* 移除所有内边距，让内容自然排列 */
+    position: relative; /* 确保绝对定位的 subtitle 相对于此容器定位 */
+    padding-top: 18pt; /* 为 subtitle 预留空间，避免与 title 重叠（网页和打印统一处理） */
+}
+.header_open_or_close {
+    width: 45mm;
+}
+.header_open_or_close .hd_txt:first-child {
+    width: 18mm;
+}
+.header_a_or_b {
+    width: 40mm;
+}
+.header_a_or_b .hd_txt:first-child {
+    width: 15mm;
+    text-align: right;
+}
+.header_course_id {
+    width: 45mm;
+}
+.header_course_id .hd_txt:first-child {
+    width: 18mm;
+}
+.header_course_name {
+    flex: 1 1 auto;
+}
+.header_credit {
+    width: 40mm;
+}
+.header_credit .hd_txt:first-child {
+    width: 15mm;
+    text-align: right;
+}
+.header_exam_question_creater {
+    width: 50mm;
+}
+.header_exam_question_reviewer {
+    flex: 1 1 auto;
+}
+.header_year {
+    width: 25mm;
+}
+.header_month {
+    width: 15mm;
+}
+.header_day {
+    width: 15mm;
+}
+/* 密封线布局：
+ * 总宽度 = 18mm（密封线）+ 6mm（间距）+ 180mm（主体）= 204mm
+ * 在页面中居中显示
+ */
+.sealline_layout {
+    position: relative;
+    width: 204mm; /* 18mm + 6mm + 180mm */
+    margin: 0 auto; /* 居中 */
+    min-height: 297mm; /* A4 完整高度，密封线贯穿整个页面 */
+    page-break-after: always; /* 确保密封线只在第一页显示 */
+}
+/* 密封线左侧区域：18mm 宽 */
+.sealline_left {
+    /* 网页显示时：使用 absolute 定位，相对于 sealline_layout */
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18mm;
+    height: 297mm; /* A4 完整高度 */
+    z-index: 9999;
+    overflow: visible;
+}
+/* 密封线内容：旋转90度，垂直居中 */
+.sealline_left_content {
+    position: absolute;
+    /* CSS rotate 机制：
+     * - transform-origin: center center（围绕元素中心旋转）
+     * - rotate(-90deg): 逆时针旋转90度
+     * - 旋转前：宽度 297mm（横向），高度 18mm（竖向）
+     * - 旋转后：宽度变成高度（竖向297mm），高度变成宽度（横向18mm）
+     * - 使用 translate(-50%, -50%) 先居中，再旋转，确保旋转后垂直居中
+     */
+    left: 50%;
+    top: 50%;
+    width: 297mm; /* 旋转前是横向宽度，旋转后变成竖向高度（A4 完整高度） */
+    height: 18mm; /* 旋转前是竖向高度，旋转后变成横向宽度 */
+    transform-origin: center center;
+    transform: translate(-50%, -50%) rotate(-90deg); /* 先居中，再旋转 */
+    z-index: 10000;
+    overflow: visible;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+/* 密封线右侧内容区域：180mm 宽，距离密封线 6mm */
+.sealline_right {
+    position: absolute;
+    left: 24mm; /* 18mm（密封线）+ 6mm（间距） */
+    width: 180mm;
+    max-width: 180mm;
+    z-index: 1;
+    background: transparent;
+}
+.sealline_txt_line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12pt;
+}
+.sealline_content_txt {
+    flex: 0 0 auto;
+}
+.sealline_content_underline {
+    flex: 1;
+    border-bottom: 1px solid black;
+}
+.sealline_content_space {
+    flex: 1;
+}
+.sealline_notify_line {
+    align-items: center;
+    text-align: center;
+    font-size: 11pt;
+}
+.sealline_line, .sealline_txt>div{
+    padding-bottom: 2mm;
+}
+
+/* ############################################# */
+/* 数学公式字号控制 - 与正文字号保持一致 */
+/* ############################################# */
+
+/* 让 katex 字号继承父元素字号，与正文保持一致 */
+.question_div .katex,
+.md_display_div .katex {
+    font-size: 1em !important;
+    font: normal 1em KaTeX_Main, Times New Roman, serif !important;
+}
+
+/* 确保 katex 内部元素也使用相对字号 */
+.question_div .katex *,
+.md_display_div .katex * {
+    font-size: inherit !important;
+}

@@ -1,0 +1,103 @@
+name: ccpcoj
+services:
+  db:
+    platform: linux/amd64
+    image: mysql:8.4@sha256:80f4933e3835f9dc4d35a28ec500d7986cb4414e6c6821c5461239cb7beb8995
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Run scripts/init_env.py}
+      MYSQL_DATABASE: ccpcoj
+      MYSQL_USER: ccpcoj
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Run scripts/init_env.py}
+      TZ: ${APP_TIMEZONE:-Asia/Macau}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_ROOT_PASSWORD}" mysqladmin ping -h 127.0.0.1 --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  web:
+    platform: linux/amd64
+    image: ccpcoj-web-local:ccpc2026
+    build:
+      context: .
+      dockerfile: deploy/docker/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOSTNAME: db
+      DB_HOSTPORT: '3306'
+      DB_DATABASE: ccpcoj
+      DB_USERNAME: ccpcoj
+      DB_PASSWORD: ${DB_PASSWORD:?Run scripts/init_env.py}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Run scripts/init_env.py}
+      JUDGER_PASSWORD: ${JUDGER_PASSWORD:?Run scripts/init_env.py}
+      CCPC_HMAC_KEY: ${CCPC_HMAC_KEY:?Run scripts/init_env.py}
+      OJ_SESSION: ccpc
+      OJ_NAME: ccpc
+      OJ_CDN: local
+      OJ_MODE: cpcsys
+      OJ_STATUS: cpc
+      OJ_STATIC: /var/www/public/ccpc
+      OJ_UPDATE_STATIC: '1'
+      BELONG_TO: ccpc
+      PORT_OJ: '80'
+      APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Macau}
+      TZ: ${APP_TIMEZONE:-Asia/Macau}
+      CSGOJ_BACKTASK: '1'
+    volumes:
+      - web-data:/var/www
+      - judge-data:/home/judge
+      - nginx-conf:/etc/nginx/conf.d
+    networks:
+      default:
+        aliases: [php-ccpc]
+    healthcheck:
+      test: [CMD, php, '-r', 'exit(@fsockopen("127.0.0.1",9000)?0:1);']
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  nginx:
+    platform: linux/amd64
+    image: nginx:1.28-alpine@sha256:0dcc88822d45581e65ae329f8be769762bf628d3b2bb7d2a077d4aa5c98b30e3
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - '${OJ_BIND:-127.0.0.1}:${OJ_PORT:-20080}:80'
+    volumes:
+      - web-data:/var/www:ro
+      - nginx-conf:/etc/nginx/conf.d:ro
+  judge:
+    platform: linux/amd64
+    profiles: [judge]
+    image: ccpcoj-judge-local:ccpc2026
+    build:
+      context: .
+      dockerfile: deploy/docker/judge.Dockerfile
+    privileged: true
+    cgroup: host
+    shm_size: 1gb
+    init: true
+    restart: unless-stopped
+    depends_on:
+      nginx:
+        condition: service_started
+    environment:
+      CSGOJ_SERVER_BASE_URL: http://nginx
+      CSGOJ_SERVER_API_PATH: /ojtool/judge2
+      CSGOJ_SERVER_USERNAME: judger
+      CSGOJ_SERVER_PASSWORD: ${JUDGER_PASSWORD:?Run scripts/init_env.py}
+      TZ: ${APP_TIMEZONE:-Asia/Macau}
+    volumes:
+      - judge-work:/judge
+volumes:
+  mysql-data:
+  web-data:
+  judge-data:
+  nginx-conf:
+  judge-work:

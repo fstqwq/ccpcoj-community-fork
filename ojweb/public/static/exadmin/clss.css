@@ -1,0 +1,407 @@
+/* 班级管理样式 */
+
+/* 页面标题容器 - 标题和工具栏在同一行 */
+/* 注意：basecss.css 中已有通用样式，这里只做特定优化 */
+.page-title-container .page-title {
+    white-space: nowrap;
+}
+
+/* 工具栏在标题右侧时的样式优化 */
+.page-title-container #clss_toolbar {
+    margin: 0;
+    padding: 0;
+}
+
+.page-title-container #clss_toolbar .table-toolbar {
+    margin: 0;
+    padding: 0;
+}
+
+.page-title-container #clss_toolbar .d-flex {
+    justify-content: flex-end;
+}
+
+.page-title-container #clss_toolbar .toolbar-input {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.5rem;
+    height: auto;
+}
+
+.page-title-container #clss_toolbar .toolbar-btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* 筛选输入框宽度（标题栏右侧布局） */
+#clss_id_input { max-width: 100px; }
+#clss_title_input { max-width: 200px; }
+#clss_year_input { max-width: 100px; }
+#clss_semester_input { max-width: 150px; }
+#clss_teacher_input { max-width: 220px; }
+
+/* 响应式：小屏幕时工具栏换行 */
+@media (max-width: 992px) {
+    .page-title-container #clss_toolbar .d-flex {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}
+
+/* 无数据状态样式 */
+.toolbar-no-data {
+    background-color: rgba(108, 117, 125, 0.1) !important;
+    border-left: 4px solid #6c757d !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.toolbar-no-data #toolbar_title {
+    color: #6c757d !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+}
+
+.toolbar-no-data #toolbar_title i {
+    color: #6c757d !important;
+}
+
+/* 表格样式优化 */
+#clss_table {
+    font-size: 0.9rem;
+}
+
+#clss_table th {
+    font-weight: 600;
+}
+
+#clss_table td {
+    vertical-align: middle;
+}
+
+/* 教师标签样式 */
+.badge.bg-info {
+    font-size: 0.85em;
+    padding: 0.25em 0.5em;
+    margin: 0.1em;
+}
+
+/* 错误摘要样式 */
+#error_summary {
+    margin-top: 0.5rem;
+}
+
+#error_summary .alert {
+    margin-bottom: 0;
+}
+
+/* 模态框样式优化 */
+#clssModifyModal .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+#clssModifyModal .form-control,
+#clssModifyModal .form-select {
+    margin-bottom: 0.5rem;
+}
+
+#clssModifyModal .form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* 工具栏按钮间距 */
+.toolbar-right .btn {
+    margin-left: 0.5rem;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .toolbar-container {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .toolbar-right {
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .toolbar-right .btn {
+        flex: 1;
+        margin-left: 0;
+        margin-right: 0.5rem;
+    }
+    
+    .toolbar-right .btn:last-child {
+        margin-right: 0;
+    }
+}
+
+/* 批量删除结果模态框样式 */
+.batch-delete-result {
+    padding: 0;
+}
+
+.batch-delete-result .result-summary .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.batch-delete-result .result-summary .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.batch-delete-result .result-summary .card-body {
+    padding: 1rem;
+}
+
+.batch-delete-result .failure-details {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* 表格样式：允许折行，避免横向滚动 */
+.batch-delete-result .batch-delete-table {
+    margin-bottom: 0;
+    table-layout: fixed;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.batch-delete-result .batch-delete-table th,
+.batch-delete-result .batch-delete-table td {
+    vertical-align: top;
+    padding: 0.75rem;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* 设置各列宽度比例 */
+.batch-delete-result .batch-delete-table th:first-child,
+.batch-delete-result .batch-delete-table td:first-child {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+}
+
+.batch-delete-result .batch-delete-table th:nth-child(2),
+.batch-delete-result .batch-delete-table td:nth-child(2) {
+    width: 150px;
+    min-width: 150px;
+}
+
+.batch-delete-result .batch-delete-table th:nth-child(3),
+.batch-delete-result .batch-delete-table td:nth-child(3) {
+    width: auto;
+    min-width: 0;
+}
+
+/* 表头中英双语上下分布 */
+.batch-delete-result .batch-delete-table .th-bilingual {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.batch-delete-result .batch-delete-table .th-bilingual .cn-text,
+.batch-delete-result .batch-delete-table .th-bilingual .en-text {
+    display: block;
+    line-height: 1.4;
+}
+
+/* 表格内容折行 */
+.batch-delete-result .batch-delete-table td code {
+    white-space: normal;
+    word-break: break-all;
+    display: inline-block;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.batch-delete-result .batch-delete-table td.fw-medium {
+    word-break: break-word;
+    white-space: normal;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 错误详情列表 */
+.batch-delete-result .failure-details .error-detail-list {
+    line-height: 1.6;
+}
+
+.batch-delete-result .failure-details .error-detail-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.5rem;
+    background-color: #fff3cd;
+    border-left: 3px solid #ffc107;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.batch-delete-result .failure-details .error-detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.batch-delete-result .failure-details .error-detail-item i {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.batch-delete-result .failure-details .error-detail-item .error-detail-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* 错误详情中英双语上下分布 */
+.batch-delete-result .failure-details .error-detail-item .error-detail-content .cn-text,
+.batch-delete-result .failure-details .error-detail-item .error-detail-content .en-text {
+    display: block;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.batch-delete-result .failure-details .error-detail-item .error-detail-content .cn-text {
+    margin-bottom: 0.25rem;
+}
+
+.batch-delete-result .failure-details .error-detail-item .error-detail-content .en-text {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.batch-delete-result .failure-details .error-message {
+    line-height: 1.6;
+    word-break: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.batch-delete-result .success-details {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.batch-delete-result .success-details .list-group-item {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid #198754;
+}
+
+.batch-delete-result .success-details .list-group-item i {
+    color: #198754;
+}
+
+/* 模态框内容优化 - 完整展开，使用窗口滚动 */
+/* 针对批量删除结果模态框，移除高度限制，使用窗口滚动 */
+.batch-delete-modal .modal-dialog,
+.modal:has(.batch-delete-result) .modal-dialog {
+    max-height: none !important;
+    margin: 1.75rem auto;
+    height: auto;
+}
+
+.batch-delete-modal .modal-content,
+.modal:has(.batch-delete-result) .modal-content {
+    max-height: none !important;
+    height: auto;
+}
+
+.batch-delete-modal .modal-body,
+.modal:has(.batch-delete-result) .modal-body {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+}
+
+/* 批量删除结果容器 */
+.modal .batch-delete-result {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 确保模态框标题栏在滚动时固定顶部 */
+.batch-delete-modal .modal-header,
+.modal:has(.batch-delete-result) .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1055;
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 确保表格容器不溢出 */
+.batch-delete-result .failure-details {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .batch-delete-result .result-summary .col-md-4 {
+        margin-bottom: 0.75rem;
+    }
+    
+    .batch-delete-result .batch-delete-table {
+        font-size: 0.875rem;
+        display: block;
+        width: 100%;
+    }
+    
+    .batch-delete-result .batch-delete-table thead,
+    .batch-delete-result .batch-delete-table tbody,
+    .batch-delete-result .batch-delete-table tr {
+        display: block;
+        width: 100%;
+    }
+    
+    .batch-delete-result .batch-delete-table th,
+    .batch-delete-result .batch-delete-table td {
+        display: block;
+        width: 100% !important;
+        padding: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .batch-delete-result .batch-delete-table th:last-child,
+    .batch-delete-result .batch-delete-table td:last-child {
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .batch-delete-result .batch-delete-table .th-bilingual {
+        font-weight: 600;
+    }
+    
+    .batch-delete-result .failure-details .error-detail-item {
+        flex-direction: column;
+    }
+    
+    .batch-delete-result .failure-details .error-detail-item i {
+        margin-bottom: 0.25rem;
+    }
+}
+

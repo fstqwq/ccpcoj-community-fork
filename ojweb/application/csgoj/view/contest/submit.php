@@ -1,0 +1,1 @@
+{include file="../../csgoj/view/problemset/submit_pro_form" /}

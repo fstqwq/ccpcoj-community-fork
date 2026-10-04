@@ -1,0 +1,1 @@
+{include file="../../admin/view/public/admin_header" /}

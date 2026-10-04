@@ -1,0 +1,512 @@
+/**
+ * 直播榜单专用样式（与 contest/rank 的 rank.css 完全分离，仅在本页与 HUD 内嵌挂载使用）
+ * 数据与排名逻辑继承 rank.js / RankLiveSystem
+ */
+
+.rank-live-page-mount,
+.rank-live-fullpage {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* live_rank 整页根字号：已并入 contestlive.css「html.contestlive-spa-html」+ contestlive_spa_viewport_scale.js */
+
+.contestlive-display--rank-live {
+    margin: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    background: #050508;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* 榜单主体占满除固定顶栏外的视口，避免 min-height:100vh 与 flex 叠加出竖向滚动条 */
+.contestlive-display--rank-live .contestlive-rank-live-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.contestlive-display--rank-live .rank-live-page-mount {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ========== HUD 右侧嵌套 ========== */
+.contestlive-hud__rank-host {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+}
+
+.contestlive-hud__rank-host .rank-live-embed {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.2rem;
+    overflow: hidden;
+    /* 与综合 HUD 背板分档联动（.contestlive-hud 上 --hud-a-embed） */
+    background: rgb(6 8 14 / var(--hud-a-embed, 0.45));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* ========== 根容器：不接 rank.css ========== */
+.rank-live-root.rank-system,
+.rank-live-root {
+    /* 与正式 rank 奖牌/题态色一致；背景略实色化，叠在暗场+水印刷上仍可读 */
+    --rl-bg: rgba(14, 17, 26, 0.88);
+    /* 现场常见红条题头，接近 ICPC/XCPC 大屏对比习惯 */
+    --rl-head-bg: #b71c1c;
+    --rl-grid-odd: rgba(255, 255, 255, 0.04);
+    --rl-grid-even: rgba(255, 255, 255, 0.07);
+    --rl-prob-ac: rgba(46, 125, 50, 0.85);
+    --rl-prob-wa: rgba(198, 40, 40, 0.85);
+    --rl-prob-pd: rgba(251, 192, 45, 0.9);
+    --rl-prob-fb: rgba(25, 118, 210, 0.9);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    color: #eceff4;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.rank-live-root .rank-content-wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rank-live-root .rank-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 0.15rem;
+    background: var(--rl-bg);
+    backdrop-filter: blur(4px);
+}
+
+.rank-live-root #rank-grid {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    /* 形成纵向 scrollport，鼠标滚轮 / 触控板可在榜体上自然滚动（此前 hidden 无法接收默认滚轮） */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* 投屏观感：保留滚动能力，隐藏系统滚动条（Firefox / Chromium / 旧 Edge） */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.rank-live-root #rank-grid::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.rank-live-root #loading {
+    opacity: 0.88;
+}
+
+/* ========== 表头 ========== */
+.rank-live-root .rl-head {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.rank-live-root .rl-head__banner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.35rem 0.65rem;
+    padding: 0.32rem 0.5rem;
+    background: var(--rl-head-bg);
+    font-size: clamp(0.78rem, 0.42vmin + 0.52rem, 1.05rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.rank-live-root .rl-head__banner .cn-text {
+    font-weight: 800;
+}
+
+.rank-live-root .rl-head__banner .en-text {
+    font-size: 0.78em;
+    font-weight: 700;
+    opacity: 0.88;
+    letter-spacing: 0.04em;
+}
+
+/* live_rank 单页：计时并入红条标题栏右端（DOM 由 rank_live.js 移入 `.rl-head__banner-timer`） */
+.rank-live-root .rl-head__banner--with-timer {
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.rank-live-root .rl-head__banner-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.35rem 0.65rem;
+}
+
+.rank-live-root .rl-head__banner--with-timer .rl-head__banner-title {
+    text-align: center;
+}
+
+.rank-live-root .rl-head__banner-timer {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: min(13.5rem, 46vw);
+}
+
+.rank-live-root .contestlive-rank-timer-host {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.06rem;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #fff;
+    max-width: 100%;
+    pointer-events: none;
+    line-height: 1.15;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.rank-live-root .contestlive-rank-timer-host__wall {
+    font-size: 0.62em;
+    opacity: 0.88;
+    font-variant-numeric: tabular-nums;
+}
+
+.rank-live-root .contestlive-rank-timer-host__remain {
+    font-size: 0.92em;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.rank-live-root .contestlive-rank-timer-host__state {
+    font-size: 0.58em;
+    opacity: 0.95;
+}
+
+.rank-live-root .contestlive-rank-timer-host__state .contestlive-contest-timer-state__bi {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.35rem;
+}
+
+.rank-live-root .contestlive-rank-timer-host__state .contestlive-contest-timer-state__bi .en-text {
+    display: inline;
+    margin-left: 0;
+    margin-top: 0;
+    font-size: 0.92em;
+    font-style: normal;
+}
+
+.rank-live-root .contestlive-rank-timer-host .en-text {
+    opacity: 0.88;
+}
+
+.rank-live-root .rl-th {
+    text-align: center;
+}
+
+.rank-live-root .rl-th--team {
+    text-align: left;
+    padding-left: 0.15rem;
+}
+
+.rank-live-root .rl-head__problems {
+    display: grid;
+    grid-template-columns: repeat(var(--rl-prob-count, 12), minmax(0, 1fr));
+    gap: 1px;
+    padding: 0.18rem 0.25rem;
+    background: rgba(0, 0, 0, 0.35);
+    overflow-x: hidden;
+}
+
+.rank-live-root .rl-prob-th {
+    width: auto;
+    min-width: 0;
+    text-align: center;
+    font-weight: 800;
+    font-size: clamp(0.65rem, 0.3vmin + 0.48rem, 0.95rem);
+    line-height: 1.15;
+    padding: 0.12rem 0.05rem;
+    border-radius: 0.12rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-bottom: 4px solid var(--rl-p, #888);
+    /* 左/右/上 inset 描边；字母与色条仅 border-bottom 一条分界（勿用 ::before + z-index，会压到字上） */
+    box-shadow:
+        inset 1px 0 0 var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.22)),
+        inset -1px 0 0 var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.22)),
+        inset 0 1px 0 var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.22));
+}
+
+.rank-live-root .rl-head__loading {
+    padding: 0.35rem;
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* ========== 数据行 ========== */
+.rank-live-root .rl-row {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--rl-grid-even);
+}
+
+.rank-live-root .rl-row.odd {
+    background: var(--rl-grid-odd);
+}
+
+.rank-live-root .rl-row--last {
+    border-radius: 0 0 0.2rem 0.2rem;
+}
+
+.rank-live-root .rl-row__main {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) 2.25rem 3.5rem;
+    gap: 0.18rem;
+    align-items: center;
+    padding: 0.28rem 0.42rem;
+    font-size: clamp(0.75rem, 0.38vmin + 0.52rem, 1.08rem);
+}
+
+.rank-live-root .rl-cell--name {
+    min-width: 0;
+}
+
+.rank-live-root .rl-name {
+    min-width: 0;
+}
+
+.rank-live-root .rl-cell--rank {
+    text-align: center;
+}
+
+.rank-live-root .rl-cell--rank .rank-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+}
+
+.rank-live-root .rl-cell--rank .rank-number {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.rank-live-root .rl-cell--solv,
+.rank-live-root .rl-cell--pen {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.rank-live-root .rl-name__school {
+    font-size: 0.78em;
+    opacity: 0.88;
+    line-height: 1.15;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rank-live-root .rl-name__primary {
+    font-weight: 700;
+    line-height: 1.2;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    word-break: normal;
+}
+
+/* 同步间歇跑马灯（csg_marquee_plain.js · syncIntermittentMarqueeGroup） */
+.rank-live-root .rl-name__primary .csg-mq-inter-clip {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+.rank-live-root .rl-name__primary .csg-mq-inter-track {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    vertical-align: top;
+    will-change: transform;
+}
+
+.rank-live-root .rl-name__primary .csg-mq-inter-sep {
+    flex: 0 0 auto;
+    font-weight: 700;
+}
+
+.rank-live-root .rl-name__en {
+    font-size: 0.78em;
+    opacity: 0.82;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.rank-live-root .rl-name__meta {
+    font-size: 0.72em;
+    opacity: 0.72;
+}
+
+.rank-live-root .rl-name--school .rl-name__primary {
+    font-size: 1.02em;
+}
+
+/* 奖牌配色略扩：沿用 rank.js 的 gold/silver/bronze 类 */
+.rank-live-root .rank-item.gold .rank-number {
+    color: #ffd54f;
+}
+.rank-live-root .rank-item.silver .rank-number {
+    color: #e0e0e0;
+}
+.rank-live-root .rank-item.bronze .rank-number {
+    color: #ffab76;
+}
+
+/* ========== 题目格（继承 CreateProblemGroup 的 DOM 类名） ========== */
+.rank-live-root .rl-row__problems {
+    display: grid;
+    grid-template-columns: repeat(var(--rl-prob-count, 12), minmax(0, 1fr));
+    gap: 2px;
+    padding: 0 0.3rem 0.25rem 0.3rem;
+    overflow-x: hidden;
+}
+
+.rank-live-root .rl-row__problems .rank-col-problem {
+    width: auto;
+    min-width: 0;
+}
+
+.rank-live-root .rl-row__problems .rank-col {
+    border: 0;
+}
+
+.rank-live-root .rl-row__problems .problem-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.5rem;
+    border-radius: 0.12rem;
+    font-size: clamp(0.62rem, 0.3vmin + 0.45rem, 0.9rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: #fff;
+}
+
+.rank-live-root .rl-row__problems .problem-item.pro-ac {
+    background: var(--rl-prob-ac);
+}
+.rank-live-root .rl-row__problems .problem-item.pro-wa {
+    background: var(--rl-prob-wa);
+}
+.rank-live-root .rl-row__problems .problem-item.pro-pending,
+.rank-live-root .rl-row__problems .problem-item.pro-none {
+    background: rgba(40, 44, 58, 0.7);
+    color: rgba(255, 255, 255, 0.55);
+}
+.rank-live-root .rl-row__problems .problem-item.pro-first {
+    background: rgba(25, 118, 210, 0.82);
+}
+.rank-live-root .rl-row__problems .problem-item.pro-first-blood-regular,
+.rank-live-root .rl-row__problems .problem-item.pro-first-blood-global {
+    box-shadow: inset 0 0 0 1px rgba(144, 202, 249, 0.95);
+}
+
+.rank-live-root .rl-row__problems .time-brief,
+.rank-live-root .rl-row__problems .pro-submit-cnt {
+    font-size: inherit;
+}
+
+.rank-live-root .rl-row__problems .time-full {
+    display: none;
+}
+
+.rank-live-root .rl-row__problems .problem-separator {
+    display: none;
+}
+
+/* 内嵌榜单容器背景随 HUD 透明度分档（后加载覆盖本文件前文的 .rank-live-root --rl-bg） */
+.contestlive-hud .rank-live-root {
+    --rl-bg: rgb(14 17 26 / var(--hud-a-rl, 0.72));
+}
+
+/* ========== live_rank 全屏单页：较 HUD 嵌套再抬一档 clamp（与 html 倍率叠加） ========== */
+.contestlive-display--rank-live .rank-live-root .rl-head__banner {
+    font-size: clamp(0.88rem, 0.52vmin + 0.58rem, 1.22rem);
+    padding: 0.38rem 0.55rem;
+    gap: 0.4rem 0.72rem;
+}
+
+.contestlive-display--rank-live .rank-live-root .rl-prob-th {
+    font-size: clamp(0.72rem, 0.36vmin + 0.52rem, 1.02rem);
+    padding: 0.14rem 0.06rem;
+}
+
+.contestlive-display--rank-live .rank-live-root .rl-row__main {
+    grid-template-columns: 3rem minmax(0, 1fr) 2.45rem 3.75rem;
+    gap: 0.22rem;
+    padding: 0.32rem 0.48rem;
+    font-size: clamp(0.82rem, 0.44vmin + 0.58rem, 1.14rem);
+}
+
+.contestlive-display--rank-live .rank-live-root .rl-row__problems .problem-content {
+    min-height: 1.65rem;
+    font-size: clamp(0.7rem, 0.34vmin + 0.5rem, 0.98rem);
+}

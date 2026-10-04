@@ -1,0 +1,643 @@
+/* 外榜列表页：与全站 Bootstrap / 管理台风格统一 */
+/* 列表顶 csg-page-header 样式见 outrank_layout.css（.outrank-standalone-page-header） */
+
+/* 固定列用 data-width，标题列不限制宽度并吃掉剩余空间 */
+.outrank-list-scope table#outrank_list_table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* 标题列：无批量列为第 2 列（ID 后）；管理员勾选列为首列时标题为第 3 列 */
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table colgroup col:nth-child(2) {
+    width: auto !important;
+}
+
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table thead th:nth-child(2),
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table tbody td:nth-child(2) {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 8rem;
+}
+
+.outrank-list-scope--batch #outrank_list_table colgroup col:nth-child(3) {
+    width: auto !important;
+}
+
+.outrank-list-scope--batch #outrank_list_table thead th:nth-child(3),
+.outrank-list-scope--batch #outrank_list_table tbody td:nth-child(3) {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 8rem;
+}
+
+.outrank-list-scope #outrank_list_table .outrank-title-link {
+    display: inline;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-width: none;
+}
+
+.outrank-list-scope .bootstrap-table .fixed-table-container {
+    border: 1px solid rgba(13, 110, 253, 0.12);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.outrank-list-scope .bootstrap-table .table thead th {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(13, 110, 253, 0.12);
+    white-space: nowrap;
+}
+
+.outrank-list-scope .bootstrap-table .table tbody td {
+    vertical-align: middle !important;
+    font-size: 0.875rem;
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+.outrank-list-scope .bootstrap-table .table tbody tr:hover td {
+    background-color: rgba(13, 110, 253, 0.04);
+}
+
+/* ID 列（与表头 data-width 一致）；管理员首列为勾选框 */
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table thead th:first-child,
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table tbody td:first-child {
+    width: 156px;
+    max-width: 156px;
+    box-sizing: border-box;
+}
+
+.outrank-list-scope--batch #outrank_list_table thead th:first-child,
+.outrank-list-scope--batch #outrank_list_table tbody td:first-child {
+    width: 52px;
+    max-width: 52px;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.outrank-list-scope--batch #outrank_list_table thead th:nth-child(2),
+.outrank-list-scope--batch #outrank_list_table tbody td:nth-child(2) {
+    width: 156px;
+    max-width: 156px;
+    box-sizing: border-box;
+}
+
+.outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table tbody td:first-child {
+    padding: 0.5rem 0.5rem !important;
+}
+
+.outrank-list-scope--batch #outrank_list_table tbody td:nth-child(2) {
+    padding: 0.5rem 0.5rem !important;
+}
+
+/* ID + 可选类型徽标 */
+.outrank-id-cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    cursor: pointer;
+    user-select: none;
+    min-width: 0;
+}
+
+/* 「更新」列：大管理员且近 7 天内有更新时，黄星叠在时间上不占额外列宽 */
+.outrank-updated-at-cell--recent {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.outrank-updated-at__inner {
+    display: block;
+}
+
+.outrank-updated-at__star {
+    position: absolute;
+    left: -0.1rem;
+    top: -0.42rem;
+    z-index: 2;
+    font-size: 0.65rem;
+    line-height: 1;
+    color: #ca8a04;
+    text-shadow: 0 0 3px rgba(250, 204, 21, 0.85);
+    pointer-events: auto;
+    cursor: default;
+}
+
+.outrank-id-cell__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.125rem;
+    min-width: 0;
+    text-align: left;
+}
+
+.outrank-id-cell__id {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.outrank-id-cell__uuid {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.65rem;
+    line-height: 1.15;
+    color: #64748b;
+    max-width: 5.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 比赛类型 logo：小圆角卡片，清晰展示（替代半透明大半圆） */
+/* 无 ckind 徽标时占位，尺寸与 .outrank-type-logo 一致，保证 ID 列横向对齐 */
+.outrank-type-logo.outrank-type-logo--placeholder {
+    visibility: hidden;
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.outrank-type-logo {
+    flex-shrink: 0;
+    width: 2.375rem;
+    height: 2.375rem;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    background-image: var(--outrank-logo-bg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid rgba(13, 110, 253, 0.16);
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.outrank-list-scope .bootstrap-table .table tbody tr:hover .outrank-type-logo {
+    border-color: rgba(13, 110, 253, 0.28);
+    box-shadow:
+        0 2px 6px rgba(13, 110, 253, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* 操作列：横向排列 */
+.outrank-action-cell {
+    min-width: 5.5rem;
+}
+
+.outrank-action-cell .btn {
+    padding: 0.25rem 0.45rem;
+}
+
+/* 导入预览 Modal */
+.outrank-import-preview-modal .outrank-import-preview-dialog {
+    max-width: min(1080px, 98vw);
+    margin: 0.75rem auto;
+}
+
+.outrank-import-preview-modal .modal-content {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(13, 110, 253, 0.12);
+}
+
+.outrank-import-preview-scroll {
+    max-height: min(62vh, 520px);
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.375rem;
+    background: #fff;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 导入预览：bootstrap-table 外层与列表页风格统一（无 data-height 时仅一层表头，勿再 sticky thead，避免与旧版固定表头叠成双行） */
+.outrank-import-preview-modal .outrank-import-preview-scroll .bootstrap-table {
+    margin-bottom: 0;
+}
+
+.outrank-import-preview-modal .outrank-import-preview-scroll .fixed-table-container {
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.outrank-import-preview-table {
+    font-size: 0.8125rem;
+    --bs-table-striped-bg: rgba(13, 110, 253, 0.035);
+}
+
+.outrank-import-preview-modal .outrank-import-preview-table thead th {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    vertical-align: middle;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+    background-color: var(--bs-table-bg, #fff);
+}
+
+.outrank-import-preview-col-check,
+.outrank-import-preview-table th:first-child,
+.outrank-import-preview-table td:first-child {
+    width: 2.5rem;
+    max-width: 2.5rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 文件名列：固定 80px，中间省略由脚本生成 */
+.outrank-import-preview-col-file,
+.outrank-import-preview-filename {
+    width: 120px;
+    max-width: 120px;
+    min-width: 80px;
+    box-sizing: border-box;
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+    vertical-align: middle;
+}
+
+.outrank-import-preview-filename-inner {
+    display: block;
+    overflow: hidden;
+    line-height: 1.25;
+    font-size: 0.7rem;
+    word-break: break-all;
+    cursor: default;
+}
+
+.outrank-import-preview-col-meta,
+.outrank-import-preview-meta-cell {
+    min-width: 12rem;
+    max-width: 28rem;
+}
+
+.outrank-import-preview-meta-title {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.outrank-import-preview-col-num,
+.outrank-import-preview-num {
+    width: 2.75rem;
+    max-width: 3rem;
+    white-space: nowrap;
+}
+
+.outrank-import-preview-col-time,
+.outrank-import-preview-time-cell {
+    width: 6.5rem;
+    max-width: 7.5rem;
+}
+
+.outrank-import-preview-table .badge .en-text {
+    margin-left: 0.25rem;
+}
+
+.outrank-import-preview-table .badge {
+    font-weight: 500;
+    font-size: 0.7rem;
+}
+
+/* 禁用态「打包 ZIP」：tooltip 绑在外层 span 上；禁用时让事件落到 span，避免依赖 global.js 把 title 提升到整行 toolbar */
+.outrank-batch-zip-btn-wrap button:disabled {
+    pointer-events: none;
+}
+
+/* ========== 窄屏合并列：三行时间 + 左端图标；无边框卡片感，紧凑；近 7 日行淡底强调 ========== */
+.outrank-list-scope .outrank-time-stack {
+    --outrank-time-icon-rail: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* 时间列：保证日期+时间完整可见（与 data-width 配合） */
+.outrank-list-scope #outrank_list_table th[data-field="_times_bundle"],
+.outrank-list-scope #outrank_list_table td[data-field="_times_bundle"] {
+    min-width: 13.5rem;
+    box-sizing: border-box;
+}
+
+.outrank-list-scope .outrank-time-flow-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+}
+
+/* 三行左端图标：定宽轨，保证纵向对齐 */
+.outrank-list-scope .outrank-time-flow-row__icon {
+    flex: 0 0 var(--outrank-time-icon-rail);
+    width: var(--outrank-time-icon-rail);
+    min-width: var(--outrank-time-icon-rail);
+    max-width: var(--outrank-time-icon-rail);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.02rem;
+    line-height: 1;
+    padding: 0.1rem 0;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.outrank-list-scope .outrank-time-flow-row--start .outrank-time-flow-row__icon {
+    color: #0d6efd;
+    background: rgba(13, 110, 253, 0.12);
+}
+
+.outrank-list-scope .outrank-time-flow-row--end .outrank-time-flow-row__icon {
+    color: #ea580c;
+    background: rgba(251, 146, 60, 0.16);
+}
+
+.outrank-list-scope .outrank-time-flow-row--upd .outrank-time-flow-row__icon {
+    color: #d97706;
+    background: rgba(252, 211, 77, 0.2);
+}
+
+.outrank-list-scope .outrank-time-flow-row--upd-recent {
+    border: none;
+    box-shadow: none;
+    background: rgba(254, 243, 199, 0.45);
+    border-radius: 0.25rem;
+    /* 勿加左右 padding，避免与上两行图标列错位 */
+    padding: 0.04rem 0;
+}
+
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-time-flow-row__icon {
+    color: #b45309;
+    background: rgba(251, 191, 36, 0.26);
+}
+
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-time-flow-row__icon .bi-star-fill {
+    filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.55));
+}
+
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-mtime-val,
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-mtime-val__date,
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-mtime-val__time,
+.outrank-list-scope .outrank-time-flow-row--upd-recent .outrank-mtime-val__mono {
+    color: #78350f !important;
+    font-weight: 700;
+}
+
+.outrank-list-scope .outrank-time-flow-row__clock {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0.12rem 0 0.12rem 0.35rem;
+    overflow: visible;
+}
+
+.outrank-list-scope .outrank-time-flow-row__clock .outrank-mtime-val {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: max-content;
+    white-space: nowrap;
+}
+
+.outrank-list-scope .outrank-time-flow-row__clock .outrank-mtime-val__date,
+.outrank-list-scope .outrank-time-flow-row__clock .outrank-mtime-val__time {
+    display: inline;
+    white-space: nowrap;
+}
+
+.outrank-list-scope .outrank-time-flow-row__clock .outrank-mtime-val__mono {
+    display: inline;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
+
+/* Token：列表仅 4…4 摘要 + 剪贴按钮，定宽列（与 th data-width 一致） */
+.outrank-list-scope #outrank_list_table th[data-field="token"],
+.outrank-list-scope #outrank_list_table td:has(.outrank-token-cell) {
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    box-sizing: border-box;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.outrank-list-scope .outrank-token-cell {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.outrank-list-scope .outrank-token-cell__preview {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.outrank-list-scope .outrank-mtime-val {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+}
+
+.outrank-list-scope .outrank-mtime-val__date,
+.outrank-list-scope .outrank-mtime-val__time {
+    display: block;
+}
+
+/* 开始：主色蓝（日期略深、时间略亮） */
+.outrank-list-scope .outrank-time-flow-row--start .outrank-mtime-val__date {
+    color: #1d4ed8 !important;
+    font-weight: 600;
+}
+
+.outrank-list-scope .outrank-time-flow-row--start .outrank-mtime-val__time,
+.outrank-list-scope .outrank-time-flow-row--start .outrank-mtime-val__mono {
+    color: var(--bs-primary, #0d6efd) !important;
+    font-weight: 700;
+}
+
+/* 结束：深橙系（与主色蓝区分、白底可读） */
+.outrank-list-scope .outrank-time-flow-row--end .outrank-mtime-val__date {
+    color: #9a3412 !important;
+    font-weight: 600;
+}
+
+.outrank-list-scope .outrank-time-flow-row--end .outrank-mtime-val__time,
+.outrank-list-scope .outrank-time-flow-row--end .outrank-mtime-val__mono {
+    color: #c2410c !important;
+    font-weight: 700;
+}
+
+/* 更新：黑色系 */
+.outrank-list-scope .outrank-time-flow-row--upd .outrank-mtime-val,
+.outrank-list-scope .outrank-time-flow-row--upd .outrank-mtime-val__date,
+.outrank-list-scope .outrank-time-flow-row--upd .outrank-mtime-val__time,
+.outrank-list-scope .outrank-time-flow-row--upd .outrank-mtime-val__mono {
+    color: var(--bs-body-color, #212529) !important;
+}
+
+.outrank-list-scope .outrank-mtime-val__mono {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.outrank-list-scope .outrank-mtime-empty {
+    color: var(--bs-secondary-color, #6c757d);
+    font-weight: 500;
+}
+
+.outrank-list-scope .outrank-mtime-val--recent {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.35rem;
+    width: 100%;
+}
+
+.outrank-list-scope .outrank-mtime-val__badge {
+    flex-shrink: 0;
+    margin-top: 0.08rem;
+    font-size: 0.8rem;
+}
+
+.outrank-list-scope .outrank-mtime-val__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* ========== 窄屏合并列：管理 — Bootstrap 5 竖向网格 + 全宽按钮 ========== */
+.outrank-list-scope .outrank-ops-bs .btn-group > .btn {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.outrank-list-scope .outrank-ops-bs .btn-group > .btn > .bi {
+    font-size: 1rem;
+}
+
+.outrank-list-scope .outrank-ops-bs-alert {
+    border-radius: var(--bs-border-radius, 0.375rem);
+}
+
+/* ========== 窄屏（手机竖屏 / 小宽度）列表与表格 ========== */
+@media (max-width: 767.98px) {
+    .outrank-list-scope #outrank_toolbar .d-flex {
+        align-items: stretch;
+    }
+
+    .outrank-list-scope #outrank_toolbar #outrank_search_input {
+        width: 100% !important;
+        max-width: none;
+    }
+
+    .outrank-list-scope .bootstrap-table .fixed-table-container {
+        border-radius: 0.375rem;
+    }
+
+    .outrank-list-scope .bootstrap-table .table thead th {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.2rem;
+        white-space: normal;
+        line-height: 1.25;
+        word-break: break-word;
+    }
+
+    .outrank-list-scope .bootstrap-table .table tbody td {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.2rem !important;
+    }
+
+    .outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table thead th:first-child,
+    .outrank-list-scope:not(.outrank-list-scope--batch) #outrank_list_table tbody td:first-child {
+        width: 108px;
+        max-width: 108px;
+    }
+
+    .outrank-list-scope--batch #outrank_list_table thead th:nth-child(2),
+    .outrank-list-scope--batch #outrank_list_table tbody td:nth-child(2) {
+        width: 108px;
+        max-width: 108px;
+    }
+
+    .outrank-type-logo {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .outrank-id-cell__uuid {
+        max-width: 4.25rem;
+    }
+
+    .outrank-list-scope .fixed-table-pagination {
+        padding: 0.35rem 0.25rem;
+        font-size: 0.8125rem;
+    }
+
+    .outrank-list-scope .fixed-table-pagination .pagination-detail {
+        margin-bottom: 0.35rem;
+    }
+}
+
+/* 页眉横幅管理：列表操作列图标 */
+.outrank-sponsor-banner-admin-btn {
+    position: relative;
+}
+
+.outrank-sponsor-banner-admin-btn--has::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #16a34a;
+    border: 1px solid #fff;
+}
+
+#outrank_sponsor_banner_modal .outrank-sb-preview-img {
+    max-height: 220px;
+    width: auto;
+    object-fit: contain;
+}
+
+#outrank_sponsor_banner_modal .outrank-sb-hint .en-text {
+    display: block;
+    margin-top: 0.35rem;
+}

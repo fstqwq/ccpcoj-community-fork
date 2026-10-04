@@ -1,0 +1,322 @@
+/**
+ * 题包转换页（Polygon + 酒井算协）专用样式。
+ * 页面须引入本文件；两来源面板共用 class，禁止各写一套 toolbar/button 样式。
+ */
+.pkg-convert-nav .nav-link {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.45rem 1rem;
+    color: var(--bs-secondary-color);
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+}
+.pkg-convert-nav .nav-link:hover {
+    color: var(--bs-body-color);
+    border-bottom-color: rgba(var(--bs-primary-rgb), 0.35);
+}
+.pkg-convert-nav .nav-link.active {
+    color: var(--bs-primary);
+    background: transparent;
+    border-bottom-color: var(--bs-primary);
+}
+.pkg-convert-tab-content {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+}
+.pkg-tab-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    vertical-align: middle;
+}
+.pkg-placeholder-card {
+    background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), 0.03) 0%, transparent 100%);
+}
+
+/* —— 工具栏：Polygon / 酒井同一套（btn-sm、bilingual-inline） —— */
+.pkg-convert-toolbar .btn {
+    line-height: 1.2;
+}
+
+/* —— 以下均在 .pkg-parser-panel 内生效（两面板根节点须带此类） —— */
+.pkg-parser-panel .directory {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+    margin: 1rem 0;
+}
+.pkg-parser-panel .directory ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 0;
+}
+.pkg-parser-panel .directory li {
+    margin: 5px 0;
+}
+.pkg-parser-panel .directory .folder::before {
+    content: "📁 ";
+}
+.pkg-parser-panel .directory .file::before {
+    content: "📄 ";
+}
+.pkg-parser-panel .directory .img::before {
+    content: "🏞️ ";
+}
+.pkg-parser-panel .modal-body p {
+    margin-bottom: 1rem;
+}
+/* 帮助 modal 目录树；勿作用于测例文件 list-group（会与 flex 滚动冲突） */
+.pkg-parser-panel #helpModal .modal-body ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}
+.pkg-parser-panel #helpModal .modal-body li {
+    margin-bottom: 0.75rem;
+}
+
+/* 题包表「语言」列：数字徽章，与测例 chip 区分 */
+.pkg-parser-panel .pkg-lang-badge-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.85rem;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), 0.12) 0%, rgba(var(--bs-primary-rgb), 0.06) 100%);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.22);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    line-height: 1.2;
+    transition: box-shadow 0.15s ease, transform 0.12s ease;
+}
+.pkg-parser-panel .pkg-lang-order-open:hover .pkg-lang-badge-chip {
+    box-shadow: 0 0.12rem 0.35rem rgba(var(--bs-primary-rgb), 0.2);
+}
+.pkg-lang-order-list .list-group-item {
+    cursor: grab;
+}
+.pkg-lang-order-list .list-group-item:active {
+    cursor: grabbing;
+}
+
+.pkg-parser-panel .polygon-batch-pdf-group .polygon-btn-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem 0.5rem;
+    min-height: 2.25rem;
+    line-height: 1.12;
+}
+.pkg-parser-panel .polygon-btn-stack-cn {
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.pkg-parser-panel .polygon-btn-stack-en {
+    font-size: 0.62rem;
+    font-weight: 400;
+    opacity: 0.88;
+}
+
+.pkg-parser-panel .polygon-td-data-chip {
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    max-width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pkg-parser-panel .polygon-td-data-chip:hover {
+    border-color: rgba(13, 110, 253, 0.4);
+    box-shadow: 0 1px 4px rgba(13, 110, 253, 0.12);
+}
+.pkg-parser-panel .polygon-td-data-chip:focus {
+    outline: none;
+}
+.pkg-parser-panel .polygon-td-data-chip:focus-visible {
+    outline: 2px solid var(--bs-primary, #0d6efd);
+    outline-offset: 2px;
+}
+.pkg-parser-panel .polygon-td-chip-sep {
+    color: var(--bs-secondary-color, #adb5bd);
+    font-weight: 400;
+    opacity: 0.85;
+}
+.pkg-parser-panel .polygon-td-chip-count {
+    color: var(--bs-primary, #0d6efd);
+}
+.pkg-parser-panel .polygon-td-chip-size {
+    color: #c0392b;
+}
+.pkg-parser-panel .polygon-spj-cell {
+    display: inline-block;
+    border-radius: 0.3rem;
+    padding: 1px;
+}
+.pkg-parser-panel .polygon-spj-cell.polygon-spj-v-0 {
+    background: rgba(13, 110, 253, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.22);
+}
+.pkg-parser-panel .polygon-spj-cell.polygon-spj-v-1 {
+    background: rgba(230, 126, 34, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(230, 126, 34, 0.35);
+}
+.pkg-parser-panel .polygon-spj-cell.polygon-spj-v-2 {
+    background: rgba(25, 135, 84, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(25, 135, 84, 0.28);
+}
+.pkg-parser-panel .polygon-lang-count-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    min-width: 1.5rem;
+}
+.pkg-parser-panel .polygon-lang-count-tag--sm {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.08em 0.38em;
+    min-width: 1.05rem;
+    line-height: 1.2;
+}
+.pkg-parser-panel .polygon-lang-cell-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    max-width: 100%;
+}
+
+.pkg-parser-panel .polygon-stmt-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.12;
+    padding: 0.18rem 0.42rem;
+    min-width: 3.1rem;
+    border-radius: 0.35rem;
+    border: 1px solid transparent;
+    font-size: 0.68rem;
+    vertical-align: middle;
+}
+.pkg-parser-panel .polygon-stmt-badge-cn {
+    font-weight: 600;
+    font-size: 0.72rem;
+}
+.pkg-parser-panel .polygon-stmt-badge-en {
+    font-weight: 400;
+    font-size: 0.62rem;
+    opacity: 0.88;
+}
+.pkg-parser-panel .polygon-stmt-tag--latex {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--bs-font-monospace, ui-monospace, monospace);
+    padding: 0.12rem 0.42rem;
+    border-radius: 0.35rem;
+    line-height: 1.2;
+    color: var(--bs-secondary-color, #6c757d);
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    vertical-align: middle;
+}
+.pkg-parser-panel .polygon-stmt-badge--none {
+    color: var(--bs-danger-text-emphasis, #58151c);
+    background: var(--bs-danger-bg-subtle, #f8d7da);
+    border-color: rgba(220, 53, 69, 0.35);
+}
+
+.pkg-parser-panel .polygon-hash-pill {
+    display: inline-block;
+    max-width: 3.6rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.7rem;
+    padding: 0.08rem 0.28rem;
+    border-radius: 0.2rem;
+    background: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    vertical-align: middle;
+    cursor: pointer;
+    color: inherit;
+    line-height: inherit;
+    font-family: var(--bs-font-monospace, ui-monospace, monospace);
+}
+.pkg-parser-panel .polygon-hash-pill:hover {
+    border-color: rgba(13, 110, 253, 0.45);
+    color: var(--bs-primary);
+    background: var(--bs-primary-bg-subtle, #e7f1ff);
+}
+.pkg-parser-panel .polygon-hash-pill:focus {
+    outline: none;
+}
+.pkg-parser-panel .polygon-hash-pill:focus-visible {
+    outline: 2px solid var(--bs-primary, #0d6efd);
+    outline-offset: 2px;
+}
+
+.polygon-testdata-modal-dialog {
+    max-width: min(520px, 94vw);
+    width: min(520px, 94vw);
+}
+.pkg-parser-panel ul.polygon-testdata-file-list:not(:empty) {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-left: 0;
+    list-style: none;
+}
+.pkg-parser-panel .polygon-testdata-file-list:not(:empty) {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.25rem;
+}
+/* list-group 为 column flex；条目过多时默认 flex-shrink:1 会把行高压扁，text-truncate 裁掉全部文字 */
+.pkg-parser-panel .polygon-testdata-file-list > .list-group-item {
+    flex-shrink: 0;
+    min-height: 1.6rem;
+    color: var(--bs-body-color, #212529);
+}
+
+.pkg-parser-panel #polygon_parse_table .polygon-spj-select,
+.pkg-parser-panel #thusaa_parse_table .polygon-spj-select,
+.pkg-parser-panel #polygon_parse_table .polygon-pdf-mode-select,
+.pkg-parser-panel #polygon_parse_table .polygon-primary-lang-select {
+    font-size: 0.7rem;
+    min-height: 1.45rem;
+    max-width: 7.5rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
+/* Polygon 解析/打包遮罩：主标题短而稳，小标题跟进度（与全局 overlay 槽位协同） */
+.csgoj-overlay-card.pkg-polygon-overlay-card #overlay-text .overlay-stack-cn {
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+}
+.csgoj-overlay-card.pkg-polygon-overlay-card #overlay-subtitle-slot .overlay-stack-cn {
+    font-weight: 600;
+    font-size: 0.94rem;
+    opacity: 1;
+    color: var(--bs-emphasis-color, #212529);
+}
+.csgoj-overlay-card.pkg-polygon-overlay-card #overlay-subtitle-slot .overlay-stack-en {
+    font-size: 0.87rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+.csgoj-overlay-card.pkg-polygon-overlay-card #overlay-detail-slot .overlay-stack-cn {
+    font-size: 0.78rem;
+    opacity: 0.92;
+}

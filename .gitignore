@@ -1,0 +1,14 @@
+.env
+!.env.example
+__pycache__/
+*.pyc
+/ojweb/runtime/
+/data/
+/.cache/
+/test-results/
+/ojweb/PROBLEM_EXPORT/
+/ojweb/CONTEST_EXPORT/
+/ojweb/CONTEST_SUMMARY/
+/ojweb/CHUNK_TEMP/
+/ojweb/CPC_CLIENT_RECORD/
+*.log

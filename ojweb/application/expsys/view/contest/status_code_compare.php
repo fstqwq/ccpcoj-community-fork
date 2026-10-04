@@ -1,0 +1,2 @@
+{include file="../../csgoj/view/contest/status_code_compare" /}
+

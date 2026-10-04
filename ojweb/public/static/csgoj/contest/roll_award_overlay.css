@@ -1,0 +1,1849 @@
+/**
+ * 滚榜获奖：全视口渐显 overlay + 16:9 舞台；字号/间距随舞台 .csg-roa__scale 比例缩放（--roa-vu），无顶部奖项字条。
+ * 大屏投屏：overlay 内禁止滚动条；**右栏底**统计为**三行竖排**（排名 / 解题 / 首答），首答**单行**，溢出横向跑马灯（见 rank_roll enableAwardFbStatValueIfNeeded）。
+ * 主区左右分栏：左照片列宽 **`--roa-photo-col-w`**；右 **`award-right-column`** 贯通详情 + 底栏统计。**字阶**：`--roa-s = min(100vw/1920, 100vh/1080)`，详情与正文用 `calc(设计px × --roa-s × …)` 随舞台等比。详情区**所有行标签**（院校/组织、队名、成员等）同一套 **`--roa-fs-lbl-detail-cn|en`**；底栏统计标签 **`--roa-fs-lbl-dock-cn|en`**；院校**正文** **`--roa-fs-school-line`**。**`--roa-fs-mul`** 乘在正文/奖牌/底栏数字及详情 label（detail/dock）上，**不**乘 `--roa-fs-school-line`。
+ * 校徽默认**紧凑圆**：`min(96cqw, 0.215×--roa-stage-h)`（宽仍相对 badge 宿主 cqw；高用舞台高，避免详情卡纵向撑满后 `cqh` 变大）。**靠详情卡信息区右上**；其它尺寸/贴边见试验台 `lab_badge_presets.css`。
+ * 校徽：**`rank_tool.js`**（`RankToolApplySchoolBadgeBackgroundFit`）写 **`--roa-badge-bg-size`**，按「图心到非白非透明像素」最远距离收紧缩放，减轻异形徽被圆裁切；抠边等预处理与 **`rank.js`** 榜单行同源，**榜单行不写本变量**（展示尺寸固定见 **`rank.css`**）。
+ * 多归属奖项块：`.award-group-scrollport::before/::after` 做左右云气边框，`.award-group-item::before/::after` 做卡内错位卷云角花；均为 SVG mask 线描，色值由 **`--csg-award-xiangyun-accent`** 驱动。卡面见 `--tier-*`。
+ * 详情信息对齐：根节点 **`data-roa-info-align`**（`RollAwardOverlay.configure({ infoAlign })`，`center` | `start`）；`start` 为历史左对齐正文，见文件末段。
+ */
+
+/* @font-face 见 rank_font_faces.css（CsgRank SC / CsgRank Latin），须在本文件之前加载 */
+
+/* ========= 全屏根层：整层渐显 / 渐隐 ========= */
+#csg-roll-award-overlay.csg-roa {
+    --csg-roa-fi: 720ms;
+    --csg-roa-fo: 540ms;
+    --csg-roa-accent: #94a3b8;
+    /* 大屏投屏：禁止任何滚动条（内容靠布局与换行消化，不使用 overflow:auto） */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:
+        'CsgRank Latin',
+        'CsgRank SC',
+        'Noto Sans SC',
+        'PingFang SC',
+        'Microsoft YaHei',
+        '微软雅黑',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        'Helvetica Neue',
+        Arial,
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+    opacity: 0;
+    transition: opacity var(--csg-roa-fi) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#csg-roll-award-overlay.csg-roa::-webkit-scrollbar,
+#csg-roll-award-overlay.csg-roa *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+#csg-roll-award-overlay.csg-roa * {
+    scrollbar-width: none;
+}
+
+#csg-roll-award-overlay.csg-roa.csg-roa--in {
+    opacity: 1;
+}
+
+#csg-roll-award-overlay.csg-roa.csg-roa--out {
+    opacity: 0;
+    transition: opacity var(--csg-roa-fo) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#csg-roll-award-overlay.csg-roa .csg-roa__veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .csg-roa__veil,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .csg-roa__veil {
+    background: rgba(8, 10, 14, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .csg-roa__veil {
+    background: rgba(2, 4, 10, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .csg-roa__veil {
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* 16:9 舞台：min(100vw, 100vh*16/9) × min(100vh, 100vw*9/16) ⇒ 总有一边贴齐视口 */
+#csg-roll-award-overlay.csg-roa .csg-roa__stage {
+    position: relative;
+    z-index: 2;
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(100vh, calc(100vw * 9 / 16));
+    max-width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 0;
+    box-shadow: none;
+    /*
+     * 16:9 舞台与视口：W = min(100vw, 100vh·16/9)，H = min(100vh, 100vw·9/16)（与本节点 width/height 一致）。
+     * 与 1920×1080 的等比尺 s = min(W/1920, H/1080) = min(100vw/1920px, 100vh/1080px)，无量纲；字阶 = 设计像素 × s。
+     */
+    --roa-stage-w: min(100vw, calc(100vh * 16 / 9));
+    --roa-stage-h: min(100vh, calc(100vw * 9 / 16));
+    --roa-s: min(calc(100vw / 1920px), calc(100vh / 1080px));
+    --roa-vu: calc(9.5px * var(--roa-s));
+    --roa-photo-col-w: min(calc(var(--roa-stage-h) * 4 / 3), var(--roa-stage-w));
+    /*
+     * 字阶约定：见文件头。**院校正文**只改 `--roa-fs-school-line`。
+     */
+    --roa-fs-mul: 0.94;
+    --roa-fs-school: calc(56px * var(--roa-s) * var(--roa-fs-mul));
+    /* #award-school 院校名正文：不乘 --roa-fs-mul */
+    --roa-fs-school-line: calc(48px * var(--roa-s));
+    --roa-fs-block: calc(37px * var(--roa-s) * var(--roa-fs-mul));
+    --roa-fs-stat-num: calc(43px * var(--roa-s) * var(--roa-fs-mul));
+    --roa-fs-stat-fb: calc(36px * var(--roa-s) * var(--roa-fs-mul));
+    /* 详情区所有行标签（院校/组织、队名、成员…）中英 */
+    --roa-fs-lbl-detail-cn: calc(20px * var(--roa-s) * var(--roa-fs-mul));
+    --roa-fs-lbl-detail-en: calc(16px * var(--roa-s) * var(--roa-fs-mul));
+    --roa-fs-lbl-dock-cn: calc(20px * var(--roa-s) * var(--roa-fs-mul));
+    --roa-fs-lbl-dock-en: calc(16px * var(--roa-s) * var(--roa-fs-mul));
+    /* 子树 cqw/cqh：校徽等局部仍相对本舞台容器查询 */
+    container-type: size;
+    container-name: roa-stage-cq;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .csg-roa__stage,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .csg-roa__stage {
+    background: #f8fafc;
+    color: #0f172a;
+    --csg-roa-accent: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .csg-roa__stage {
+    background: #0b1220;
+    color: #e2e8f0;
+    --csg-roa-accent: #cbd5e1;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .csg-roa__stage {
+    background: #ffffff;
+    color: #0f172a;
+    --csg-roa-accent: #475569;
+}
+
+/*
+ * 与校徽水印叠压：① 八向 text-shadow（0 模糊偏移，各引擎可见）② 极细 -webkit-text-stroke + paint-order: stroke fill
+ * ③ 正文常在子节点（.marquee-wrapper / innerHTML span），父级单独 text-shadow 可能画不到字形，故子节点同步套变量。
+ */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'],
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) {
+    --roa-light-text-stroke: 0.45px rgba(255, 255, 255, 0.94);
+    --roa-light-info-outline:
+        -1px 0 0 rgba(255, 255, 255, 0.92),
+        1px 0 0 rgba(255, 255, 255, 0.92),
+        0 -1px 0 rgba(255, 255, 255, 0.92),
+        0 1px 0 rgba(255, 255, 255, 0.92),
+        -1px -1px 0 rgba(255, 255, 255, 0.82),
+        1px -1px 0 rgba(255, 255, 255, 0.82),
+        -1px 1px 0 rgba(255, 255, 255, 0.82),
+        1px 1px 0 rgba(255, 255, 255, 0.82),
+        0 0 20px rgba(255, 255, 255, 0.72);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] {
+    --roa-light-text-stroke: 0.48px rgba(255, 255, 255, 0.96);
+    --roa-light-info-outline:
+        -1px 0 0 rgba(255, 255, 255, 0.94),
+        1px 0 0 rgba(255, 255, 255, 0.94),
+        0 -1px 0 rgba(255, 255, 255, 0.94),
+        0 1px 0 rgba(255, 255, 255, 0.94),
+        -1px -1px 0 rgba(255, 255, 255, 0.84),
+        1px -1px 0 rgba(255, 255, 255, 0.84),
+        -1px 1px 0 rgba(255, 255, 255, 0.84),
+        1px 1px 0 rgba(255, 255, 255, 0.84),
+        0 0 22px rgba(255, 255, 255, 0.78);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] {
+    --roa-dark-text-stroke: 0.5px rgba(15, 23, 42, 0.88);
+    --roa-dark-info-halo:
+        -1px 0 0 rgba(15, 23, 42, 0.9),
+        1px 0 0 rgba(15, 23, 42, 0.9),
+        0 -1px 0 rgba(15, 23, 42, 0.9),
+        0 1px 0 rgba(15, 23, 42, 0.9),
+        -1px -1px 0 rgba(15, 23, 42, 0.76),
+        1px -1px 0 rgba(15, 23, 42, 0.76),
+        -1px 1px 0 rgba(15, 23, 42, 0.76),
+        1px 1px 0 rgba(15, 23, 42, 0.76),
+        0 0 18px rgba(0, 0, 0, 0.58);
+}
+
+/* 比例由父级 .csg-roa__stage 的 --roa-s / --roa-vu / --roa-fs-* 继承，不在此重复定义 */
+#csg-roll-award-overlay.csg-roa .csg-roa__scale {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+#csg-roll-award-overlay.csg-roa .award-main-content {
+    display: grid;
+    grid-template-columns: var(--roa-photo-col-w) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 0;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    align-items: stretch;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 左：仅照片列，与舞台左/上/下零外边距贴齐 */
+#csg-roll-award-overlay.csg-roa .award-photo-column {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    overflow: hidden;
+    background: linear-gradient(168deg, #eef2f7 0%, #e8edf5 52%, #dfe7f0 100%);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-photo-column {
+    background: linear-gradient(168deg, #0f172a 0%, #0b1324 55%, #070d18 100%);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-photo-column {
+    background: linear-gradient(168deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* 右：详情 + 底栏统计，贯通高度 */
+#csg-roll-award-overlay.csg-roa .award-right-column {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+    padding: clamp(16px, calc(2 * var(--roa-vu)), 38px) clamp(18px, calc(2.25 * var(--roa-vu)), 42px)
+        clamp(14px, calc(1.65 * var(--roa-vu)), 32px) clamp(16px, calc(2.05 * var(--roa-vu)), 40px);
+    box-shadow: inset 1px 0 0 rgba(15, 23, 42, 0.055);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column {
+    box-shadow: inset 1px 0 0 rgba(148, 163, 184, 0.1);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column {
+    box-shadow: inset 1px 0 0 rgba(51, 65, 85, 0.06);
+}
+
+/* 右栏：与左照片同舞台下的弱「信息层」底，扁平无渐变（奖项块同理） */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-right-column,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-right-column {
+    background: rgba(252, 252, 254, 0.58);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column {
+    background: rgba(255, 255, 255, 0.75);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column {
+    background: rgba(15, 23, 42, 0.32);
+}
+
+/* 照片列 — 容器尺寸供 cqw/cqh；列宽已与舞台高成 4:3，内框铺满即固定 4:3 */
+#csg-roll-award-overlay.csg-roa .award-photo-section {
+    container-type: size;
+    container-name: roa-photo;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-frame {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+    outline: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-wrapper {
+    position: absolute;
+    inset: 0;
+    background: #e5e7eb;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-photo-wrapper {
+    background: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-photo-wrapper {
+    background: #f1f5f9;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(160px, calc(28 * var(--roa-vu)), 520px);
+    opacity: 0.22;
+    border-radius: 0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-placeholder-gold {
+    background: #fef3c7;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-placeholder-silver {
+    background: #e2e8f0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-photo-placeholder-bronze {
+    background: #ffedd5;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-photo-placeholder-gold {
+    background: #422006;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-photo-placeholder-silver {
+    background: #1e293b;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-photo-placeholder-bronze {
+    background: #431407;
+}
+
+/* 详情（右栏内 flex 生长；横向留白由 .award-right-column 承担；正文块在卡内 safe 垂直居中见 __surface） */
+#csg-roll-award-overlay.csg-roa .award-details-section {
+    flex: 1 1 auto;
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: clip;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    padding-inline: 0;
+    padding-block: 0;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-section {
+    border: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-section {
+    border: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-details-card {
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow: visible;
+    border: none;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card {
+    box-shadow: none;
+}
+
+/* 与试验台 lab_layout_editorial：整卡高校徽层 + 容器查询定义直径 */
+#csg-roll-award-overlay.csg-roa .award-school-badge-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+    overflow: visible;
+    container-type: size;
+    container-name: roa-badge-host;
+    /* 默认：紧凑圆直径；高用舞台 --roa-stage-h，避免卡面纵向撑满后 cqh 放大校徽 */
+    --roa-badge-d: min(96cqw, calc(0.215 * var(--roa-stage-h)));
+}
+
+/*
+ * 默认几何：圆心在信息区右上附近（right/top + 无 translate），整圆裁切；随 --roa-badge-d 与 --roa-vu 等比。
+ */
+#csg-roll-award-overlay.csg-roa .award-school-logo-bg {
+    position: absolute;
+    left: auto;
+    right: clamp(5px, calc(1 * var(--roa-vu)), 14px);
+    top: clamp(5px, calc(0.9 * var(--roa-vu)), 14px);
+    bottom: auto;
+    transform: none;
+    width: var(--roa-badge-d);
+    height: var(--roa-badge-d);
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    opacity: 0;
+    filter: saturate(1.14) contrast(1.05);
+}
+
+#csg-roll-award-overlay.csg-roa .award-school-logo-bg.has-background {
+    background-image: var(--rank-school-logo-bg);
+    opacity: 0.32;
+    /* 默认 contain；JS 测得异形校徽「内容半径」后写入 --roa-badge-bg-size，避免圆裁切裁掉有效图形 */
+    background-size: var(--roa-badge-bg-size, contain);
+}
+
+/*
+ * 整卡渐变 veil 会在 surface（透明）的 padding/gap 处透出，像多铺了一层「信息卡底」。
+ * 主 overlay 与右栏同面：veil 不设底；校徽仍由 .award-school-logo-bg + 正文 text-shadow 可读性兜底。
+ * 试验台 lab_layout_left_rail 等可单独覆盖本层。
+ */
+#csg-roll-award-overlay.csg-roa .award-school-badge-veil {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+}
+
+#csg-roll-award-overlay.csg-roa .award-details-card__surface {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: min(16px, calc(1.58 * var(--roa-vu)));
+    padding: clamp(16px, calc(1.95 * var(--roa-vu)), 36px) 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    /* 信息少时整块在「详情区减底栏」内垂直居中；溢出时回退顶对齐（safe） */
+    justify-content: safe center;
+    box-sizing: border-box;
+    overflow-x: clip;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: none;
+    background-color: transparent;
+    background-image: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card {
+    /* 与右栏同面：不另铺「卡片」底 */
+    background: transparent;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card {
+    background: transparent;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card {
+    background: transparent;
+}
+
+#csg-roll-award-overlay.csg-roa .award-info-section--fixed {
+    display: flex;
+    flex-direction: column;
+    gap: min(16px, calc(1.42 * var(--roa-vu)));
+    position: relative;
+    z-index: 1;
+}
+
+/* 固定信息块：发丝底部分隔 + 纵向间距（右栏信息节奏） */
+#csg-roll-award-overlay.csg-roa .award-info-section--fixed .award-roa-block {
+    display: flex;
+    flex-direction: column;
+    gap: min(7px, calc(0.62 * var(--roa-vu)));
+    padding-bottom: min(14px, calc(1.12 * var(--roa-vu)));
+    border-bottom: 1px solid rgba(15, 23, 42, 0.065);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-info-section--fixed .award-roa-block {
+    border-bottom-color: rgba(148, 163, 184, 0.12);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-info-section--fixed .award-roa-block {
+    border-bottom-color: rgba(51, 65, 85, 0.08);
+}
+
+
+#csg-roll-award-overlay.csg-roa .award-roa-block--school {
+    padding-bottom: min(14px, calc(1.22 * var(--roa-vu)));
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-label {
+    font-size: var(--roa-fs-lbl-detail-cn);
+    font-weight: 600;
+    line-height: 1.14;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 详情区标签：中英**同一行**左中文、右英文（底栏排名/解题等仍用 `.award-stat-label-col` 上下结构，勿动） */
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.4em;
+    align-items: center;
+    justify-items: stretch;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-cn {
+    grid-column: 1;
+    justify-self: start;
+    display: block;
+    font-size: var(--roa-fs-lbl-detail-cn);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: 0.04em;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+    width: auto;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-en {
+    grid-column: 2;
+    justify-self: end;
+    display: block;
+    font-size: var(--roa-fs-lbl-detail-en);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'CsgRank Latin', 'CsgRank SC', 'Noto Sans SC', sans-serif;
+    opacity: 0.82;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: right;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-roa-label,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-roa-label {
+    color: rgba(71, 85, 105, 0.92);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-roa-label {
+    color: rgba(148, 163, 184, 0.95);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-roa-label {
+    color: rgba(71, 85, 105, 0.92);
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-label--groups {
+    margin-bottom: min(4px, calc(0.35 * var(--roa-vu)));
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-value-slot {
+    font-size: var(--roa-fs-block);
+    /* 与 rank_font_faces 已托管 CsgRank 字重对齐（最高 700），避免 800 伪粗体发糊 */
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.012em;
+    overflow: hidden;
+    white-space: nowrap;
+    min-height: calc(1.14 * var(--roa-fs-block));
+    text-align: left;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-value-slot:not(.needs-marquee) {
+    text-overflow: clip;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-value-slot.needs-marquee {
+    text-overflow: clip;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-value-slot.award-roa-placeholder {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: normal;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-roa-value-slot,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-roa-value-slot {
+    color: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-roa-value-slot {
+    color: #f8fafc;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-roa-value-slot {
+    color: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-roa-placeholder,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-roa-placeholder {
+    color: rgba(15, 23, 42, 0.38);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-roa-placeholder {
+    color: rgba(248, 250, 252, 0.35);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-roa-placeholder {
+    color: rgba(15, 23, 42, 0.38);
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-block--vacant .award-roa-value-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 接近有正文时一行高（与 .award-roa-value-slot 字阶一致），避免空行塌得过矮 */
+    min-height: max(calc(40px * var(--roa-s)), calc(1.14 * var(--roa-fs-block)));
+    font-weight: 600;
+}
+
+#csg-roll-award-overlay.csg-roa .award-roa-vacant-ornament {
+    width: min(68%, 200px);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.14), transparent);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-roa-vacant-ornament {
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.16), transparent);
+}
+
+/* 院校：大字左对齐；校徽在详情卡背景层叠压 */
+#csg-roll-award-overlay.csg-roa .award-school-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-school-text {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--roa-fs-school-line);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+}
+
+#csg-roll-award-overlay.csg-roa .award-school-text:not(.needs-marquee) {
+    text-overflow: clip;
+}
+
+#csg-roll-award-overlay.csg-roa .award-school-text.needs-marquee {
+    text-overflow: clip;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-school-text,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-school-text {
+    color: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-school-text {
+    color: #f8fafc;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-school-text {
+    color: #0f172a;
+}
+
+/* 浅色详情卡信息区：与校徽叠压仍可读（标签 / 正文 / 奖项区） */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-label--groups,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-label--groups,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-label--groups,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-school-text,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-school-text,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-school-text,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-label-stack-cn,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-label-stack-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-label-stack-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-label-stack-en,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-label-stack-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-label-stack-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-value-slot,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-value-slot,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-value-slot,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-name,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-name,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-name,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-medal-cn,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-medal-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-medal-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-medal-en,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-medal-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-medal-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-medal > en-text,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-medal > en-text,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-medal > en-text {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+/* 子节点承载字形时父级 text-shadow 可能不生效：与上列同步描边（排除空行装饰） */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-school-text *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-school-text *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-school-text *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-value-slot *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-value-slot *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-value-slot *:not(.award-roa-vacant-ornament) {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-school-text .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-school-text .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-school-text .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-value-slot .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-value-slot .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-value-slot .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-name .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-name .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-name .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-medal .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-medal .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-medal .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-label-stack-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-label-stack-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-label-stack-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-roa-label-stack-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-roa-label-stack-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-roa-label-stack-en.needs-marquee > .marquee-wrapper {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-details-card__surface .award-group-name *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-details-card__surface .award-group-name *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-details-card__surface .award-group-name *:not(.award-roa-vacant-ornament) {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-name *:not(.award-roa-vacant-ornament) {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+/* 深色详情 surface：浅色字 + 深色外晕，与右上校徽水印分离 */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-label--groups,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-school-text,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-label-stack-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-label-stack-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-value-slot,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-name,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-medal-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-medal-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-medal > en-text {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-school-text *:not(.award-roa-vacant-ornament),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-value-slot *:not(.award-roa-vacant-ornament) {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-school-text .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-value-slot .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-name .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-group-medal .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-label-stack-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-details-card__surface .award-roa-label-stack-en.needs-marquee > .marquee-wrapper {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+/* 底栏统计在 surface 外，同样叠压风险：浅色字晕 / 深色字晕 */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-right-column .award-stats-triple .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-right-column .award-stats-triple .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column .award-stats-triple .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-right-column .award-stats-triple .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-right-column .award-stats-triple .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column .award-stats-triple .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-right-column .award-stats-triple .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-right-column .award-stats-triple .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column .award-stats-triple .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-right-column .award-stats-triple .award-stat-value-big.award-stat-value-fb,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-right-column .award-stats-triple .award-stat-value-big.award-stat-value-fb,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-right-column .award-stats-triple .award-stat-value-big.award-stat-value-fb {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column .award-stats-triple .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column .award-stats-triple .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column .award-stats-triple .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-right-column .award-stats-triple .award-stat-value-big.award-stat-value-fb {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] #award-rank.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) #award-rank.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] #award-rank.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] #award-solved.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) #award-solved.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] #award-solved.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] #award-first-blood.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) #award-first-blood.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] #award-first-blood.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-lbl-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-lbl-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-lbl-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-lbl-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-lbl-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-lbl-en.needs-marquee > .marquee-wrapper {
+    -webkit-text-stroke: var(--roa-light-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-light-info-outline);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] #award-rank.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] #award-solved.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] #award-first-blood.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-lbl-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-lbl-en.needs-marquee > .marquee-wrapper {
+    -webkit-text-stroke: var(--roa-dark-text-stroke);
+    paint-order: stroke fill;
+    text-shadow: var(--roa-dark-info-halo);
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-container {
+    display: block;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* 兼容类名：与底栏统计同节点时可与 .award-stats-dock 并存 */
+#csg-roll-award-overlay.csg-roa .award-stats-under-photo {
+    width: 100%;
+    margin-top: 0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-dock {
+    margin-top: auto;
+    flex-shrink: 0;
+    padding-top: clamp(12px, calc(1.45 * var(--roa-vu)), 22px);
+    border-top: 1px solid rgba(15, 23, 42, 0.055);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stats-dock {
+    border-top-color: rgba(148, 163, 184, 0.14);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stats-dock {
+    border-top-color: rgba(51, 65, 85, 0.065);
+}
+
+/* 右栏底统计：三行竖排 + 单面板（窄右栏下可读性更好；无首答时两行） */
+#csg-roll-award-overlay.csg-roa .award-stats-triple {
+    display: grid;
+    width: 100%;
+    box-sizing: border-box;
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    gap: 0;
+    align-items: stretch;
+    min-height: 0;
+    height: auto;
+    border-radius: min(12px, calc(0.88 * var(--roa-vu)));
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.085);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.045);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stats-triple {
+    border-color: rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.55);
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stats-triple {
+    border-color: rgba(51, 65, 85, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-triple:not(.award-stats-triple--no-fb) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-triple--no-fb {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-triple--no-fb .award-stat-cell--fb {
+    display: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(10px, calc(1.1 * var(--roa-vu)), 18px);
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: clamp(11px, calc(1.22 * var(--roa-vu)), 20px) clamp(12px, calc(1.25 * var(--roa-vu)), 20px);
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-cell,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-cell {
+    background: rgba(241, 245, 249, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.055);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-cell {
+    background: rgba(2, 6, 23, 0.38);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-cell {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(51, 65, 85, 0.07);
+}
+
+/* 面板内：扁平一行一条，行间分隔（覆盖上分格圆角卡片） */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stats-triple .award-stat-cell,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stats-triple .award-stat-cell {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.075);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stats-triple .award-stat-cell {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stats-triple .award-stat-cell {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.08);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stats-triple .award-stat-cell:last-child {
+    border-bottom: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-label-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: min(2px, calc(0.2 * var(--roa-vu)));
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: min(52%, 22rem);
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-cell--fb .award-stat-label-col {
+    max-width: min(48%, 20rem);
+    flex-shrink: 0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-cn {
+    font-size: var(--roa-fs-lbl-dock-cn);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: 0.04em;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-en {
+    font-size: var(--roa-fs-lbl-dock-en);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'CsgRank Latin', 'CsgRank SC', 'Noto Sans SC', sans-serif;
+    opacity: 0.82;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-lbl-cn,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-lbl-cn {
+    color: rgba(51, 65, 85, 0.95);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-lbl-cn {
+    color: rgba(226, 232, 240, 0.96);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-lbl-en,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-lbl-en {
+    color: rgba(71, 85, 105, 0.88);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-lbl-en {
+    color: rgba(148, 163, 184, 0.92);
+}
+
+#csg-roll-award-overlay.csg-roa .award-stat-value-big {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--roa-fs-stat-num);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/*
+ * 首答：与排名、解题同列；**单行**，溢出由 JS 横向跑马灯（与 #award-rank 等一致）。
+ */
+#csg-roll-award-overlay.csg-roa .award-stat-value-big.award-stat-value-fb {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    align-self: center;
+    overflow: hidden;
+    text-overflow: clip;
+    text-align: right;
+    padding-top: 0;
+    line-height: 1.06;
+    font-size: var(--roa-fs-stat-fb);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-stat-value-big,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-stat-value-big {
+    color: #0f172a;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-stat-value-big {
+    color: #f8fafc;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 0 0 auto;
+    min-height: 0;
+    margin-top: min(12px, calc(1.08 * var(--roa-vu)));
+    padding-top: clamp(14px, calc(1.52 * var(--roa-vu)), 24px);
+    border-top: 1px solid rgba(15, 23, 42, 0.065);
+    position: relative;
+    z-index: 1;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-panel {
+    border-top-color: rgba(148, 163, 184, 0.14);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-panel {
+    border-top-color: rgba(51, 65, 85, 0.08);
+}
+
+/* 超过两条时可视区高度锁死为两行 + 与 rotator 同口径 gap，自下而上步进上滚（rank_roll RefreshAwardGroupPanel） */
+#csg-roll-award-overlay.csg-roa .award-group-scrollport {
+    overflow: hidden;
+    width: 100%;
+    height: calc(2 * (118px * var(--roa-s)) + clamp(8px, calc(1 * var(--roa-vu)), 14px));
+    min-height: calc(2 * (118px * var(--roa-s)) + clamp(8px, calc(1 * var(--roa-vu)), 14px));
+    max-height: calc(2 * (118px * var(--roa-s)) + clamp(8px, calc(1 * var(--roa-vu)), 14px));
+    flex-shrink: 0;
+    box-sizing: border-box;
+    position: relative;
+    isolation: isolate;
+    /* 与右栏同宽：云气边框用 scrollport 的 ::before/::after 绝对贴边，不再用 padding 内收 rotator */
+    padding-inline: 0;
+    --csg-award-xiangyun-accent: rgba(71, 85, 105, 0.46);
+    --csg-award-cloud-rail: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20120%20280'%20fill%3D'none'%3E%3Cg%20stroke%3D'%23000'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20stroke-width%3D'2.8'%20stroke-opacity%3D'.72'%20d%3D'M9%20252C30%20216%2051%20191%2080%20170c23-17%2035-44%2018-62-14-15-42-10-48%2012-5%2019%2012%2033%2029%2025%2019-9%2016-35-3-39-22-5-34%2012-27%2030%205%2013%2021%2018%2036%2011'%2F%3E%3Cpath%20stroke-width%3D'1.9'%20stroke-opacity%3D'.42'%20d%3D'M22%20248c18-28%2038-51%2068-69%2024-15%2033-42%2015-59'%2F%3E%3Cpath%20stroke-width%3D'1.7'%20stroke-opacity%3D'.34'%20d%3D'M18%20220c22-26%2046-45%2075-60'%2F%3E%3Cpath%20stroke-width%3D'1.7'%20stroke-opacity%3D'.34'%20d%3D'M28%20191c21-20%2043-34%2069-45'%2F%3E%3Cpath%20stroke-width%3D'2.1'%20stroke-opacity%3D'.55'%20d%3D'M14%20139c21-36%2044-64%2077-88'%2F%3E%3Cpath%20stroke-width%3D'1.6'%20stroke-opacity%3D'.28'%20d%3D'M31%20138c20-29%2041-50%2069-68'%2F%3E%3Cpath%20stroke-width%3D'1.6'%20stroke-opacity%3D'.24'%20d%3D'M18%20109c22-25%2048-44%2082-61'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-scrollport {
+    --csg-award-xiangyun-accent: rgba(226, 232, 240, 0.34);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-scrollport {
+    --csg-award-xiangyun-accent: rgba(71, 85, 105, 0.42);
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-scrollport::before,
+#csg-roll-award-overlay.csg-roa .award-group-scrollport::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    width: clamp(38px, calc(5.2 * var(--roa-vu)), 72px);
+    height: 105%;
+    pointer-events: none;
+    background-color: var(--csg-award-xiangyun-accent, rgba(100, 116, 139, 0.38));
+    opacity: 0.42;
+    -webkit-mask-image: var(--csg-award-cloud-rail);
+    mask-image: var(--csg-award-cloud-rail);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    filter: drop-shadow(0 0 min(10px, calc(1.05 * var(--roa-vu))) rgba(255, 255, 255, 0.2));
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-scrollport::before {
+    left: 0;
+    transform: translate(-18%, -50%);
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-scrollport::after {
+    right: 0;
+    transform: translate(18%, -50%) scaleX(-1);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-scrollport::before,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-scrollport::after {
+    opacity: 0.3;
+    filter: drop-shadow(0 0 min(10px, calc(1.05 * var(--roa-vu))) rgba(226, 232, 240, 0.14));
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-rotator {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, calc(1 * var(--roa-vu)), 14px);
+    position: relative;
+    z-index: 1;
+    will-change: transform;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(6px, calc(0.75 * var(--roa-vu)), 12px);
+    flex: 0 0 auto;
+    height: calc(118px * var(--roa-s));
+    min-height: calc(118px * var(--roa-s));
+    max-height: calc(118px * var(--roa-s));
+    padding: clamp(10px, calc(1.25 * var(--roa-vu)), 18px) clamp(14px, calc(1.8 * var(--roa-vu)), 28px);
+    border-radius: min(10px, calc(0.92 * var(--roa-vu)));
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    --csg-award-cloud-corner-left: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20162%20104'%20fill%3D'none'%3E%3Cg%20stroke%3D'%23000'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20stroke-width%3D'3.2'%20stroke-opacity%3D'.78'%20d%3D'M7%2086h53c19%200%2035-13%2035-29%200-14-11-24-25-24-12%200-21%207-24%2017-4%2014%207%2027%2021%2027%2010%200%2018-7%2018-16%200-7-5-13-13-13'%2F%3E%3Cpath%20stroke-width%3D'2.2'%20stroke-opacity%3D'.5'%20d%3D'M23%2070h54c30%200%2054-21%2054-47'%2F%3E%3Cpath%20stroke-width%3D'1.8'%20stroke-opacity%3D'.34'%20d%3D'M31%2055h47c22%200%2040-14%2046-34'%2F%3E%3Cpath%20stroke-width%3D'1.8'%20stroke-opacity%3D'.32'%20d%3D'M52%2097h54c21%200%2039-11%2049-28'%2F%3E%3Cpath%20stroke-width%3D'2.4'%20stroke-opacity%3D'.54'%20d%3D'M104%2088c15%200%2028-12%2028-27%200-10-6-19-15-23'%2F%3E%3Cpath%20stroke-width%3D'1.7'%20stroke-opacity%3D'.28'%20d%3D'M4%2018h65c18%200%2034%208%2044%2022'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    --csg-award-cloud-corner-right: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20162%20104'%20fill%3D'none'%3E%3Cg%20stroke%3D'%23000'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20stroke-width%3D'3'%20stroke-opacity%3D'.74'%20d%3D'M155%2018h-52c-20%200-36%2014-36%2030%200%2013%2010%2023%2024%2023%2012%200%2021-7%2023-18%203-13-7-25-20-25-10%200-18%207-18%2016'%2F%3E%3Cpath%20stroke-width%3D'2.2'%20stroke-opacity%3D'.48'%20d%3D'M139%2034H86c-30%200-54%2020-56%2047'%2F%3E%3Cpath%20stroke-width%3D'1.8'%20stroke-opacity%3D'.34'%20d%3D'M130%2049H84c-23%200-41%2014-47%2035'%2F%3E%3Cpath%20stroke-width%3D'1.8'%20stroke-opacity%3D'.3'%20d%3D'M110%207h-53C35%207%2018%2018%208%2035'%2F%3E%3Cpath%20stroke-width%3D'2.4'%20stroke-opacity%3D'.52'%20d%3D'M57%2016C42%2016%2030%2028%2030%2043c0%2010%206%2018%2015%2022'%2F%3E%3Cpath%20stroke-width%3D'1.7'%20stroke-opacity%3D'.27'%20d%3D'M158%2086H92c-18%200-34-8-44-22'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+/*
+ * 卡内线描祥云：mask 只取线条 alpha，背景色由 CSS 变量上色，避免 data SVG `currentColor` 不继承导致失色。
+ * 左下重、右上轻，形成传统卷云的流动方向；文字层保持 z-index: 2。
+ */
+#csg-roll-award-overlay.csg-roa .award-group-item::before,
+#csg-roll-award-overlay.csg-roa .award-group-item::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    width: clamp(96px, calc(15.2 * var(--roa-vu)), 158px);
+    height: clamp(62px, calc(9.8 * var(--roa-vu)), 104px);
+    pointer-events: none;
+    opacity: 0.56;
+    box-sizing: border-box;
+    background-color: var(--csg-award-xiangyun-accent, #64748b);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    filter: drop-shadow(0 min(1px, calc(0.12 * var(--roa-vu))) min(2px, calc(0.24 * var(--roa-vu))) rgba(15, 23, 42, 0.12));
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-item::before {
+    left: clamp(-20px, calc(-2.35 * var(--roa-vu)), -10px);
+    bottom: clamp(-22px, calc(-2.5 * var(--roa-vu)), -11px);
+    -webkit-mask-image: var(--csg-award-cloud-corner-left);
+    mask-image: var(--csg-award-cloud-corner-left);
+    transform: rotate(-2deg);
+    transform-origin: 18% 86%;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-item::after {
+    right: clamp(-20px, calc(-2.35 * var(--roa-vu)), -10px);
+    left: auto;
+    top: clamp(-22px, calc(-2.5 * var(--roa-vu)), -11px);
+    -webkit-mask-image: var(--csg-award-cloud-corner-right);
+    mask-image: var(--csg-award-cloud-corner-right);
+    transform: rotate(2deg);
+    transform-origin: 82% 14%;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-item--csg-group-accent::before,
+#csg-roll-award-overlay.csg-roa .award-group-item--csg-group-accent::after {
+    opacity: 0.68;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item::before,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item::after {
+    opacity: 0.38;
+    filter: drop-shadow(0 0 min(7px, calc(0.72 * var(--roa-vu))) rgba(226, 232, 240, 0.16));
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--csg-group-accent::before,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--csg-group-accent::after {
+    opacity: 0.48;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-item--csg-group-accent {
+    --csg-award-xiangyun-accent: var(--csg-group-accent);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-gold:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-gold:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-gold:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(161, 98, 7, 0.62);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-silver:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-silver:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-silver:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(71, 85, 105, 0.52);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-bronze:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-bronze:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-bronze:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(120, 53, 15, 0.54);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-none:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-none:not(.award-group-item--csg-group-accent),
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-none:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(71, 85, 105, 0.46);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-gold:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(253, 224, 71, 0.42);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-silver:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(226, 232, 240, 0.38);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-bronze:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(254, 202, 202, 0.4);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-none:not(.award-group-item--csg-group-accent) {
+    --csg-award-xiangyun-accent: rgba(203, 213, 225, 0.34);
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-name-row,
+#csg-roll-award-overlay.csg-roa .award-group-award-row {
+    position: relative;
+    z-index: 2;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-name-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(6px, calc(0.62 * var(--roa-vu)), 12px);
+    width: 100%;
+    min-width: 0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-name-row .award-group-name {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* 组名与左侧 hash 图标垂直居中：去掉 value-slot 在该行上的 min-height 撑高 */
+#csg-roll-award-overlay.csg-roa .award-group-name-row .award-group-name.award-roa-value-slot {
+    min-height: 0;
+    align-self: center;
+    display: flex;
+    align-items: center;
+}
+
+/* 多归属：hash 色只落在左侧图标，组名仍走统一字色与浅色 glow */
+#csg-roll-award-overlay.csg-roa .award-group-hash-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    font-size: calc(24px * var(--roa-s) * var(--roa-fs-mul));
+    line-height: 1;
+    opacity: 0.96;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-award-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #f1f5f9;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item {
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(15, 23, 42, 0.42);
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item {
+    border: 1px solid rgba(51, 65, 85, 0.09);
+    background: #f8fafc;
+    box-shadow: none;
+}
+
+/* ── 奖项整块：中式卡面（微圆角 + 多层渐变 + 内外光），与左右祥云呼应 ── */
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-gold,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-gold,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-gold {
+    background:
+        radial-gradient(ellipse 72% 48% at 88% 10%, rgba(255, 255, 255, 0.42) 0%, transparent 58%),
+        radial-gradient(ellipse 55% 40% at 10% 92%, rgba(217, 119, 6, 0.09) 0%, transparent 55%),
+        linear-gradient(168deg, #fffdf7 0%, #fef3c7 42%, #fde68a 100%);
+    border: 1px solid rgba(180, 83, 9, 0.34);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        inset 0 min(-1px, -0.08 * var(--roa-vu)) 0 rgba(245, 158, 11, 0.12),
+        0 min(2px, 0.25 * var(--roa-vu)) min(12px, 1.05 * var(--roa-vu)) rgba(146, 64, 14, 0.11);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-silver,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-silver,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-silver {
+    background:
+        radial-gradient(ellipse 68% 44% at 86% 12%, rgba(255, 255, 255, 0.5) 0%, transparent 55%),
+        linear-gradient(172deg, #f8fafc 0%, #e2e8f0 52%, #cbd5e1 100%);
+    border: 1px solid rgba(100, 116, 139, 0.28);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        0 min(2px, 0.25 * var(--roa-vu)) min(10px, 0.95 * var(--roa-vu)) rgba(51, 65, 85, 0.09);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-bronze,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-bronze,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-bronze {
+    background:
+        radial-gradient(ellipse 62% 42% at 82% 14%, rgba(255, 252, 248, 0.55) 0%, transparent 54%),
+        linear-gradient(170deg, #faf6f1 0%, #f1ebe6 48%, #e8ddd4 100%);
+    border: 1px solid rgba(124, 45, 18, 0.28);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 min(2px, 0.25 * var(--roa-vu)) min(10px, 0.95 * var(--roa-vu)) rgba(91, 38, 18, 0.08);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item.award-group-item--tier-none,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item.award-group-item--tier-none,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item.award-group-item--tier-none {
+    background:
+        radial-gradient(ellipse 58% 38% at 90% 8%, rgba(255, 255, 255, 0.35) 0%, transparent 52%),
+        linear-gradient(175deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        0 min(2px, 0.22 * var(--roa-vu)) min(8px, 0.85 * var(--roa-vu)) rgba(15, 23, 42, 0.06);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item--tier-gold .award-group-medal.gold,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item--tier-gold .award-group-medal.gold,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item--tier-gold .award-group-medal.gold {
+    background: transparent;
+    color: #a16207;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item--tier-silver .award-group-medal.silver,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item--tier-silver .award-group-medal.silver,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item--tier-silver .award-group-medal.silver {
+    background: transparent;
+    color: #1e293b;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item--tier-bronze .award-group-medal.bronze,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item--tier-bronze .award-group-medal.bronze,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item--tier-bronze .award-group-medal.bronze {
+    background: transparent;
+    color: #3f2318;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='default'] .award-group-item--tier-none .award-group-medal.none,
+#csg-roll-award-overlay.csg-roa:not([data-rank-skin]) .award-group-item--tier-none .award-group-medal.none,
+#csg-roll-award-overlay.csg-roa[data-rank-skin='light_macaron'] .award-group-item--tier-none .award-group-medal.none {
+    background: transparent;
+    color: #475569;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-gold {
+    background:
+        radial-gradient(ellipse 70% 45% at 78% 8%, rgba(254, 243, 199, 0.14) 0%, transparent 55%),
+        linear-gradient(162deg, rgba(58, 48, 28, 0.97) 0%, rgba(42, 32, 14, 0.96) 48%, rgba(28, 22, 10, 0.98) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.32);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 251, 235, 0.1),
+        0 min(4px, 0.45 * var(--roa-vu)) min(18px, 1.35 * var(--roa-vu)) rgba(0, 0, 0, 0.42);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-silver {
+    background:
+        radial-gradient(ellipse 65% 42% at 80% 10%, rgba(226, 232, 240, 0.1) 0%, transparent 54%),
+        linear-gradient(168deg, rgba(36, 44, 58, 0.97) 0%, rgba(24, 32, 46, 0.96) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    box-shadow:
+        inset 0 1px 0 rgba(248, 250, 252, 0.06),
+        0 min(4px, 0.45 * var(--roa-vu)) min(16px, 1.2 * var(--roa-vu)) rgba(0, 0, 0, 0.4);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-bronze {
+    background:
+        radial-gradient(ellipse 60% 40% at 75% 12%, rgba(254, 202, 202, 0.1) 0%, transparent 52%),
+        linear-gradient(165deg, rgba(52, 32, 30, 0.97) 0%, rgba(44, 24, 22, 0.96) 100%);
+    border: 1px solid rgba(248, 113, 113, 0.24);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 241, 242, 0.06),
+        0 min(4px, 0.45 * var(--roa-vu)) min(16px, 1.2 * var(--roa-vu)) rgba(0, 0, 0, 0.4);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item.award-group-item--tier-none {
+    background:
+        radial-gradient(ellipse 58% 38% at 85% 8%, rgba(148, 163, 184, 0.08) 0%, transparent 50%),
+        linear-gradient(170deg, rgba(38, 48, 68, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow:
+        inset 0 1px 0 rgba(248, 250, 252, 0.05),
+        0 min(3px, 0.38 * var(--roa-vu)) min(14px, 1.1 * var(--roa-vu)) rgba(0, 0, 0, 0.38);
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--tier-gold .award-group-medal.gold {
+    background: transparent;
+    color: #fef3c7;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--tier-silver .award-group-medal.silver {
+    background: transparent;
+    color: #e2e8f0;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--tier-bronze .award-group-medal.bronze {
+    background: transparent;
+    color: #fecaca;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-item--tier-none .award-group-medal.none {
+    background: transparent;
+    color: #cbd5e1;
+    box-shadow: none;
+}
+
+/*
+ * 多归属：强调色用于左侧图标（见 rank_roll + RankToolContestGroupOverlayIconClass），组名不设 hash 字色。
+ * --csg-group-accent：rank_roll.js + RankToolContestGroupAccentHex（图标 color 内联）
+ */
+
+#csg-roll-award-overlay.csg-roa .award-group-name {
+    font-size: var(--roa-fs-lbl-detail-cn);
+    font-weight: 700;
+    text-align: left;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/*
+ * 中英同一行：flex 左起成组，避免「中文 auto + 英文 1fr 右对齐」把英文甩到行末、与中文奖牌名脱节。
+ * 勿对整块跑跑马灯（rank_roll 已跳过双 span）。
+ */
+#csg-roll-award-overlay.csg-roa .award-group-medal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(0.42em, calc(0.62 * var(--roa-vu)), 0.95em);
+    font-weight: 700;
+    text-align: left;
+    border-radius: 0;
+    padding: clamp(4px, calc(0.45 * var(--roa-vu)), 10px) 0;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+    font-size: var(--roa-fs-school);
+    line-height: 1.06;
+    letter-spacing: -0.018em;
+}
+
+/* 奖项名：中英同一行；字号相对 .award-group-medal 的 font-size */
+#csg-roll-award-overlay.csg-roa .award-group-medal-cn {
+    flex: 0 1 auto;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.06;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal-en {
+    flex: 0 1 auto;
+    font-size: 0.88em;
+    font-weight: 600;
+    line-height: 1.06;
+    opacity: 0.92;
+    min-width: 0;
+    max-width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    font-family: 'CsgRank Latin', 'CsgRank SC', 'Noto Sans SC', sans-serif;
+}
+
+/* CreateBilingualText 兜底：`中文<en-text>En</en-text>` 与 .award-group-medal-en 同列流 */
+#csg-roll-award-overlay.csg-roa .award-group-medal > en-text {
+    flex: 0 1 auto;
+    font-size: 0.88em;
+    font-weight: 600;
+    line-height: 1.06;
+    opacity: 0.92;
+    min-width: 0;
+    max-width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    font-family: 'CsgRank Latin', 'CsgRank SC', 'Noto Sans SC', sans-serif;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal.needs-marquee {
+    white-space: nowrap;
+}
+
+/* 兜底：奖牌文案区不设独立底色（整块配色由 .award-group-item--tier-* 承担） */
+#csg-roll-award-overlay.csg-roa .award-group-medal.gold,
+#csg-roll-award-overlay.csg-roa .award-group-medal.silver,
+#csg-roll-award-overlay.csg-roa .award-group-medal.bronze,
+#csg-roll-award-overlay.csg-roa .award-group-medal.none {
+    background: transparent;
+    box-shadow: none;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal.gold {
+    color: #a16207;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal.silver {
+    color: #1e293b;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal.bronze {
+    color: #3f2318;
+}
+
+#csg-roll-award-overlay.csg-roa .award-group-medal.none {
+    color: #475569;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-medal.gold {
+    color: #fef3c7;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-medal.silver {
+    color: #e2e8f0;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-medal.bronze {
+    color: #fecaca;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-medal.none {
+    color: #cbd5e1;
+}
+
+#csg-roll-award-overlay.csg-roa[data-rank-skin='dark_stage'] .award-group-name {
+    color: #e2e8f0;
+}
+
+#csg-roll-award-overlay.csg-roa .award-info-section--fixed > .award-roa-block:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* 跑马灯：overlay 内超长文案统一 enableMarqueeIfNeeded + .marquee-wrapper（rank_roll.js） */
+#csg-roll-award-overlay.csg-roa #award-school.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-team-name.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-team-en.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-members.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-coach.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-rank.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-solved.needs-marquee,
+#csg-roll-award-overlay.csg-roa #award-first-blood.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-cn.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-en.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-cn.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-en.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-group-name.needs-marquee,
+#csg-roll-award-overlay.csg-roa .award-group-medal.needs-marquee {
+    text-overflow: clip;
+    overflow: hidden;
+    position: relative;
+}
+
+#csg-roll-award-overlay.csg-roa #award-school.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-team-name.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-team-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-members.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-coach.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-rank.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-solved.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-first-blood.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-cn.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-en.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-group-name.needs-marquee > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-group-medal.needs-marquee > .marquee-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+    animation: csg-roa-award-marquee linear infinite;
+    animation-duration: var(--marquee-duration, 15s);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+@keyframes csg-roa-award-marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(var(--marquee-translate, -100px));
+    }
+}
+
+#csg-roll-award-overlay.csg-roa #award-school.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-team-name.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-team-en.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-members.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-coach.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-rank.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-solved.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa #award-first-blood.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-cn.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-stat-lbl-en.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-cn.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-roa-label-stack-en.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-group-name.needs-marquee:hover > .marquee-wrapper,
+#csg-roll-award-overlay.csg-roa .award-group-medal.needs-marquee:hover > .marquee-wrapper {
+    animation-play-state: paused;
+}
+
+/* ========= 获奖详情信息对齐：`data-roa-info-align`（`RollAwardOverlay.configure`）=========
+ * `start`：不显式写选择器，沿用上文默认（院校/队名/成员/教练、组名与奖牌等**左对齐**）。
+ * `center`：标签 `.award-roa-label-stack` 仍为左中文 / 右英文；仅**信息正文**与归属组名、奖牌行居中。底栏统计不动。
+ */
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-school-line {
+    justify-content: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-school-text {
+    text-align: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-roa-value-slot {
+    text-align: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-name-row {
+    justify-content: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-name-row .award-group-name {
+    flex: 0 1 auto;
+    text-align: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-name-row .award-group-name.award-roa-value-slot {
+    justify-content: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-award-row {
+    justify-content: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-medal {
+    justify-content: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-medal-cn,
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-medal-en {
+    text-align: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-medal > en-text {
+    text-align: center;
+}
+
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-school-text.needs-marquee,
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-roa-value-slot.needs-marquee,
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-name.needs-marquee,
+#csg-roll-award-overlay.csg-roa[data-roa-info-align='center'] .award-group-medal.needs-marquee {
+    text-align: center;
+}
+

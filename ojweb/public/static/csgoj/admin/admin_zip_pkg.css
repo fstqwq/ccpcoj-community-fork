@@ -1,0 +1,647 @@
+/**
+ * 后台 ZIP 包导入/导出共用样式
+ * 用于：比赛包（contest_pkg）、题目包（problem_export）等「上传 zip + 后台任务」页。
+ * 导出卡片内表单条：admin-zip-pkg-form-*（题包 3×2、比赛包 3×2 与分段 tab 等）。
+ * 勿与题包转换（Polygon/THUSAAC pkg_convert）混淆。
+ *
+ * 路径：public/static/csgoj/admin/admin_zip_pkg.css
+ */
+
+/* filemanager/js_upload 在 compact 模式下使用，页面可能无 .admin-zip-pkg 根节点（独立弹层/旧入口） */
+.admin-zip-pkg-retention-alert {
+    box-shadow: none;
+    border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+.admin-zip-pkg-upload-toolbar {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.45rem;
+    margin-bottom: 0 !important;
+    vertical-align: middle;
+}
+
+.admin-zip-pkg {
+    max-width: 1200px;
+}
+
+.admin-zip-pkg .admin-page-header {
+	margin-bottom: 0.5rem;
+	padding: 0.5rem 0.85rem;
+}
+
+.admin-zip-pkg .admin-page-header-title {
+    font-size: 1.28rem;
+    flex-wrap: wrap;
+    row-gap: 0.2rem;
+}
+
+.admin-zip-pkg .admin-page-header-icon {
+    padding: 0.35rem 0.45rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-hint {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    margin-bottom: 0.55rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-export-card .card-header {
+    padding: 0.35rem 0.7rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-export-card .card-body {
+    padding: 0.35rem 0.6rem 0.45rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-feedback {
+    min-height: 0;
+    max-width: 42rem;
+    margin-top: 0.12rem;
+    font-size: 0.72rem;
+    line-height: 1.25;
+}
+
+/* 导出表单条：题包 / 比赛包共用（浅底圆角 + 选项分段 + 提交靠右） */
+.admin-zip-pkg .admin-zip-pkg-form-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.45rem;
+    margin-bottom: 0.4rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-heading-cn {
+    font-size: 0.9375rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-heading-en {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.6rem;
+    padding: 0.42rem 0.55rem;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+@supports (background: color-mix(in srgb, red, blue)) {
+    .admin-zip-pkg .admin-zip-pkg-form-sheet {
+        background: color-mix(in srgb, var(--bs-tertiary-bg, #f8f9fa) 88%, var(--bs-body-bg, #fff));
+    }
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch--opts {
+    gap: 0.55rem 0.85rem;
+    padding-right: 0.5rem;
+    border-right: 1px solid var(--bs-border-color);
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-opt-lbl {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-opt-lbl-cn {
+    font-size: 0.74rem;
+    font-weight: 650;
+    color: var(--bs-body-color);
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-opt-lbl-en {
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch--fields {
+    flex: 1 1 10rem;
+    min-width: 0;
+    align-items: center;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch--fields .tab-content,
+.admin-zip-pkg .admin-zip-pkg-form-g-inputs .tab-content {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch--fields .tab-pane,
+.admin-zip-pkg .admin-zip-pkg-form-g-inputs .tab-pane {
+    width: 100%;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-bunch--go {
+    margin-left: auto;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-go-btn.btn {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    box-shadow: 0 1px 2px rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
+}
+
+/* 3×2 左列：文案列 80px + 开关列，标签与 csg-switch 间距收紧（题包/比赛包共用） */
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-opt,
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-opt {
+    display: grid;
+    grid-template-columns: 80px auto;
+    align-items: center;
+    column-gap: 0.2rem;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-opt .admin-zip-pkg-form-opt-lbl,
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-opt .admin-zip-pkg-form-opt-lbl {
+    justify-self: start;
+    text-align: left;
+    min-width: 0;
+    max-width: 80px;
+}
+
+/* 题目导出：3 列 × 2 行（修饰类 --problem-3x2；比赛包见 --contest-3x2） */
+.admin-zip-pkg .admin-zip-pkg-form-sheet.admin-zip-pkg-form-sheet--problem-3x2 {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0.38rem 0.85rem;
+    align-items: center;
+    flex-wrap: unset;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-opt1 {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-opt2 {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-tabs {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-inputs {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    /* 比赛 ID 下拉链不被右侧「提交导出」列盖住 */
+    position: relative;
+    z-index: 5;
+    overflow: visible;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-inputs .tab-content,
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-inputs .tab-pane {
+    overflow: visible;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-go {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-go .admin-zip-pkg-form-go-btn.btn {
+    flex: 1 1 auto;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-opt1 {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-opt2 {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-tabs {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-inputs {
+        grid-column: 1;
+        grid-row: 4;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-go {
+        grid-column: 1;
+        grid-row: 5;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--problem-3x2 .admin-zip-pkg-form-g-go .admin-zip-pkg-form-go-btn.btn {
+        flex: 0 0 auto;
+        min-height: 0;
+        width: auto;
+    }
+}
+
+/* 比赛导出：3 列 × 2 行（与题包 3×2 对齐：左开关列 / 中比赛 ID / 右竖条提交） */
+.admin-zip-pkg .admin-zip-pkg-form-sheet.admin-zip-pkg-form-sheet--contest-3x2 {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0.38rem 0.85rem;
+    align-items: center;
+    flex-wrap: unset;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-opt1 {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-opt2 {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-cid {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    min-width: 0;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-go {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    min-width: 0;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-go .admin-zip-pkg-form-go-btn.btn {
+    flex: 1 1 auto;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-opt1 {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-opt2 {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-cid {
+        grid-column: 1;
+        grid-row: 3;
+        align-self: stretch;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-cid .admin-zip-pkg-cid-wrap,
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-cid .form-control {
+        max-width: 100%;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-go {
+        grid-column: 1;
+        grid-row: 4;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .admin-zip-pkg .admin-zip-pkg-form-sheet--contest-3x2 .admin-zip-pkg-form-g-c-go .admin-zip-pkg-form-go-btn.btn {
+        flex: 0 0 auto;
+        min-height: 0;
+        width: auto;
+    }
+}
+
+/* 表单内分段 tab（题导出方式等，ZIP 页可复用） */
+.admin-zip-pkg ul.nav.admin-zip-pkg-form-seg {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: var(--bs-body-bg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.admin-zip-pkg ul.admin-zip-pkg-form-seg .nav-item {
+    display: flex;
+    margin: 0;
+}
+
+.admin-zip-pkg ul.admin-zip-pkg-form-seg .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0.24rem 0.55rem;
+    font-size: 0.73rem;
+    font-weight: 550;
+    line-height: 1.2;
+    color: var(--bs-secondary-color);
+    background: transparent;
+}
+
+.admin-zip-pkg ul.admin-zip-pkg-form-seg .nav-link:hover {
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.07);
+}
+
+.admin-zip-pkg ul.admin-zip-pkg-form-seg .nav-link.active {
+    background: var(--bs-primary);
+    color: #fff;
+}
+
+.admin-zip-pkg ul.admin-zip-pkg-form-seg .nav-link:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45);
+    z-index: 1;
+}
+
+/* 紧凑 input-group（题导出范围/比赛 ID 等） */
+.admin-zip-pkg .admin-zip-pkg-form-ig.input-group-sm .input-group-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.38rem;
+    color: var(--bs-secondary-color);
+    background: var(--bs-body-bg);
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig.input-group-sm .form-control {
+    font-size: 0.8125rem;
+    padding: 0.22rem 0.4rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig--range {
+    max-width: 18rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig--range .form-control {
+    text-align: center;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig--range .form-control:first-of-type {
+    max-width: 4.6rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig--range .form-control:last-of-type {
+    max-width: 4.6rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-ig--cid {
+    max-width: 12rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-problem-id-list {
+    min-width: min(100%, 14rem);
+}
+
+/* 题目导入导出单页「列表」模式：缩短 chips 区宽度，与范围/比赛输入条视觉对齐 */
+.admin-zip-pkg .admin-zip-pkg-form-problem-id-list--export {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-problem-id-list--export .problem-input-component--compact .input-group {
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-problem-id-list--export .problem-input-component--compact .csg-prochips {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 9.5rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-problem-id-list--export .problem-input-component--compact .csg-prochips input.csg-prochips-input {
+    min-width: 2.25rem;
+    flex: 1 1 2.25rem;
+    max-width: 100%;
+}
+
+@media (min-width: 576px) {
+    .admin-zip-pkg .admin-zip-pkg-form-problem-id-list--export .problem-input-component--compact .csg-prochips {
+        max-width: 11rem;
+    }
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-g-c-cid .admin-zip-pkg-cid-wrap {
+    min-width: 7.25rem;
+    max-width: 11rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-form-g-c-cid .form-control {
+    width: 100%;
+    min-width: 7rem;
+    max-width: 11rem;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.8125rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 2px);
+    z-index: 1080;
+    min-width: min(100vw - 2rem, 22rem);
+    max-width: min(100vw - 2rem, 32rem);
+    max-height: 15rem;
+    overflow-y: auto;
+    display: none;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest.show {
+    display: block;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-item {
+    cursor: pointer;
+    border-left: none;
+    border-right: none;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    text-align: left;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-item:first-child {
+    border-top: none;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-item:hover,
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-item:focus {
+    background-color: rgba(13, 110, 253, 0.08);
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-id {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-right: 0.35rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-suggest-title {
+    color: #495057;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    margin-bottom: 0.15rem;
+    line-height: 1.12;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.admin-zip-pkg .admin-zip-pkg-cid-en {
+    display: block;
+    margin-top: 1px;
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: #6c757d;
+    line-height: 1.1;
+}
+
+.admin-zip-pkg .admin-zip-pkg-files-card .card-header {
+    padding: 0.35rem 0.7rem;
+}
+
+.admin-zip-pkg .admin-zip-pkg-files-card .card-body {
+    padding: 0.4rem 0.55rem 0.55rem;
+}
+
+/* 文件区：上传与表格搜索同一行工具带 */
+.admin-zip-pkg .fixed-table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.55rem;
+    padding: 0.28rem 0.1rem 0.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.admin-zip-pkg .fixed-table-toolbar .bars,
+.admin-zip-pkg .fixed-table-toolbar .columns,
+.admin-zip-pkg .fixed-table-toolbar .search {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.admin-zip-pkg .fixed-table-toolbar .search {
+    flex: 1 1 12rem;
+    min-width: 10rem;
+    max-width: 22rem;
+    margin-left: auto !important;
+}
+
+.admin-zip-pkg .fixed-table-toolbar .search .search-input,
+.admin-zip-pkg .fixed-table-toolbar .search input {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+.admin-zip-pkg .fixed-table-toolbar .search ~ .search {
+    display: none !important;
+}
+
+.admin-zip-pkg .bootstrap-table .table {
+    font-size: 0.875rem;
+}
+
+.admin-zip-pkg .bootstrap-table .table > thead > tr > th {
+    padding: 0.35rem 0.45rem;
+}
+
+.admin-zip-pkg .bootstrap-table .table > tbody > tr > td {
+    padding: 0.3rem 0.45rem;
+}
+
+.admin-zip-pkg .bilingual-label .en-text {
+    font-size: 0.65rem;
+}

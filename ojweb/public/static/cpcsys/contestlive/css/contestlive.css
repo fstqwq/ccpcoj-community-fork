@@ -1,0 +1,3003 @@
+/* cpcsys/contestlive · 直播画面：与全站 Bootstrap 5 共用 */
+/* 字体：Rajdhani（标题/数字）+ Outfit（正文/ticker）+ Bebas Neue（大屏倒计时），SIL OFL 1.1 */
+
+@font-face {
+    font-family: 'CsgLiveRajdhani';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/static/fonts/live_display/rajdhani-latin-700.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'CsgLiveOutfit';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/static/fonts/live_display/outfit-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'CsgLiveBebasNeue';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/static/fonts/live_display/bebas-neue-latin-400-normal.woff2') format('woff2');
+}
+
+.contestlive-ctrl .card-header {
+    font-weight: 600;
+}
+
+/* 控制台卡片标题下的凝练说明（中英两行，避免占满 card-body） */
+.contestlive-ctrl .contestlive-ctrl-panel-hint {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+    max-width: 100%;
+}
+
+.contestlive-ctrl .contestlive-ctrl-panel-hint .en-text {
+    margin-top: 0.15rem;
+}
+
+.contestlive-ctrl .card-header.contestlive-ctrl-card-header-stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+}
+
+.contestlive-ctrl .contestlive-logo-grid .contestlive-logo-card {
+    transition: box-shadow 0.15s ease;
+}
+
+.contestlive-ctrl .contestlive-logo-grid .contestlive-logo-card:hover {
+    box-shadow: 0 0.2rem 0.65rem rgba(0, 0, 0, 0.1);
+}
+
+/* 投屏根字号：按视口 vmin 缩放，1080p～4K 可读性优于纯 vw（避免过度依赖宽度） */
+/* 投屏 body 背景与皮肤色：basecss.css 给 body 设了 background-color:#fff !important（用于普通业务页防站点水印 body::before），
+   投屏页须强制覆盖以保证皮肤生效；同时屏蔽全局 body::before 的 CSG 水印，避免与皮肤暗色叠透出灰雾。 */
+.contestlive-display {
+    margin: 0;
+    min-height: 100vh;
+    height: 100vh;
+    background: #07070c !important;
+    color: #e8e8f0;
+    overflow: hidden;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    font-size: clamp(14px, calc(7px + 0.62vmin), 24px);
+}
+
+/* 投屏独立单页 SPA：vmin 基底 + −/+/= 倍率（contestlive_spa_viewport_scale.js，需 html.contestlive-spa-html） */
+html.contestlive-spa-html {
+    --contestlive-spa-html-mul: 1.12;
+    font-size: calc(clamp(15px, 0.62vmin + 14px, 22px) * var(--contestlive-spa-html-mul));
+}
+
+html.contestlive-spa-html body.contestlive-display {
+    font-size: 1rem;
+}
+
+body.contestlive-display::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* 消灭整页级滚动：仅投屏视图（body.contestlive-display）锁 html，OBS/推源不出现纵横向条 */
+html:has(body.contestlive-display) {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    max-width: 100vw;
+}
+
+.contestlive-is-hidden {
+    display: none !important;
+}
+
+/* 合页的 #contestlive_display_root 为内层 flex，禁止再锁 100vh（否则与外层 padding/grid 纵向溢出）。 */
+#contestlive_display_root:not(.contestlive-combo-page__scope) {
+    position: relative;
+    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#contestlive_display_root.contestlive-combo-page__scope {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* 16:9 安全区内留白，便于推流画面裁切 */
+.contestlive-display__safe {
+    box-sizing: border-box;
+    min-height: 100vh;
+    height: 100vh;
+    padding: 2.2% 3.2% 9% 3.2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.contestlive-brand-strip {
+    position: absolute;
+    top: 2.5%;
+    left: 3.2%;
+    right: 38%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.contestlive-brand-strip__item {
+    flex: 0 0 auto;
+    max-height: clamp(2.2rem, 7vw, 4.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.35rem;
+}
+
+.contestlive-brand-strip__item img {
+    max-height: clamp(2rem, 6.5vw, 4rem);
+    max-width: min(32vw, 12rem);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.contestlive-helpfab {
+    position: absolute;
+    bottom: calc(9% + 0.5rem);
+    right: 3.2%;
+    z-index: 4;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(30, 34, 50, 0.85);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.contestlive-help-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.contestlive-help-layer__panel {
+    max-width: 36rem;
+    width: 100%;
+    background: #10131f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
+    color: #e8e8f0;
+}
+
+.contestlive-help-layer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contestlive-help-layer__title {
+    font-size: 1.1rem;
+    margin: 0;
+    font-family: 'CsgLiveRajdhani', 'CsgLiveOutfit', sans-serif;
+    font-weight: 700;
+}
+
+.contestlive-help-layer__close {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.contestlive-help-layer__body {
+    padding: 1rem 1.1rem 1.15rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.contestlive-help-klist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.contestlive-help-klist-item {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.55rem 0.75rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contestlive-help-klist-item:last-child {
+    border-bottom: none;
+}
+
+.contestlive-help-klist-keys {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+
+.contestlive-help-klist-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.contestlive-help-klist-desc .en-text {
+    font-size: 0.82em;
+    line-height: 1.35;
+}
+
+.contestlive-help-klist kbd {
+    display: inline-block;
+    padding: 0.08rem 0.4rem;
+    border-radius: 0.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 0.85em;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.contestlive-help-layer__title .contestlive-help-layer__title-cn {
+    display: block;
+    font-size: 1.05rem;
+}
+
+.contestlive-help-layer__title .contestlive-help-layer__title-en {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    opacity: 0.72;
+    margin-top: 0.12rem;
+}
+
+.contestlive-clock {
+    position: absolute;
+    top: 3%;
+    right: 3.2%;
+    font-family: 'CsgLiveRajdhani', 'CsgLiveOutfit', sans-serif;
+    font-size: clamp(1.1rem, 2.4vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.9);
+    font-variant-numeric: tabular-nums;
+    z-index: 3;
+}
+
+.contestlive-ticker {
+    width: 100%;
+    min-height: 3.2rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.35rem;
+    background: linear-gradient(90deg, rgba(30, 30, 45, 0.92), rgba(20, 24, 38, 0.88));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0.25rem 1.2rem rgba(0, 0, 0, 0.45);
+}
+
+.contestlive-ticker__inner {
+    font-size: clamp(0.95rem, 1.65vw, 1.35rem);
+    line-height: 1.35;
+    word-break: break-word;
+    color: #f0f3ff;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+}
+
+.contestlive-ticker__inner:empty::before {
+    content: "等待控制台推送…\A Waiting for control…";
+    white-space: pre-line;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ========== 直播控制台 contest_live：中英双语（禁止用「/」拼在同一视觉行） ========== */
+.contestlive-ctrl .contestlive-ctrl-bilingual-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.12rem;
+    line-height: 1.25;
+}
+
+.contestlive-ctrl .contestlive-ctrl-bilingual-stack--center {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.contestlive-ctrl .contestlive-ctrl-bilingual-stack__en {
+    font-size: 0.82em;
+    color: var(--bs-secondary-color);
+    font-weight: 500;
+}
+
+/* 实心/主操作按钮内竖排英文：勿用 secondary 灰（覆盖上一行；与 bilingual.css .btn .en-text 一致） */
+.contestlive-ctrl .btn .contestlive-ctrl-bilingual-stack__en {
+    color: inherit;
+    opacity: 0.92;
+}
+
+.contestlive-ctrl .contestlive-ctrl-bilingual-inline {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.65rem;
+}
+
+.contestlive-ctrl .contestlive-ctrl-bilingual-inline__en {
+    font-size: 0.86em;
+    color: var(--bs-secondary-color);
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-item {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.65rem 0.85rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    font-size: 0.875rem;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-item:last-child {
+    border-bottom: none;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-keys {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-keys kbd {
+    display: inline-block;
+    min-width: 1.65rem;
+    padding: 0.12rem 0.38rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    color: #0d6efd;
+    background-color: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: 0.2rem;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.contestlive-ctrl .contestlive-ctrl-roll-help-desc .en-text {
+    font-size: 0.8em;
+}
+
+.contestlive-ctrl .contestlive-ctrl-shortcuts-heading .en-text {
+    font-size: 0.82em;
+}
+
+/* 仅小号按钮内双语栈铺满：避免「主操作」大按钮被拉成整行宽（与 admin bilingual-button 一致） */
+.contestlive-ctrl .btn.btn-sm .contestlive-ctrl-bilingual-stack {
+    align-items: center;
+    width: 100%;
+}
+
+.contestlive-ctrl .contestlive-hub-table thead th .contestlive-ctrl-bilingual-stack {
+    align-items: flex-start;
+}
+
+#contestlive_log_list.contestlive-recent-push-list > li.list-group-item {
+    --bs-list-group-item-padding-y: 0.3rem;
+    --bs-list-group-item-padding-x: 0;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    line-height: 1.3;
+}
+
+#contestlive_log_list.contestlive-recent-push-list > li.list-group-item:last-child {
+    border-bottom: 0;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-time {
+    color: var(--bs-secondary-color);
+    margin-right: 0;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-msg {
+    word-break: break-word;
+    min-width: 0;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-expired-badge {
+    font-size: 0.7rem;
+    vertical-align: 0.08em;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-revoke {
+    line-height: 1.15;
+    padding-top: 0.12rem;
+    padding-bottom: 0.12rem;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-revoke .contestlive-ctrl-bilingual-inline {
+    gap: 0.2rem 0.45rem;
+}
+
+#contestlive_log_list.contestlive-recent-push-list .contestlive-log-revoke .contestlive-ctrl-bilingual-inline__en {
+    font-size: 0.78em;
+}
+
+/* 直播控制台：卡头投屏口令区（时长：标签与数字框同一行） */
+.contestlive-ctrl .contestlive-token-inline {
+    align-items: center;
+}
+
+.contestlive-ctrl .contestlive-token-ttl-block {
+    flex-wrap: nowrap;
+}
+
+.contestlive-ctrl .contestlive-token-ttl-block .contestlive-token-ttl-input {
+    width: 4.25rem;
+    max-width: 100%;
+}
+
+/* 卡片标题旁「说明」：问号按钮与标题顶对齐 */
+.contestlive-ctrl .contestlive-ctrl-panel-help-btn {
+    line-height: 1;
+    margin-top: 0.1rem;
+    text-decoration: none;
+}
+
+.contestlive-ctrl .contestlive-ctrl-panel-help-btn:focus {
+    box-shadow: none;
+}
+
+.contestlive-ctrl .contestlive-ctrl-panel-hint-wrap .contestlive-ctrl-panel-hint {
+    border-top: 0 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.contestlive-ctrl .contestlive-ctrl-panel-hint-wrap .contestlive-ctrl-panel-hint + .contestlive-ctrl-panel-hint {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--bs-border-color-translucent) !important;
+}
+
+/* —— 多路投屏页 —— */
+
+.contestlive-hub-table td {
+    vertical-align: middle;
+}
+
+/* 控制台矩阵：皮肤列为窄下拉，避免挤占链接列 */
+.contestlive-ctrl .contestlive-hub-table .contestlive-hub-th-skin,
+.contestlive-ctrl .contestlive-hub-table .contestlive-hub-td-skin {
+    width: 4.5rem;
+    max-width: 5.25rem;
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+    vertical-align: middle;
+}
+
+.contestlive-ctrl .contestlive-hub-td-skin .form-select {
+    padding-top: 0.12rem;
+    padding-bottom: 0.12rem;
+    padding-left: 0.3rem;
+    padding-right: 1.5rem;
+    font-size: 0.8125rem;
+    background-position: right 0.2rem center;
+    background-size: 0.55rem 0.45rem;
+}
+
+/* 投屏矩阵：「页面」列打开投屏、「常见用途」列打开说明 modal */
+.contestlive-ctrl .contestlive-hub-td-page,
+.contestlive-ctrl .contestlive-hub-td-use {
+    cursor: pointer;
+    border-radius: 0.2rem;
+    transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.contestlive-ctrl .contestlive-hub-td-page:hover,
+.contestlive-ctrl .contestlive-hub-td-use:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.06);
+}
+
+.contestlive-ctrl .contestlive-hub-td-page:focus-visible,
+.contestlive-ctrl .contestlive-hub-td-use:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.35);
+}
+
+/* 控制台：OBS 机位矩阵（复制链接 + 嵌套皮肤表等） */
+.contestlive-ctrl .contestlive-hub-row--obs .contestlive-hub-dd .dropdown-toggle {
+    white-space: normal;
+    text-align: start;
+}
+
+.contestlive-ctrl .contestlive-hub-dd-menu {
+    min-width: 13.5rem;
+    max-width: min(26rem, 94vw);
+}
+
+.contestlive-ctrl .contestlive-hub-dd-menu .dropdown-item {
+    white-space: normal;
+    line-height: 1.28;
+}
+
+.contestlive-ctrl .contestlive-hub-skin-grid {
+    margin-bottom: 0;
+}
+
+.contestlive-ctrl .contestlive-hub-skin-grid .contestlive-hub-td-skin {
+    width: 5.5rem;
+    max-width: 6.5rem;
+}
+
+.contestlive-ctrl .contestlive-hub-page-extras {
+    cursor: default;
+}
+
+.contestlive-ctrl .contestlive-ctrl-schoolwall-layout {
+    min-width: 7.25rem;
+    max-width: 11rem;
+    padding-top: 0.12rem;
+    padding-bottom: 0.12rem;
+    padding-left: 0.3rem;
+    padding-right: 1.45rem;
+    font-size: 0.8125rem;
+    background-position: right 0.2rem center;
+    background-size: 0.55rem 0.45rem;
+}
+
+.contestlive-clock-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.contestlive-clock-page__title {
+    font-size: clamp(1rem, 2.5vw, 1.75rem);
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 90%;
+}
+
+.contestlive-clock-page__main {
+    font-size: clamp(3rem, 14vw, 9rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: 0.04em;
+}
+
+.contestlive-clock-page__sub {
+    margin-top: 1.5rem;
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+    opacity: 0.85;
+}
+
+.contestlive-clock-page__wall {
+    margin-top: 2.5rem;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+ * 比赛计时独立页 live_timer：
+ * 以可容纳的最大 16:9 矩形之宽 min(100vw, 100vh×16/9) 为主尺度；默认仅大号计时；
+ * 标题 / 状态由 body.contestlive-timer-ui-title / contestlive-timer-ui-state（快捷键 H / S）显隐。
+ */
+.contestlive-display--timer .contestlive-timer-page {
+    --csg-live-fit-w: min(100vw, calc(100vh * 16 / 9));
+    /* 与 __remain 默认字号同源，供 −/= 档位用 calc(基准 * 乘数)，避免首档固定 rem 小于大屏 clamp */
+    --csg-live-remain-fs-clamp: clamp(
+        3.75rem,
+        calc(0.178 * min(100vw, calc(100vh * 16 / 9))),
+        min(26rem, 42vw)
+    );
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    min-height: 100vh;
+    padding: clamp(0.85rem, 3vmin, 2.25rem) clamp(1rem, 4vmin, 2.75rem);
+}
+
+.contestlive-display--timer .contestlive-timer-page__stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: min(100%, var(--csg-live-fit-w, 100vw));
+    gap: clamp(0.85rem, 2.4vmin, 2rem);
+    overflow: visible;
+}
+
+/* 大号计时手动放大：允许超出拟合宽度，不交浏览器裁切（父链勿设 overflow:hidden） */
+.contestlive-display--timer .contestlive-timer-page--size-custom .contestlive-timer-page__stage {
+    max-width: none;
+}
+
+.contestlive-display--timer .contestlive-timer-page__title {
+    display: none;
+    margin: 0;
+    padding: 0 clamp(0.65rem, 4vmin, 2rem);
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    font-size: clamp(1rem, calc(0.058 * min(100vw, calc(100vh * 16 / 9))), 2.6rem);
+    font-weight: 600;
+    line-height: 1.25;
+    opacity: 0.96;
+    letter-spacing: 0.02em;
+}
+
+.contestlive-display--timer.contestlive-timer-ui-title .contestlive-timer-page__title {
+    display: block;
+}
+
+.contestlive-display--timer .contestlive-timer-page__state {
+    display: none;
+    margin: 0;
+    padding: 0 1rem;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    font-size: clamp(1rem, calc(0.065 * min(100vw, calc(100vh * 16 / 9))), 2.05rem);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.contestlive-display--timer.contestlive-timer-ui-state .contestlive-timer-page__state {
+    display: block;
+}
+
+.contestlive-display--timer .contestlive-timer-page__remain {
+    margin: 0;
+    font-family: 'CsgLiveBebasNeue', 'CsgLiveRajdhani', system-ui, sans-serif;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: 0.08em;
+    /*
+     * 默认：约在「拟合 16:9 视口宽」的 ~17.8%，并设上限以防横屏爆表。
+     * 自定义档（-/=）：calc(本变量 * --csg-live-remain-mul)，乘数由 JS 写入，可大于 1 突破原 clamp 上限。
+     */
+    font-size: var(--csg-live-remain-fs-clamp);
+    text-shadow: 0 0 clamp(1.25rem, 6vmin, 5rem) rgba(147, 197, 253, 0.26), 0 4px 22px rgba(0, 0, 0, 0.48);
+}
+
+.contestlive-display--timer .contestlive-timer-page--size-custom .contestlive-timer-page__remain {
+    font-size: calc(var(--csg-live-remain-fs-clamp) * var(--csg-live-remain-mul, 1)) !important;
+}
+
+/* 比赛计时 / 榜单顶栏：按 T 切换套装时的短暂漂浮提示（挂 body，不占版面） */
+.contestlive-timer-pack-toast {
+    position: fixed;
+    z-index: 12060;
+    pointer-events: none;
+    box-sizing: border-box;
+    max-width: min(92vw, 28rem);
+    padding: 0.4rem 0.95rem;
+    margin: 0;
+    border-radius: 0.4rem;
+    text-align: center;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    font-size: clamp(0.78rem, 1.65vmin, 1.05rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    color: #f8fafc;
+    background: rgba(15, 18, 28, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0.35rem 1.25rem rgba(0, 0, 0, 0.45);
+    opacity: 1;
+    transition: opacity 0.28s ease;
+}
+
+.contestlive-timer-pack-toast--out {
+    opacity: 0;
+}
+
+.contestlive-timer-pack-toast__sep {
+    opacity: 0.72;
+}
+
+/* 赛段状态：中英左右（.bilingual-inline），与全站默认「英文块级在下」区分 */
+.contestlive-display--timer .contestlive-timer-page__state .contestlive-contest-timer-state__bi {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+}
+
+.contestlive-display--timer .contestlive-timer-page__state .contestlive-contest-timer-state__bi .cn-text {
+    font-weight: inherit;
+}
+
+.contestlive-display--timer .contestlive-timer-page__state .contestlive-contest-timer-state__bi .en-text {
+    display: inline;
+    margin-left: 0;
+    margin-top: 0;
+    font-size: 0.82em;
+    opacity: 0.82;
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* 直播榜单单页计时：由 rank_live.js 挂入 `.rl-head__banner-timer`，样式见 rank_live.css */
+
+/* 最新过题 / 各题统计 独立页 */
+.contestlive-ac-page,
+.contestlive-probstats-page {
+    min-height: 100vh;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.25rem 1rem;
+    overflow: hidden;
+}
+
+.contestlive-probstats-page__mount {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* 各题统计 / 最新过题 独立页：大屏字号 + 默认隐藏页内顶栏（H 切换，见 contestlive_standalone_chrome_hotkeys.js） */
+body.contestlive-hero-hidden .contestlive-probstats-page__hero,
+body.contestlive-hero-hidden .contestlive-ac-page__hero,
+body.contestlive-hero-hidden .contestlive-queue-page__hero {
+    display: none !important;
+}
+
+body.contestlive-display.contestlive-display--probstats-only {
+    font-size: clamp(19px, calc(11px + 1.18vmin), 42px);
+    min-height: 100vh;
+}
+
+body.contestlive-display.contestlive-display--ac-only {
+    font-size: clamp(18px, calc(11px + 1.05vmin), 36px);
+}
+
+body.contestlive-hero-hidden.contestlive-display--probstats-only .contestlive-probstats-page {
+    padding-top: 0.55rem;
+    padding-bottom: 0.65rem;
+}
+
+body.contestlive-hero-hidden.contestlive-display--ac-only .contestlive-ac-page {
+    padding-top: 0.55rem;
+    padding-bottom: 0.65rem;
+}
+
+body.contestlive-hero-hidden.contestlive-display--queue .contestlive-queue-page--standalone {
+    padding-top: clamp(0.55rem, 1vmin, 1rem);
+    gap: clamp(0.35rem, 0.65vmin, 0.85rem);
+}
+
+/* 独立页柱状图：放宽 HUD 左栏的窄列上限，让题柱随视口均分变宽；题号/图例/题色条按大屏放大（皮肤文字色见 contestlive_skin.css） */
+body.contestlive-display--probstats-only .csg-hud-statchart {
+    gap: clamp(0.42rem, 1.1vmin, 1.15rem);
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__legend {
+    font-size: clamp(1rem, 0.75vmin + 0.82rem, 1.95rem);
+    gap: clamp(0.42rem, 1vmin, 0.95rem) clamp(0.5rem, 1.2vmin, 1.25rem);
+    padding-bottom: clamp(0.22rem, 0.45vmin, 0.5rem);
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__legtext {
+    max-width: min(14rem, 36vw);
+    font-size: inherit;
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__sw {
+    width: clamp(0.88rem, 1.4vmin, 1.5rem);
+    height: clamp(0.88rem, 1.4vmin, 1.5rem);
+    border-radius: 0.2rem;
+    box-shadow: inset 0 0 0 clamp(1px, 0.12vmin, 2px) rgba(255, 255, 255, 0.18);
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__plot {
+    gap: clamp(0.18rem, 0.65vmin, 0.65rem) clamp(0.2rem, 0.75vmin, 0.75rem);
+    justify-content: space-between;
+    padding-top: 0.22rem;
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__col {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__bar {
+    width: min(92%, 6.5rem);
+    max-width: none;
+    box-shadow: 0 0 0 clamp(1px, 0.12vmin, 2px) rgba(255, 255, 255, 0.1);
+}
+
+body.contestlive-display--probstats-only .csg-hud-statchart__letter {
+    font-size: clamp(1.3rem, 2.15vmin + 1rem, 3rem);
+    font-weight: 800;
+    margin-top: clamp(0.28rem, 0.5vmin, 0.5rem);
+    padding-top: clamp(0.32rem, 0.55vmin, 0.6rem);
+    line-height: 1.12;
+    letter-spacing: 0.06em;
+    border-top-width: clamp(5px, 0.75vmin, 14px);
+    border-top-style: solid;
+}
+
+body.contestlive-display--probstats-only .contestlive-hud-prob-stats__empty {
+    font-size: clamp(1rem, 0.55vmin + 0.82rem, 1.35rem);
+}
+
+.contestlive-ac-page__tablewrap {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 与 HUD / live_queue：`tablewrap` 内先包一层 `hud-queue-surface` 再挂表 */
+.contestlive-ac-page__tablewrap .contestlive-hud-queue-surface {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.contestlive-ac-page__tablewrap .contestlive-queue-table {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    align-self: stretch;
+}
+
+.contestlive-queue-page {
+    min-height: 100vh;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem 1.25rem;
+    overflow: hidden;
+}
+
+/* —— 评测队列独立投屏：与 HUD 左栏数据一致，版式按现场大屏习惯加顶栏+卡片表（对齐站内 rank 红条题头基因） —— */
+.contestlive-display.contestlive-display--queue {
+    font-size: clamp(18px, calc(11px + 1.05vmin), 36px);
+}
+
+.contestlive-queue-page--standalone {
+    padding: clamp(0.75rem, 1.2vmin, 1.35rem) clamp(0.85rem, 1.5vmin, 1.75rem) clamp(0.65rem, 1vmin, 1rem);
+    gap: clamp(0.65rem, 1vmin, 1rem);
+    /* 默认与独立页背板档位 var 对齐；马卡龙/default 肤色可再覆盖透明 */
+    background:
+        radial-gradient(
+            120% 80% at 100% 0%,
+            rgba(80, 40, 120, var(--csl-pa-page-radial-a, 0.12)),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            rgb(6 7 14 / var(--csl-pa-page-a, 1)) 0%,
+            rgb(7 7 12 / var(--csl-pa-page-a, 1)) 40%,
+            rgb(5 5 8 / var(--csl-pa-page-a, 1)) 100%
+        );
+}
+
+/* 表头中英左右：flex 只能放在 th 内层，避免 th 被设为 flex 导致整表塌成一列 */
+.contestlive-queue-table thead th {
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+.contestlive-th-split-inner.contestlive-th-split {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.35rem 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.contestlive-th-split__cn {
+    flex: 0 1 auto;
+    text-align: left;
+}
+
+.contestlive-th-split__en {
+    flex: 0 0 auto;
+    text-align: right;
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    opacity: 0.72;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.contestlive-queue-team {
+    min-width: 0;
+}
+
+.contestlive-queue-team__line1 {
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.contestlive-queue-team__line2 {
+    margin-top: 0.12em;
+    font-size: 0.86em;
+    font-weight: 500;
+    line-height: 1.2;
+    opacity: 0.78;
+    color: rgba(230, 235, 255, 0.88);
+}
+
+.contestlive-queue-team__line-en {
+    margin-top: 0.06em;
+    font-size: 0.84em;
+    font-weight: 500;
+    line-height: 1.2;
+    opacity: 0.76;
+    color: rgba(200, 210, 255, 0.88);
+}
+
+.contestlive-queue-hero {
+    position: relative;
+    flex: 0 0 auto;
+    border-radius: 0.4rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgb(12 14 22 / var(--hud-a-left, 0.85));
+    box-shadow: 0 0.35rem 1.2rem rgba(0, 0, 0, 0.4);
+}
+
+.contestlive-queue-hero__accent {
+    height: 0.28rem;
+    background: linear-gradient(90deg, #b71c1c 0%, #c62828 35%, #8e0000 100%);
+}
+
+.contestlive-queue-hero__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.65rem 1.25rem;
+    padding: 0.75rem 1rem 0.85rem;
+}
+
+.contestlive-queue-hero__badge {
+    display: inline-block;
+    font-size: clamp(0.68rem, 0.35vmin + 0.48rem, 0.82rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 200, 200, 0.95);
+    margin-bottom: 0.25rem;
+}
+
+.contestlive-queue-hero__title {
+    margin: 0;
+    font-size: clamp(1.05rem, 0.85vmin + 0.55rem, 1.65rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: #f2f4ff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    min-width: 0;
+}
+
+.contestlive-queue-hero__title .contestlive-hud-title-slot {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.contestlive-queue-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.85rem;
+    font-size: clamp(0.78rem, 0.32vmin + 0.48rem, 1rem);
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.contestlive-queue-hero__cid {
+    font-family: 'CsgLiveRajdhani', 'CsgLiveOutfit', ui-monospace, monospace;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 0.2rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.contestlive-queue-hero__hint.en-text::before {
+    content: "· ";
+    opacity: 0.5;
+}
+
+.contestlive-queue-panel {
+    flex: 1 1 0;
+    min-height: 0;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: rgb(10 12 20 / var(--hud-a-panel, 0.72));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.contestlive-queue-table--standalone thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: rgb(14 16 24 / var(--csl-pa-table-th, 0.96));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.contestlive-queue-table--standalone tbody tr {
+    transition: background 0.12s ease;
+}
+
+.contestlive-queue-table--standalone tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.contestlive-queue-table--standalone tbody tr:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.contestlive-queue-table--standalone .col-time {
+    width: 10rem;
+    max-width: 26%;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: clamp(0.88rem, 0.42vmin + 0.58rem, 1.22rem);
+    white-space: nowrap;
+}
+
+.contestlive-queue-table--standalone .col-team {
+    min-width: 0;
+    width: 55%;
+    word-break: break-word;
+    font-weight: 600;
+}
+
+.contestlive-queue-table--standalone .col-pr {
+    width: 3.25rem;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: rgba(200, 220, 255, 0.95);
+}
+
+.contestlive-queue-table--standalone .col-res {
+    width: 6.5rem;
+    text-align: center;
+}
+
+.contestlive-queue-res-pill {
+    display: inline-block;
+    min-width: 2.75rem;
+    padding: 0.09rem 0.38rem;
+    border-radius: 0.25rem;
+    font-weight: 800;
+    font-size: 0.92em;
+    letter-spacing: 0.06em;
+}
+
+.contestlive-queue-res-pill[data-tone="ac"] {
+    background: rgba(46, 125, 50, 0.65);
+    color: #e8f5e9;
+    box-shadow: inset 0 0 0 1px rgba(129, 199, 132, 0.45);
+}
+
+.contestlive-queue-res-pill[data-tone="bad"] {
+    background: rgba(198, 40, 40, 0.55);
+    color: #ffebee;
+}
+
+.contestlive-queue-res-pill[data-tone="warn"] {
+    background: rgba(251, 192, 45, 0.4);
+    color: #1a1003; /* 亮肤默认；暗场见 contestlive_skin.css 覆盖 */
+}
+
+.contestlive-queue-res-pill[data-tone="info"] {
+    background: rgba(66, 165, 245, 0.35);
+    color: #e3f2fd;
+}
+
+.contestlive-queue-res-pill[data-tone="pending"] {
+    background: rgba(80, 90, 110, 0.45);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* 题号：与榜单题头一致使用 contest 气球色（--contestlive-pr-color）；描边随 html 皮肤变量 */
+.contestlive-queue-pr-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.65em;
+    padding: 0.06em 0.32em;
+    border-radius: 0.22rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    background-color: var(--contestlive-pr-color, #6b7280);
+    box-shadow:
+        inset 0 0 0 1px var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.28)),
+        0 0 0 1px var(--csg-balloon-ring-outer, rgba(0, 0, 0, 0.5));
+}
+
+.contestlive-queue-row--tone-ac {
+    border-left: 3px solid rgba(76, 175, 80, 0.75);
+}
+
+.contestlive-queue-row--tone-warn {
+    border-left: 3px solid rgba(255, 193, 7, 0.55);
+}
+
+.contestlive-queue-page__tablewrap {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.contestlive-queue-table {
+    width: 100%;
+    color: #e8e8f0;
+    border-collapse: collapse;
+}
+
+.contestlive-queue-table th,
+.contestlive-queue-table td {
+    padding: 0.5rem 0.72rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.contestlive-queue-table thead th {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: clamp(0.8rem, 0.32vmin + 0.5rem, 1.05rem);
+}
+
+.contestlive-rank-iframe {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+}
+
+.contestlive-rank-hint {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.65);
+    color: rgba(255, 255, 255, 0.85);
+    z-index: 2;
+}
+
+.contestlive-balloon-page {
+    position: relative;
+    min-height: 100vh;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* 默认不显示占位区（透明/肤色底上仅叠动效）；.contestlive-balloon-page--chrome-on 时显示 */
+.contestlive-balloon-page__chrome {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    min-height: 0;
+    position: relative;
+    z-index: 3;
+}
+
+.contestlive-balloon-page--chrome-on .contestlive-balloon-page__chrome {
+    display: flex;
+    /* 高于 .contestlive-balloon-fx-host(10)，避免试播层叠在提示上；默认仍 display:none 至按 I */
+    z-index: 15;
+}
+
+.contestlive-balloon-page__icon {
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1;
+    opacity: 0.92;
+}
+
+.contestlive-balloon-page__hint {
+    color: inherit;
+    opacity: 0.82;
+}
+
+.contestlive-balloon-fx-host {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/*
+ * 试播气球：.unit 宽度用纯视口比例（--csg-balloon-fx-base：vmin/vw/vh）× JS 尺寸系数。
+ * 默认由 JS 单 RAF 写 .lift/.cluster 的 transform（宿主加 .contestlive-balloon-fx-host--physics），
+ * 下列 lift/cluster/splay 关键帧仅作非 physics 回退或旧页兼容；绑线仍用 CSS 轻量摆动。
+ */
+.contestlive-balloon-fx-host--physics .contestlive-balloon-fx__lift,
+.contestlive-balloon-fx-host--physics .contestlive-balloon-fx__cluster,
+.contestlive-balloon-fx-host--physics .contestlive-balloon-fx__splay {
+    animation: none !important;
+}
+
+.contestlive-balloon-fx__unit {
+    /* 大屏更大：以 vmin 为主，再用 vw/vh 防极端宽高比溢出；bottom 可由 JS 行内覆盖以错开生成高度 */
+    --csg-balloon-fx-base: min(54vmin, min(92vw, 78vh));
+    --balloon-dur: 6.8s;
+    --balloon-delay: 0s;
+    --balloon-splay-x: 0vw;
+    position: absolute;
+    bottom: -42%;
+    width: calc(var(--csg-balloon-fx-base) * var(--csg-balloon-fx-size, 1));
+    max-width: 132vw;
+}
+
+.contestlive-balloon-fx__lift {
+    width: 100%;
+    /* linear：各段缓动写在 @keyframes 内，避免与 JS --balloon-ease 叠出非物理感 */
+    animation: contestlive-balloon-fx-lift-y var(--balloon-dur, 6.8s) linear var(--balloon-delay, 0s) forwards;
+    will-change: transform, opacity;
+}
+
+.contestlive-balloon-fx__cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    animation: contestlive-balloon-fx-drift-x var(--balloon-dur, 6.8s) ease-in-out var(--balloon-delay, 0s) forwards;
+    transform-origin: 50% 30%;
+    will-change: transform;
+}
+
+/* 偏左/偏右气球随时间增加横向外飘（ease-in，与 drift 叠加，拟「一把松开」外散） */
+.contestlive-balloon-fx__splay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    animation: contestlive-balloon-fx-splay-x var(--balloon-dur, 6.8s) cubic-bezier(0.52, 0.06, 0.72, 0.98) var(--balloon-delay, 0s) forwards;
+    will-change: transform;
+}
+
+.contestlive-balloon-fx__silhouette {
+    display: block;
+    width: 100%;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.contestlive-balloon-fx__balloon-path {
+    stroke: rgba(0, 0, 0, 0.16);
+    stroke-width: 1.1;
+    paint-order: stroke fill;
+}
+
+.contestlive-balloon-fx__string-wrap {
+    --csg-balloon-string-up-dur: 0.46s;
+    --csg-balloon-string-lo-dur: 0.38s;
+    --csg-balloon-string-lo-delay: 0s;
+    width: 46%;
+    max-width: min(6vmin, 22vw);
+    margin-top: -4%;
+    flex-shrink: 0;
+}
+
+.contestlive-balloon-fx__string-svg {
+    display: block;
+    width: 100%;
+    height: calc(var(--csg-balloon-fx-base) * var(--csg-balloon-fx-size, 1) * 0.52);
+    min-height: min(16vmin, 26vh);
+    overflow: visible;
+    filter: drop-shadow(0 0 0.45px rgba(255, 255, 255, 0.35));
+}
+
+.contestlive-balloon-fx__string-path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    stroke: rgba(22, 22, 28, 0.78);
+    stroke-width: 1.22;
+}
+
+.contestlive-balloon-fx__string-path--lower {
+    stroke: rgba(18, 18, 24, 0.72);
+    stroke-width: 1.08;
+}
+
+.contestlive-balloon-fx__string-upper-rot {
+    transform-origin: 0 0;
+    animation: contestlive-balloon-fx-string-upper-rot var(--csg-balloon-string-up-dur, 0.46s) ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.contestlive-balloon-fx__string-lower-rot {
+    transform-origin: 0 0;
+    animation: contestlive-balloon-fx-string-lower-rot var(--csg-balloon-string-lo-dur, 0.38s) ease-in-out infinite alternate;
+    animation-delay: var(--csg-balloon-string-lo-delay, 0s);
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contestlive-balloon-fx__lift {
+        animation: contestlive-balloon-fx-lift-y-reduced var(--balloon-dur, 6.8s) ease-out var(--balloon-delay, 0s) forwards;
+    }
+
+    .contestlive-balloon-fx__cluster {
+        animation: none;
+    }
+
+    .contestlive-balloon-fx__string-upper-rot,
+    .contestlive-balloon-fx__string-lower-rot {
+        animation: none !important;
+    }
+
+    .contestlive-balloon-fx__splay {
+        animation: none !important;
+    }
+}
+
+@keyframes contestlive-balloon-fx-splay-x {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(var(--balloon-splay-x, 0vw), 0, 0);
+    }
+}
+
+@keyframes contestlive-balloon-fx-lift-y {
+    0% {
+        transform: translate3d(0, 0, 0);
+        opacity: 0;
+        /* 更陡的 ease-in：初速更大、仍保持离手加速感 */
+        animation-timing-function: cubic-bezier(0.58, 0.02, 0.78, 0.22);
+    }
+    2% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+    22% {
+        transform: translate3d(0, -52vh, 0);
+        /* 近似达终端速度后阻力主导，位移随时间接近匀速 */
+        animation-timing-function: linear;
+    }
+    94% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate3d(0, -172vh, 0);
+        opacity: 0;
+    }
+}
+
+@keyframes contestlive-balloon-fx-drift-x {
+    0% {
+        transform: translate3d(calc(-1 * min(2.9vw, 3.6vh)), 0, 0) rotate(-2.6deg);
+    }
+    100% {
+        transform: translate3d(min(2.9vw, 3.6vh), 0, 0) rotate(2.6deg);
+    }
+}
+
+@keyframes contestlive-balloon-fx-string-upper-rot {
+    0% {
+        transform: rotate(-4.5deg);
+    }
+    100% {
+        transform: rotate(4.5deg);
+    }
+}
+
+@keyframes contestlive-balloon-fx-string-lower-rot {
+    0% {
+        transform: rotate(-13deg);
+    }
+    100% {
+        transform: rotate(9.5deg);
+    }
+}
+
+@keyframes contestlive-balloon-fx-lift-y-reduced {
+    0% {
+        transform: translate3d(0, 0, 0);
+        opacity: 0;
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    3% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+    30% {
+        transform: translate3d(0, -28vh, 0);
+        animation-timing-function: linear;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate3d(0, -118vh, 0);
+        opacity: 0;
+    }
+}
+
+/* ========== 投屏「队列 + 过题 + 气球」合页 live_combo ========== */
+.contestlive-display--combo {
+    margin: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'CsgLiveOutfit', system-ui, sans-serif;
+    font-size: clamp(14px, calc(7px + 0.62vmin), 24px);
+}
+
+.contestlive-combo-page {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0.55rem 0.65rem 0.5rem;
+    gap: 0.45rem;
+}
+
+/* 合页内与综合 HUD 一致：双栏同挂 #contestlive_display_root，供跑马灯 reflow 覆盖队列+过题 */
+.contestlive-combo-page__scope {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 隐蔽挂载 RankLiveSystem，仅用于投喂序/Σ（与 live 页右侧榜同源） */
+.contestlive-combo-rank-sink {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    inset: 0 auto auto 0;
+    pointer-events: none;
+}
+
+.contestlive-combo-page__grid {
+    flex: 1 1 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .contestlive-combo-page__grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+.contestlive-combo-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.28rem;
+    background: rgb(10 12 22 / var(--csl-pa-combo-shell, 0.42));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.contestlive-combo-panel--queue .contestlive-queue-page {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+.contestlive-combo-panel--queue .contestlive-queue-page__tablewrap {
+    flex: 1 1 0;
+    min-height: 0;
+}
+
+.contestlive-combo-panel--ac .contestlive-ac-page {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+.contestlive-combo-panel--ac .contestlive-ac-page__tablewrap {
+    flex: 1 1 0;
+    min-height: 0;
+}
+
+.contestlive-combo-page--hide-queue .contestlive-combo-panel--queue {
+    display: none;
+}
+
+.contestlive-combo-page--hide-ac .contestlive-combo-panel--ac {
+    display: none;
+}
+
+.contestlive-combo-page--hide-queue:not(.contestlive-combo-page--hide-ac) .contestlive-combo-page__grid {
+    grid-template-columns: 1fr;
+}
+
+.contestlive-combo-page--hide-ac:not(.contestlive-combo-page--hide-queue) .contestlive-combo-page__grid {
+    grid-template-columns: 1fr;
+}
+
+.contestlive-combo-page--hide-balloons .contestlive-balloon-fx-host {
+    visibility: hidden;
+}
+
+.contestlive-combo-page .contestlive-balloon-fx-host {
+    z-index: 20;
+}
+
+.contestlive-schoolwall {
+    min-height: 100vh;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.contestlive-schoolwall__caption {
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+}
+
+.contestlive-schoolwall__grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: clamp(0.28rem, 0.35vmin, 0.55rem);
+    align-content: stretch;
+}
+
+.contestlive-schoolwall[data-schoolwall-layout='hex'] .contestlive-schoolwall__grid {
+    row-gap: clamp(0.06rem, 0.2vmin, 0.24rem);
+}
+
+.contestlive-schoolwall__cell {
+    border-radius: 0.28rem;
+    border: 0;
+    position: relative;
+    background: transparent;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* 与 rank 行校徽同源：预处理后的图写入 CSS 变量 */
+.contestlive-schoolwall__badge {
+    position: absolute;
+    inset: clamp(0.18rem, 0.35vmin, 0.42rem);
+    z-index: 2;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    pointer-events: none;
+}
+
+.contestlive-schoolwall__badge.has-background {
+    background-image: var(--csg-schoolwall-badge-bg);
+}
+
+.contestlive-schoolwall__ph {
+    opacity: 0.25;
+    font-size: 1.5rem;
+}
+
+.contestlive-schoolwall__ph--hidden {
+    opacity: 0 !important;
+    visibility: hidden;
+}
+
+/* 无静态校徽文件时：仍占格展示学校名（与 rank 榜单校徽缺省时的可读性一致） */
+.contestlive-schoolwall__ph--label {
+    opacity: 0.92;
+    font-size: clamp(0.55rem, 0.22vmin + 0.42rem, 0.95rem);
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    padding: 0.35rem 0.28rem;
+    word-break: break-word;
+    hyphens: auto;
+    color: rgba(248, 250, 255, 0.94);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    max-height: 100%;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.contestlive-brand-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.contestlive-brand__logo {
+    position: absolute;
+    top: 3%;
+    left: 3.5%;
+    max-width: 38%;
+    min-height: 3rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.35rem;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 1;
+}
+
+.contestlive-brand__logo-ph {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.contestlive-brand__fill {
+    flex: 1;
+}
+
+.contestlive-brand__bottom {
+    padding-top: 0 !important;
+    justify-content: flex-end !important;
+}
+
+.contestlive-brand__ticker {
+    margin-top: 0;
+}
+
+/* ========== 综合 HUD（整页铺满、底栏贴底） ========== */
+/* 独立整页（各题统计 / 最新过题）需实心底，不得套用 HUD 透明整页，否则浏览器白底 + 浅色字不可读 */
+.contestlive-display--hud.contestlive-display:not(.contestlive-display--probstats-only):not(.contestlive-display--ac-only) {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    /* 整页透明：供 OBS 等将本浏览器源叠在会场视频之上；信息仅靠各块半透明背板承载 */
+    background: transparent !important;
+}
+
+.contestlive-display--hud.contestlive-display.contestlive-display--probstats-only,
+.contestlive-display--hud.contestlive-display.contestlive-display--ac-only {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.contestlive-hud {
+    --contestlive-hud-left-w: 23.5rem;
+    --contestlive-hud-right-w: min(34vw, 27rem);
+    /* 背板透明度分档（快捷键 O；见 data-contestlive-hud-opacity-step） */
+    --hud-a-left: 0.78;
+    --hud-a-panel: 0.62;
+    --hud-a-panel-head: 0.42;
+    --hud-a-right: 0.48;
+    --hud-a-embed: 0.45;
+    --hud-a-bottom: 0.82;
+    --hud-a-rl: 0.72;
+    /* 内嵌榜单题头横条 / 底栏计时：同为 OBS 叠层块，默认半透明并随 O 档联动 */
+    --hud-a-rank-head: 0.92;
+    --hud-a-clock: 0.9;
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+    grid-template-rows: minmax(0, 1fr) auto;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+    gap: 0;
+}
+
+/* 档 0 阅读优先；档 1 为默认（与上列变量一致）；档 2～3 更透以叠在会场画面上 */
+.contestlive-hud[data-contestlive-hud-opacity-step="0"] {
+    --hud-a-left: 0.9;
+    --hud-a-panel: 0.8;
+    --hud-a-panel-head: 0.52;
+    --hud-a-right: 0.62;
+    --hud-a-embed: 0.58;
+    --hud-a-bottom: 0.9;
+    --hud-a-rl: 0.86;
+    --hud-a-rank-head: 0.96;
+    --hud-a-clock: 0.94;
+}
+
+.contestlive-hud[data-contestlive-hud-opacity-step="1"] {
+    --hud-a-left: 0.78;
+    --hud-a-panel: 0.62;
+    --hud-a-panel-head: 0.42;
+    --hud-a-right: 0.48;
+    --hud-a-embed: 0.45;
+    --hud-a-bottom: 0.82;
+    --hud-a-rl: 0.72;
+    --hud-a-rank-head: 0.92;
+    --hud-a-clock: 0.9;
+}
+
+.contestlive-hud[data-contestlive-hud-opacity-step="2"] {
+    --hud-a-left: 0.55;
+    --hud-a-panel: 0.42;
+    --hud-a-panel-head: 0.3;
+    --hud-a-right: 0.34;
+    --hud-a-embed: 0.3;
+    --hud-a-bottom: 0.62;
+    --hud-a-rl: 0.52;
+    --hud-a-rank-head: 0.78;
+    --hud-a-clock: 0.76;
+}
+
+.contestlive-hud[data-contestlive-hud-opacity-step="3"] {
+    --hud-a-left: 0.36;
+    --hud-a-panel: 0.28;
+    --hud-a-panel-head: 0.22;
+    --hud-a-right: 0.24;
+    --hud-a-embed: 0.22;
+    --hud-a-bottom: 0.48;
+    --hud-a-rl: 0.38;
+    --hud-a-rank-head: 0.62;
+    --hud-a-clock: 0.58;
+}
+
+/* HUD 快捷键 1～4 / 5～7 / 底栏：显隐滑动（contestlive_display.js · contestlive-hud-toggle-off） */
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__left,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__right,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__masthead,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__panel--queue,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__panel--ac,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__panel--prob-stats,
+.contestlive-hud.contestlive-hud--toggle-prime .contestlive-hud__bottom {
+    transition: none !important;
+}
+
+.contestlive-hud__left {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    transition:
+        width 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.36s ease,
+        transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.4s ease,
+        border-color 0.28s ease;
+    width: var(--contestlive-hud-left-w);
+    max-width: min(var(--contestlive-hud-left-w), 44vw);
+    box-sizing: border-box;
+    padding: 0.5rem 0.5rem 0.4rem 0.55rem;
+    gap: 0.35rem;
+    justify-self: start;
+    align-self: stretch;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* 背板透明度由 --hud-a-* 分档 */
+    background: rgb(8 10 18 / var(--hud-a-left));
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contestlive-hud__left.contestlive-hud-toggle-off {
+    width: 0 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    opacity: 0;
+    transform: translateX(calc(-1 * min(0.75rem, 1.8vw)));
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+    border-right-width: 0;
+    border-right-color: transparent;
+    pointer-events: none;
+}
+
+.contestlive-hud__center-spacer {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    pointer-events: none;
+    /* 无独立铺底：与整页透明一致，合成顺序由导播在 OBS 中决定，非「固定预留给视频」的版心 */
+    background: transparent;
+}
+
+.contestlive-hud__masthead {
+    max-height: 32rem;
+    transition:
+        max-height 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        margin 0.36s ease;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.contestlive-hud__masthead.contestlive-hud-toggle-off {
+    max-height: 0 !important;
+    opacity: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    transform: translateY(-0.42rem);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.contestlive-hud__masthead-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.45rem 0.65rem;
+    min-width: 0;
+}
+
+/* 徽标超过 3 个、或紧凑双行：徽标条独占一整行（与 PHP 两行折行宽度一致，避免与标题并排导致第二行「半个挤出」） */
+#contestlive_hud_masthead_row[data-brand-title-below="1"],
+#contestlive_hud_masthead_row[data-brand-compact="1"] {
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+#contestlive_hud_masthead_row[data-brand-title-below="1"] .contestlive-hud__logos,
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__logos {
+    flex: 1 1 100%;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#contestlive_hud_masthead_row[data-brand-title-below="1"] .contestlive-hud__titles,
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__titles {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+.contestlive-hud__logos {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-start;
+    /* 横向间距与 ojtool/library/ContestliveBrandingLayout::GAP_X_PX 对齐 */
+    gap: 0.28rem 7px;
+    position: static;
+    height: clamp(1.85rem, 2.6vmin + 1.1rem, 2.55rem);
+    max-height: clamp(1.85rem, 2.6vmin + 1.1rem, 2.55rem);
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+/*
+ * 紧凑双行：
+ * - 算法装箱 + DOM 两行：`.contestlive-hud__logos--brick-rows`（第二行 inset 对齐 JS/brickPack）
+ * - 异常兜底（未加 brick class）：仍可 flex-wrap
+ */
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__logos.contestlive-hud__logos--brick-rows {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    align-content: flex-start;
+    row-gap: 0.22rem;
+}
+
+.contestlive-hud__brand-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.28rem 7px;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* 单行放不下：徽标显示高度减半，允许折两行（与 data-brand-compact / brickPack 同步） */
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__logos {
+    --hud-brand-slot-h: clamp(0.88rem, 1.28vmin + 0.52rem, 1.28rem);
+    height: auto;
+    min-height: var(--hud-brand-slot-h);
+    max-height: calc(var(--hud-brand-slot-h) * 2 + 0.3rem);
+    flex-wrap: wrap;
+    align-content: flex-start;
+    overflow: hidden;
+}
+
+.contestlive-display--hud .contestlive-hud__logos .contestlive-brand-strip__item {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    max-height: 100%;
+    padding: 0.06rem 0.28rem;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 0.18rem;
+}
+
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__logos .contestlive-brand-strip__item {
+    max-height: var(--hud-brand-slot-h, 1.28rem);
+    height: var(--hud-brand-slot-h, 1.28rem);
+}
+
+.contestlive-display--hud .contestlive-hud__logos .contestlive-brand-strip__item img {
+    max-height: 100%;
+    max-width: min(10rem, 30vw);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+#contestlive_hud_masthead_row[data-brand-compact="1"] .contestlive-hud__logos .contestlive-brand-strip__item img {
+    max-width: min(10rem, min(30vw, var(--contestlive-hud-left-w)));
+}
+
+.contestlive-hud__titles {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.contestlive-hud__titles .contestlive-hud__title {
+    display: flex;
+    align-items: center;
+    font-size: clamp(1rem, 0.9vmin + 0.55rem, 1.75rem);
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    min-width: 0;
+}
+
+.contestlive-hud-title-slot,
+.contestlive-hud-subtitle-slot {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* 测量前占位两行高（与 applyCpcCoachMemberSlot · hudLineHeightPx 默认 1.35 一致） */
+    min-height: calc(2 * 1.35lh);
+    max-height: calc(2 * 1.35lh);
+}
+
+/* SSR / JS 测量前：host 级两行 clamp */
+.contestlive-hud-title-slot.csg-mq-slot--twoline:not([data-cpc-mq-ready]):not([data-csg-mq-inter='1']),
+.contestlive-hud-subtitle-slot.csg-mq-slot--twoline:not([data-cpc-mq-ready]):not([data-csg-mq-inter='1']) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.contestlive-hud-title-slot.cpc-hud-mq-pending,
+.contestlive-hud-subtitle-slot.cpc-hud-mq-pending {
+    visibility: hidden;
+}
+
+/* 旧版持续跑马残留：顶栏标题槽禁止 needs-marquee 动画 */
+.contestlive-hud-title-slot.needs-marquee > .marquee-wrapper,
+.contestlive-hud-subtitle-slot.needs-marquee > .marquee-wrapper {
+    display: none !important;
+    animation: none !important;
+}
+
+.contestlive-hud-title-slot[data-cpc-mq-ready='1']:not([data-csg-mq-inter='1']).csg-mq-slot--twoline,
+.contestlive-hud-subtitle-slot[data-cpc-mq-ready='1']:not([data-csg-mq-inter='1']).csg-mq-slot--twoline {
+    display: block;
+    min-height: 0;
+    max-height: none;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+}
+
+.contestlive-hud-title-slot.csg-mq-slot--twoline[data-cpc-mq-ready='1']:not([data-csg-mq-inter='1']) .csg-mq-slot__inner,
+.contestlive-hud-subtitle-slot.csg-mq-slot--twoline[data-cpc-mq-ready='1']:not([data-csg-mq-inter='1']) .csg-mq-slot__inner {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.contestlive-hud-title-slot.contestlive-hud-headline-slot--single,
+.contestlive-hud-subtitle-slot.contestlive-hud-headline-slot--single {
+    display: flex;
+    align-items: center;
+    min-height: 1.35lh;
+    max-height: 1.35lh;
+    -webkit-line-clamp: unset;
+}
+
+.contestlive-hud-headline-slot--single .csg-mq-slot__inner {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/* HUD / 独立页顶栏 hero：间歇跑马灯（与 rank_live 同源类名，由 csg_marquee_plain · syncIntermittentMarqueeGroup 注入） */
+:is(.contestlive-hud, header.contestlive-standalone-hero) .contestlive-hud-title-slot .csg-mq-inter-clip,
+.contestlive-hud .contestlive-hud-subtitle-slot .csg-mq-inter-clip {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+:is(.contestlive-hud, header.contestlive-standalone-hero) .contestlive-hud-title-slot .csg-mq-inter-track,
+.contestlive-hud .contestlive-hud-subtitle-slot .csg-mq-inter-track {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    vertical-align: top;
+    will-change: transform;
+}
+
+:is(.contestlive-hud, header.contestlive-standalone-hero) .contestlive-hud-title-slot .csg-mq-inter-sep,
+.contestlive-hud .contestlive-hud-subtitle-slot .csg-mq-inter-sep {
+    flex: 0 0 auto;
+    font-weight: 700;
+}
+
+:is(.contestlive-hud, header.contestlive-standalone-hero) .contestlive-hud-title-slot[data-csg-mq-inter='1'],
+.contestlive-hud .contestlive-hud-subtitle-slot[data-csg-mq-inter='1'] {
+    min-height: 1.35lh;
+    max-height: 1.35lh;
+}
+
+/* 比赛标题：applyCpcCoachMemberSlot — 两行 clamp 在内层；超出则 data-csg-mq-inter 间歇跑马 */
+.contestlive-hud-title-slot.csg-mq-slot--twoline,
+.contestlive-hud-subtitle-slot.csg-mq-slot--twoline {
+    overflow: hidden;
+}
+
+.contestlive-hud-title-slot .csg-mq-slot__inner,
+.contestlive-hud-subtitle-slot .csg-mq-slot__inner {
+    display: block;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.contestlive-hud__subtitle {
+    font-size: clamp(0.82rem, 0.55vmin + 0.4rem, 1.1rem);
+    opacity: 0.92;
+    min-width: 0;
+}
+
+/* 综合 HUD：校名/队名/顶栏标题均仅用 data-csg-mq-inter 间歇轨道（与 team_display · applyCpcPlainLineIntermittentSlot 同源），禁止 needs-marquee 持续动画 */
+
+.contestlive-hud__panel {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: rgb(15 18 28 / var(--hud-a-panel));
+    border-radius: 0.22rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.contestlive-hud__panel--queue {
+    max-height: min(85vh, 52rem);
+    transition:
+        max-height 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        margin 0.34s ease,
+        padding 0.34s ease,
+        border-width 0.28s ease;
+    flex: 1.05;
+}
+
+.contestlive-hud__panel--ac {
+    max-height: min(85vh, 52rem);
+    transition:
+        max-height 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        margin 0.34s ease,
+        padding 0.34s ease,
+        border-width 0.28s ease;
+    flex: 0.82;
+}
+
+.contestlive-hud__panel--queue.contestlive-hud-toggle-off,
+.contestlive-hud__panel--ac.contestlive-hud-toggle-off,
+.contestlive-hud__panel--prob-stats.contestlive-hud-toggle-off {
+    flex: 0 0 0 !important;
+    max-height: 0 !important;
+    min-height: 0 !important;
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-width: 0 !important;
+    pointer-events: none;
+}
+
+/* 各题评测结果统计：置于「最新过题」之下，与队列/过题同一数据轮询内更新 */
+.contestlive-hud__panel--prob-stats {
+    flex: 0.58;
+    min-height: 0;
+    max-height: min(85vh, 52rem);
+    transition:
+        max-height 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        margin 0.34s ease,
+        padding 0.34s ease,
+        border-width 0.28s ease;
+}
+
+.contestlive-hud__tablewrap--prob-stats {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.contestlive-hud-prob-stats-mount {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.contestlive-hud-prob-stats-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 各题堆叠柱：参考现场大屏「每题提交构成」习惯，色与评测队列 pill 对齐 */
+.csg-hud-statchart {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    gap: 0.28rem;
+    min-width: min(100%, 12rem);
+    font-variant-numeric: tabular-nums;
+}
+
+.csg-hud-statchart__legend {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.32rem 0.5rem;
+    padding-bottom: 0.14rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: clamp(0.58rem, 0.28vmin + 0.46rem, 0.82rem);
+}
+
+.csg-hud-statchart__legitem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    max-width: 100%;
+}
+
+.csg-hud-statchart__sw {
+    flex: 0 0 auto;
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 0.14rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.csg-hud-statchart__sw--ac {
+    background: rgba(46, 125, 50, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(129, 199, 132, 0.45);
+}
+
+.csg-hud-statchart__sw--bad {
+    background: rgba(198, 40, 40, 0.62);
+}
+
+.csg-hud-statchart__sw--warn {
+    background: rgba(251, 192, 45, 0.48);
+}
+
+.csg-hud-statchart__sw--info {
+    background: rgba(66, 165, 245, 0.45);
+}
+
+.csg-hud-statchart__sw--pending {
+    background: rgba(80, 90, 110, 0.55);
+}
+
+.csg-hud-statchart__legtext {
+    font-weight: 700;
+    color: rgba(230, 236, 255, 0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 6.5rem;
+}
+
+.csg-hud-statchart__plot {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.12rem 0.18rem;
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 0.1rem 0 0;
+}
+
+.csg-hud-statchart__col {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 2.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+}
+
+.csg-hud-statchart__bartrack {
+    width: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.csg-hud-statchart__bar {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 1px;
+    width: 82%;
+    max-width: 1.65rem;
+    min-height: 0;
+    border-radius: 0.2rem 0.2rem 0.12rem 0.12rem;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.csg-hud-statchart__bar--empty {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.csg-hud-statchart__seg {
+    min-height: 3px;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+}
+
+.csg-hud-statchart__seg--ac {
+    background: rgba(46, 125, 50, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.csg-hud-statchart__seg--bad {
+    background: rgba(198, 40, 40, 0.62);
+}
+
+.csg-hud-statchart__seg--warn {
+    background: rgba(251, 192, 45, 0.48);
+}
+
+.csg-hud-statchart__seg--info {
+    background: rgba(66, 165, 245, 0.45);
+}
+
+.csg-hud-statchart__seg--pending {
+    background: rgba(80, 90, 110, 0.55);
+}
+
+.csg-hud-statchart__letter {
+    flex: 0 0 auto;
+    margin-top: 0.2rem;
+    padding-top: 0.22rem;
+    width: 100%;
+    text-align: center;
+    font-weight: 800;
+    font-size: clamp(0.68rem, 0.32vmin + 0.52rem, 0.95rem);
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    color: rgba(248, 250, 255, 0.94);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    border-top: 4px solid var(--contestlive-pr-color, rgba(255, 255, 255, 0.28));
+}
+
+.contestlive-hud-prob-stats__empty {
+    padding: 0.35rem 0.5rem;
+    font-size: clamp(0.62rem, 0.28vmin + 0.48rem, 0.85rem);
+    opacity: 0.72;
+}
+
+.contestlive-hud__panel-head {
+    flex: 0 0 auto;
+    padding: 0.25rem 0.45rem;
+    font-size: clamp(0.65rem, 0.35vmin + 0.45rem, 0.88rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgb(0 0 0 / var(--hud-a-panel-head));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.contestlive-hud__panel-head--bilingual {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.contestlive-hud__panel-head-cn {
+    font-size: clamp(0.72rem, 0.38vmin + 0.48rem, 0.95rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.contestlive-hud__panel-head-en {
+    font-size: clamp(0.62rem, 0.3vmin + 0.42rem, 0.82rem);
+    font-weight: 600;
+    opacity: 0.72;
+    color: rgba(220, 228, 255, 0.88);
+    white-space: nowrap;
+}
+
+.contestlive-hud__tablewrap {
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.contestlive-hud-queue-surface {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    min-height: 0;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-embed {
+    font-size: clamp(0.82rem, 0.38vmin + 0.58rem, 1.12rem);
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-embed th,
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-embed td {
+    padding: 0.32rem 0.48rem;
+}
+
+/* 综合 HUD 左表：表头中英上下叠排；纵横向均居中，两表各列一致 */
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast thead th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast thead th .contestlive-th-split-inner.contestlive-th-split {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0.12rem 0;
+    min-height: 2.35rem;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast thead th .contestlive-th-split__cn,
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast thead th .contestlive-th-split__en {
+    flex: 0 0 auto;
+    width: 100%;
+    text-align: center;
+    line-height: 1.12;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast thead th .contestlive-th-split__en {
+    font-size: 0.68em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 0.82;
+}
+
+@keyframes contestlive-queue-row-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5em);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-row--slide-in {
+    animation: contestlive-queue-row-slide-in 0.44s ease-out both;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-rnk {
+    width: 2.35rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-solv {
+    width: 2.15rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-pr {
+    width: 2.5rem;
+    vertical-align: middle;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-pr {
+    text-align: left;
+    vertical-align: middle;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-pr .contestlive-hud-pr {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast {
+    /* 评测队列「结果」与最新过题「时间」同宽，便于两表「解」「题」列对齐（与结果 pill、`+H:MM:SS` 可读下限平衡） */
+    --hud-trail-col-w: 4.1rem;
+    table-layout: fixed;
+    width: 100%;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-res {
+    width: var(--hud-trail-col-w);
+    max-width: var(--hud-trail-col-w);
+    box-sizing: border-box;
+    text-align: center;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-team {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast .col-time {
+    width: var(--hud-trail-col-w);
+    max-width: var(--hud-trail-col-w);
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.contestlive-hud-timecell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    text-align: right;
+    gap: 0.06rem;
+    min-width: 0;
+}
+
+/* 最新过题：时间与表头同向居中（列已与左侧「结果」同宽） */
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-time .contestlive-hud-timecell {
+    align-items: center;
+    text-align: center;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-time .contestlive-hud-timecell__date,
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-time .contestlive-hud-timecell__main {
+    width: 100%;
+    text-align: center;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-time .contestlive-hud-timecell__main {
+    font-size: 0.9em;
+}
+
+:is(.contestlive-display--hud, body.contestlive-live-queue-skin-sync) .contestlive-queue-table--hud-broadcast tbody td.col-time .contestlive-hud-timecell__date {
+    font-size: 0.62em;
+}
+
+.contestlive-hud-timecell__date {
+    font-size: 0.68em;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.78;
+    white-space: nowrap;
+    min-height: 1.1em;
+}
+
+.contestlive-hud-timecell__date--reserved {
+    opacity: 0;
+}
+
+.contestlive-hud-timecell__date--muted {
+    opacity: 0.72;
+}
+
+.contestlive-hud-timecell__main {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.contestlive-hud-rankcell {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+
+.contestlive-hud-team {
+    min-width: 0;
+}
+
+.contestlive-hud-mq-line {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    overflow-wrap: normal;
+    word-break: normal;
+    max-height: 1.45em;
+}
+
+.contestlive-hud-mq-line .csg-mq-inter-clip {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+.contestlive-hud-mq-line .csg-mq-inter-track {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    vertical-align: top;
+    will-change: transform;
+}
+
+.contestlive-hud-mq-line .csg-mq-inter-sep {
+    flex: 0 0 auto;
+    font-weight: 600;
+}
+
+.contestlive-hud-mq-line[data-csg-mq-inter='1'] {
+    max-height: 1.45em;
+}
+
+.contestlive-hud-team .contestlive-hud-mq-line + .contestlive-hud-mq-line {
+    margin-top: 0.06rem;
+}
+
+.contestlive-hud-team__school {
+    font-size: 0.78em;
+    font-weight: 600;
+    line-height: 1.15;
+    opacity: 0.82;
+    color: rgba(210, 220, 255, 0.92);
+}
+
+.contestlive-hud-team__name {
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.contestlive-hud-team__en {
+    font-size: 0.78em;
+    opacity: 0.78;
+    line-height: 1.15;
+}
+
+.contestlive-hud-pr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.18rem;
+    min-width: 1.35rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.contestlive-hud-pr__bar {
+    width: 0.22rem;
+    align-self: stretch;
+    min-height: 1.05em;
+    border-radius: 0.06rem;
+    background: var(--contestlive-pr-color, #6b7280);
+    flex-shrink: 0;
+    box-shadow:
+        inset 1px 0 0 var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.28)),
+        inset -1px 0 0 var(--csg-balloon-ring-inner, rgba(255, 255, 255, 0.28)),
+        1px 0 0 var(--csg-balloon-ring-outer, rgba(0, 0, 0, 0.5)),
+        -1px 0 0 var(--csg-balloon-ring-outer, rgba(0, 0, 0, 0.5));
+}
+
+.contestlive-hud-pr__letter {
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* 左栏表格外壳可 Tab 聚焦（投屏单页不再使用内部滚动条） */
+.contestlive-hud__tablewrap:focus {
+    outline: none;
+}
+
+.contestlive-hud__tablewrap:focus-visible {
+    box-shadow: inset 0 0 0 1px rgba(100, 180, 255, 0.55);
+}
+
+.contestlive-queue-table--compact {
+    width: 100%;
+    font-size: clamp(0.72rem, 0.35vmin + 0.58rem, 1rem);
+    border-collapse: collapse;
+}
+
+.contestlive-queue-table--compact thead th {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 12, 20, 0.9);
+    z-index: 1;
+}
+
+.contestlive-queue-table--compact th,
+.contestlive-queue-table--compact td {
+    padding: 0.1rem 0.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    text-align: left;
+}
+
+.contestlive-hud__right {
+    grid-column: 3;
+    grid-row: 1;
+    min-height: 0;
+    transition:
+        width 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.36s ease,
+        transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.4s ease,
+        border-color 0.28s ease;
+    width: var(--contestlive-hud-right-w);
+    max-width: min(var(--contestlive-hud-right-w), 50vw);
+    box-sizing: border-box;
+    justify-self: end;
+    align-self: stretch;
+    padding: 0.4rem 0.55rem 0.35rem 0.35rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgb(10 12 22 / var(--hud-a-right));
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contestlive-hud__right.contestlive-hud-toggle-off {
+    width: 0 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    opacity: 0;
+    transform: translateX(min(0.75rem, 1.8vw));
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+    border-left-width: 0;
+    border-left-color: transparent;
+    pointer-events: none;
+}
+
+.contestlive-hud__bottom {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: stretch;
+    min-height: 2.45rem;
+    max-height: 2.85rem;
+    width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgb(12 14 22 / var(--hud-a-bottom));
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    position: relative;
+    z-index: 4;
+    transition:
+        max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        min-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.28s ease,
+        padding 0.34s ease;
+}
+
+.contestlive-hud__bottom.contestlive-hud-toggle-off {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    opacity: 0;
+    transform: translateY(0.55rem);
+    overflow: hidden;
+    border-top-width: 0;
+    border-top-color: transparent;
+    pointer-events: none;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contestlive-hud__left,
+    .contestlive-hud__right,
+    .contestlive-hud__masthead,
+    .contestlive-hud__panel--queue,
+    .contestlive-hud__panel--ac,
+    .contestlive-hud__panel--prob-stats,
+    .contestlive-hud__bottom {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.contestlive-hud__clock {
+    flex: 0 0 7.25rem;
+    min-width: 7.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'CsgLiveRajdhani', 'CsgLiveOutfit', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: clamp(1rem, 1.75vw, 1.32rem);
+    letter-spacing: 0.05em;
+    background: rgb(198 40 40 / var(--hud-a-clock));
+    color: #fff;
+}
+
+.contestlive-hud__ticker {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    padding: 0;
+    /* 与外条 --hud-a-bottom 同向变化，避免仅底栏外边缩透、内槽仍近实色 */
+    background: rgb(18 22 34 / calc(0.22 + var(--hud-a-bottom) * 0.78));
+}
+
+.contestlive-hud__ticker-dual {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 0;
+    padding: 0 0.55rem;
+}
+
+.contestlive-hud__ticker-dual--solo .contestlive-hud__ticker-sep,
+.contestlive-hud__ticker-dual--solo .contestlive-hud__ticker-fixed-slot {
+    display: none !important;
+}
+
+.contestlive-hud__ticker-push {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.contestlive-hud__ticker-inner {
+    font-size: clamp(0.64rem, 0.92vw, 0.84rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+}
+
+.contestlive-hud__ticker-sep {
+    flex: 0 0 auto;
+    width: 1px;
+    align-self: stretch;
+    min-height: 1.15em;
+    margin: 0 0.42rem;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.contestlive-hud__ticker-fixed-slot {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    /* 双栏宽度由 contestlive_ticker.js 按内容比例分配；勿写死 max-width 以免过早省略 */
+    font-size: clamp(0.62rem, 0.88vw, 0.8rem);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+
+.contestlive-hud__helpfab {
+    position: absolute;
+    right: 0.28rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(30, 34, 50, 0.9);
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.contestlive-hud__helpfab-k {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.02em;
+}

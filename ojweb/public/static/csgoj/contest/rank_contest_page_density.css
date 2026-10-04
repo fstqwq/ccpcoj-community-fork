@@ -1,0 +1,542 @@
+/**
+ * rank_contest_page_density.css
+ *
+ * 仅由「站内比赛榜单页」/csgoj|cpcsys/contest/rank 引入；外榜、离线滚榜包、直播 HUD 等不加载本文件。
+ *
+ * 榜单列表松紧档位（data-contest-rank-density，由 JS 写在 .contest-rank-page-shell 上）：
+ *   0 = 最密一档，1 = 较紧（原投屏推荐），2 = 默认，3 = 不写属性，与 rank.css 原版一致。
+ * 布局/字号类 --rank-* 仅写在 .rank-content-wrapper 上，顶栏、时间条、皮肤/筛选下拉与弹层仍用 :root 默认尺寸。
+ * 全屏：:has(.rank-system.fullscreen) 时不应用本文件任何密度覆写。
+ *
+ * 依赖 :has()（Chrome 105+ / Safari 15.4+）；与 fullscreen-mock 兼容（仍带 .fullscreen）。
+ */
+
+/* ─── 皮肤下拉：双栏（左主题、右密度；由 rank_page.js 注入 .rank-skin-dropdown--two-col）─── */
+#rank-skin-dropdown.rank-skin-dropdown--two-col {
+    min-width: 300px;
+    max-width: min(96vw, 420px);
+    padding: 8px 10px;
+    box-sizing: border-box;
+}
+
+.rank-skin-panel-two-col {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.rank-skin-panel-col-themes {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rank-skin-panel-col-themes .custom-select-option {
+    border-radius: var(--rank-radius-inner, 4px);
+}
+
+.rank-skin-panel-col-density {
+    flex: 0 0 auto;
+    width: 142px;
+    min-height: 100%;
+    border-left: 1px solid var(--bs-border-color, #dee2e6);
+    padding: 4px 4px 4px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.rank-skin-density-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    text-align: center;
+    line-height: 1.3;
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+.rank-skin-density-label-cn {
+    display: block;
+}
+
+.rank-skin-density-label en-text {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 3px;
+}
+
+.bilingual-en .rank-skin-density-label-cn {
+    display: none;
+}
+
+.bilingual-en .rank-skin-density-label en-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-top: 0;
+}
+
+/* 深色榜单皮肤下：下拉仍为深色底，标题与副行用浅色保证对比（本块样式随 contest 页加载） */
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-label {
+    color: #f1f5f9;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-label en-text {
+    color: #cbd5e1;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .bilingual-en .rank-skin-density-label en-text {
+    color: #f1f5f9;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-panel-col-density {
+    border-left-color: rgba(148, 163, 184, 0.28);
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-level {
+    color: #f8fafc;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-btn {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(148, 163, 184, 0.45);
+    color: #e2e8f0;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-btn:hover:not(:disabled) {
+    background: rgba(51, 65, 85, 0.95);
+    border-color: rgba(186, 199, 216, 0.5);
+    color: #f8fafc;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-shortcut-btn {
+    background: rgba(30, 41, 59, 0.92);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #e2e8f0;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-shortcut-btn:hover:not(:disabled) {
+    background: rgba(51, 65, 85, 0.95);
+    border-color: rgba(96, 165, 250, 0.45);
+    color: #f8fafc;
+}
+
+.rank-skin-density-shortcut-btn {
+    width: 100%;
+    padding: 5px 4px;
+    margin: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--rank-radius-inner, 4px);
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.15;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.rank-skin-density-shortcut-btn en-text {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 2px;
+}
+
+.bilingual-en .rank-skin-density-shortcut-btn en-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 0;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .rank-skin-density-shortcut-btn en-text {
+    color: #cbd5e1;
+}
+
+.rank-header[data-rank-skin="dark_stage"] .bilingual-en .rank-skin-density-shortcut-btn en-text {
+    color: #f1f5f9;
+}
+
+.rank-skin-density-shortcut-btn:hover:not(:disabled) {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+
+.rank-skin-density-shortcut-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 十字：上最疏、下最密，左右 − / +，中为档位 */
+.rank-skin-density-controls.rank-skin-density-controls--cross {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    gap: 6px;
+    padding: 2px 0 4px;
+    box-sizing: border-box;
+}
+
+.rank-skin-density-shortcut-btn--axis {
+    flex: 0 0 auto;
+}
+
+.rank-skin-density-cross-mid {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.rank-skin-density-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--rank-radius-inner, 4px);
+    background: #fff;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.rank-skin-density-btn:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.rank-skin-density-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.rank-skin-density-level {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: #0f172a;
+    line-height: 1;
+}
+
+@media (max-width: 520px) {
+    .rank-skin-panel-two-col {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .rank-skin-panel-col-density {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--bs-border-color, #dee2e6);
+        padding-left: 0;
+        padding-top: 8px;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* ═══ 档位 0：最密 ═══ */
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .rank-content-wrapper {
+    --rank-col-width: 48px;
+    --rank-solve-col-width: 54px;
+    --rank-penalty-col-width: 54px;
+    --rank-problem-col-width: 60px;
+    --rank-header-height: 42px;
+    --rank-stats-height: 22px;
+    --rank-col-gap: 3px;
+    --rank-row-gap: 4px;
+    --rank-padding-xs: 2px;
+    --rank-padding-sm: 4px;
+    --rank-padding-md: 7px;
+    --rank-padding-lg: 8px;
+    --rank-padding-xl: 12px;
+    --rank-font-size-xs: 8px;
+    --rank-font-size-sm: 10px;
+    --rank-font-size-md: 11px;
+    --rank-font-size-lg: 11px;
+    --rank-font-size-xl: 12px;
+    --rank-font-size-2xl: 13px;
+    --rank-font-size-3xl: 16px;
+    --rank-font-size-4xl: 22px;
+    --rank-font-size-5xl: 26px;
+    line-height: 1.42;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .rank-container {
+    font-size: 12px !important;
+    line-height: 1.38 !important;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .rank-header-row {
+    padding: 5px 8px 0 8px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .rank-row,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .rank-row:not(:last-child) {
+    margin-bottom: 2px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .school-name {
+    font-size: 15px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .team-name-cn {
+    font-size: 12px;
+    min-height: 14px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .team-names.team-names-single {
+    min-height: 28px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .coach-player-section {
+    min-height: 28px;
+    --rank-text-fade-width: 13px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .coach-info,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .player-info {
+    height: 14px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .stats-section {
+    margin-top: 29px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .team-type-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .flag-icon {
+    width: 17px;
+    height: 12px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .school-logo {
+    background-size: 84px auto;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .problem-header-color-bg {
+    top: -15px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="0"] .problem-item.pro-first-blood-global::after {
+    top: -10px;
+    right: -6px;
+    font-size: 13px;
+}
+
+/* ═══ 档位 1：较紧（原投屏推荐）═══ */
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .rank-content-wrapper {
+    --rank-col-width: 52px;
+    --rank-solve-col-width: 58px;
+    --rank-penalty-col-width: 58px;
+    --rank-problem-col-width: 66px;
+    --rank-header-height: 46px;
+    --rank-stats-height: 24px;
+    --rank-col-gap: 3px;
+    --rank-row-gap: 5px;
+    --rank-padding-xs: 2px;
+    --rank-padding-sm: 5px;
+    --rank-padding-md: 8px;
+    --rank-padding-lg: 10px;
+    --rank-padding-xl: 14px;
+    --rank-font-size-xs: 9px;
+    --rank-font-size-sm: 11px;
+    --rank-font-size-md: 12px;
+    --rank-font-size-lg: 13px;
+    --rank-font-size-xl: 14px;
+    --rank-font-size-2xl: 15px;
+    --rank-font-size-3xl: 18px;
+    --rank-font-size-4xl: 24px;
+    --rank-font-size-5xl: 28px;
+    line-height: 1.45;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .rank-container {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .rank-header-row {
+    padding: 6px 10px 0 10px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .rank-row,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .rank-row:not(:last-child) {
+    margin-bottom: 3px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .school-name {
+    font-size: 17px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .team-name-cn {
+    font-size: 14px;
+    min-height: 16px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .team-names.team-names-single {
+    min-height: 32px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .coach-player-section {
+    min-height: 32px;
+    --rank-text-fade-width: 15px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .coach-info,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .player-info {
+    height: 16px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .stats-section {
+    margin-top: 34px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .team-type-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .flag-icon {
+    width: 19px;
+    height: 14px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .school-logo {
+    background-size: 96px auto;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .problem-header-color-bg {
+    top: -18px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="1"] .problem-item.pro-first-blood-global::after {
+    top: -11px;
+    right: -7px;
+    font-size: 15px;
+}
+
+/* ═══ 档位 2：默认 ═══ */
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .rank-content-wrapper {
+    --rank-col-width: 58px;
+    --rank-solve-col-width: 65px;
+    --rank-penalty-col-width: 65px;
+    --rank-problem-col-width: 73px;
+    --rank-header-height: 53px;
+    --rank-stats-height: 28px;
+    --rank-col-gap: 4px;
+    --rank-row-gap: 6px;
+    --rank-padding-xs: 3px;
+    --rank-padding-sm: 7px;
+    --rank-padding-md: 10px;
+    --rank-padding-lg: 13px;
+    --rank-padding-xl: 19px;
+    --rank-font-size-xs: 10px;
+    --rank-font-size-sm: 12px;
+    --rank-font-size-md: 13px;
+    --rank-font-size-lg: 14px;
+    --rank-font-size-xl: 16px;
+    --rank-font-size-2xl: 17px;
+    --rank-font-size-3xl: 20px;
+    --rank-font-size-4xl: 28px;
+    --rank-font-size-5xl: 34px;
+    line-height: 1.48;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .rank-container {
+    font-size: 15px !important;
+    line-height: 1.42 !important;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .rank-header-row {
+    padding: 7px 11px 0 11px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .rank-row,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .rank-row:not(:last-child) {
+    margin-bottom: 4px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .school-name {
+    font-size: 20px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .team-name-cn {
+    font-size: 15px;
+    min-height: 17px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .team-names.team-names-single {
+    min-height: 34px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .coach-player-section {
+    min-height: 35px;
+    --rank-text-fade-width: 16px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .coach-info,
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .player-info {
+    height: 17px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .stats-section {
+    margin-top: 37px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .team-type-icon {
+    width: 27px;
+    height: 27px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .flag-icon {
+    width: 20px;
+    height: 15px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .school-logo {
+    background-size: 104px auto;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .problem-header-color-bg {
+    top: -19px;
+}
+
+.contest-rank-page-shell:not(:has(.rank-system.fullscreen))[data-contest-rank-density="2"] .problem-item.pro-first-blood-global::after {
+    top: -12px;
+    right: -8px;
+    font-size: 16px;
+}

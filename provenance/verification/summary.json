@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-04",
+  "php": "7.4.33",
+  "php_syntax_files": 639,
+  "php_syntax_errors": 0,
+  "rule_assertions": 56,
+  "endpoint_assertions": 13,
+  "differential_snapshots": 900,
+  "frontend_tests": 8,
+  "python_tests": 4,
+  "javascript_syntax_files": 10,
+  "compose_config": "passed v2.39.4",
+  "mysql_offline_ddl": "passed 8.4.11",
+  "docker_build_and_e2e": "not run; no daemon and socket creation denied",
+  "elapsed_seconds": 6.67
+}

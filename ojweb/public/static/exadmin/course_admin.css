@@ -1,0 +1,271 @@
+/* **************************************************
+   课程组编辑页面样式
+   ************************************************** */
+
+/* 修改状态样式 - 淡蓝色阴影 + 小黄星 */
+.form-control.modified {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+.form-control.modified:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25), 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* CSG Switch 修改状态样式 */
+.csg-switch-setting.modified .csg-switch-input {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+.csg-switch-setting.modified .csg-switch-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25), 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* 小黄星（.modified-indicator）已迁至全站 csg_ui_markers.css */
+
+/* 折叠分类标题栏：右侧“预览 + 改动星标/计数” */
+.course-config-accordion-meta {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.course-config-cat-preview {
+    display: inline-block;
+    max-width: 52vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 0.85em;
+}
+
+/* 标题栏预览：key/value 分色，增强可读性 */
+.course-config-cat-preview .cfgk {
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.course-config-cat-preview .cfgv {
+    font-weight: 600;
+    margin-left: 0.15rem;
+}
+
+.course-config-cat-preview .cfgv-on {
+    color: var(--bs-success);
+}
+
+.course-config-cat-preview .cfgv-off {
+    color: var(--bs-secondary);
+}
+
+.course-config-cat-preview .cfgv-num {
+    color: var(--bs-primary);
+}
+
+.course-config-cat-preview .cfgsep {
+    display: inline-block;
+    width: 0.6rem;
+}
+
+.course-config-cat-indicator {
+    color: #ffc107;
+    background: #fff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.course-config-cat-indicator i {
+    display: block;
+    line-height: 1;
+    font-size: 12px;
+}
+
+/* 表单项容器需要相对定位 */
+.form-control-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* CSG Switch 容器 */
+.csg-switch-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* 数字输入框验证状态 */
+.number-input.is-valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.number-input.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.number-input.is-valid:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.number-input.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* 配置表单样式 */
+#config_form_container {
+    margin-bottom: 1rem;
+}
+
+/* =========================
+   紧凑布局（Compact）
+   ========================= */
+#config_form_container .course-config-compact .accordion-button {
+    font-size: 0.9rem;
+}
+
+#config_form_container .course-config-accordion-title {
+    font-weight: 600;
+}
+
+#config_form_container .course-config-grid {
+    margin-top: 0.25rem;
+}
+
+/* Switch 组件更紧凑 */
+#config_form_container .course-config-compact .csg-switch-setting {
+    padding: 0.35rem 0.5rem;
+}
+
+#config_form_container .course-config-compact .csg-switch-setting-title {
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+/* 数字输入更紧凑 */
+#config_form_container .course-config-compact .form-label.small {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+}
+
+#config_form_container .course-config-compact .form-control-sm {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+/* 配置项问号提示 icon */
+.course-config-help {
+    color: #6c757d;
+    cursor: help;
+    font-size: 0.95em;
+    vertical-align: -0.08em;
+}
+
+.course-config-help:hover {
+    color: #0d6efd;
+}
+
+/* Tooltip：允许 \n 换行显示 */
+.course-config-tooltip .tooltip-inner {
+    white-space: pre-line;
+    text-align: left;
+}
+
+/* 让问号 icon 始终在中文 label 右侧（不被 .en-text 的 block 样式挤到下一行） */
+.course-config-label-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+    max-width: 100%;
+}
+
+.course-config-label-cn {
+    display: inline-block;
+}
+
+/* csg-switch 的标题容器里默认有 .en-text（全局是 block），这里保持英文说明另起一行，但问号留在中文行 */
+#config_form_container .csg-switch-setting-title .en-text {
+    display: block;
+    margin-left: 0;
+}
+
+/* 配置卡片样式 */
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card-header h5 {
+    margin-bottom: 0;
+}
+
+/* 修改状态提示 */
+#modification_status {
+    font-size: 0.875rem;
+}
+
+#header_modification_icon {
+    font-size: 1.2rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 配置按钮样式 */
+.card-header .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.card-header .btn-outline-info:hover {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+    color: white;
+}
+
+.card-header .btn-outline-warning:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+.card-header .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.card-header .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    #config_form_container .col-6,
+    #config_form_container .course-config-grid .col {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+

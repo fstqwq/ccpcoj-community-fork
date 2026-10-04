@@ -1,0 +1,132 @@
+# TEMPLATE ONLY（配置模板，不是可直接使用的 nginx 配置）
+# - entrypoint.sh 会替换 __LISTEN__ / __SERVER_NAME__ 等占位符
+
+server {
+    listen __LISTEN__;
+    server_name __SERVER_NAME__;
+
+    charset utf-8;
+    client_max_body_size 128m;
+    keepalive_timeout 65s;
+    client_body_timeout 60s;
+    # FastCGI 与 PHP-FPM 之间「两次成功读/写」间隔上限。默认 30s 时，event-feed 等大响应在单次
+    # json_encode 或重查询期间若超过 30s 无字节，nginx 会掐断 chunked 连接（客户端见 Premature EOF）。
+    # 与 deploy_files/build_php 中 request_terminate_timeout=0、应用层保活 flush 配套；3600s=1h。
+    root /ojweb/public;
+    index index.php index.html index.htm;
+
+    # Docker 内置 DNS（用于 fastcgi_pass 变量形式的运行期解析）
+    # 这样在 php 容器暂时不可解析/不可用时，nginx 仍可启动/重载，其它站点不受影响。
+    resolver 127.0.0.11 ipv6=off valid=10s;
+    resolver_timeout 2s;
+    # 这里的 csgoj 会被 entrypoint.sh 替换为实际的 $OJ_NAME（从而得到 php-$OJ_NAME）
+    set $php_upstream php-csgoj:9000;
+
+    # 全局 gzip 配置
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 2048;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/javascript
+        application/xml+rss
+        application/json
+        application/xml
+        image/svg+xml;
+
+    location / {
+        try_files $uri @rewrite;
+    }
+
+    # 静态资源 - 启用 gzip 和缓存
+    location /static/ {
+        alias /var/www/baseoj/public/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        gzip_static on;  # 使用预压缩文件
+    }
+
+    # CSGOJ_OJ_LOC_SYNC_BEGIN
+    # 外榜附件（rank.json 定时推送）：PHP 以临时文件 + rename 原子替换；须关闭 open_file_cache，
+    # 否则在 nginx_base.conf 全局 open_file_cache 下，原地覆盖会令 worker 仍送出旧长度/旧内容。
+    # gzip 须写在本层 location（勿仅用嵌套 ~* \.json$）：嵌套块下 gzip 常不生效，rank.json 会退化为明文。
+    location ^~ /upload/outrank_attach/ {
+        alias /var/www/public/csgoj/upload/outrank_attach/;
+        open_file_cache off;
+        gzip on;
+        gzip_vary on;
+        gzip_types application/json text/plain;
+        expires 1d;
+    }
+    # CSGOJ_OJ_LOC_SYNC_END
+
+    # 上传文件 - 分类处理
+    location /upload/ {
+        alias /var/www/public/csgoj/upload/;
+        
+        # 文本文件启用 gzip
+        location ~* \.(txt|log|json|xml|css|js)$ {
+            gzip on;
+            gzip_vary on;
+            expires 1d;
+        }
+        
+        # 二进制文件不压缩
+        location ~* \.(jpg|jpeg|png|gif|ico|pdf|zip|rar|mp4|avi)$ {
+            expires 1y;
+            add_header Cache-Control "public";
+        }
+    }
+
+    location ~ /upload/.*\.php$ {
+        deny all;
+    }
+
+    location ~ /static/.*\.php$ {
+        deny all;
+    }
+
+    location @rewrite {
+        set $static 0;
+        if ($uri ~ \.(css|js|jpg|jpeg|png|gif|ico|woff|eot|svg|css\.map|min\.map)$) {
+            set $static 1;
+        }
+        if ($static = 0) {
+            rewrite ^/(.*)$ /index.php?s=/$1;
+        }
+    }
+
+    location ~ \.php/ {
+        if ($request_uri ~ ^(.+\.php)(/.+?)($|\?)) { }
+        fastcgi_connect_timeout 2s;
+        fastcgi_send_timeout 3600s;
+        fastcgi_read_timeout 3600s;
+        fastcgi_pass $php_upstream;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_NAME $1;
+        fastcgi_param PATH_INFO $2;
+        fastcgi_param SCRIPT_FILENAME $document_root$1;
+    }
+
+    location ~ \.php$ {
+        fastcgi_connect_timeout 2s;
+        fastcgi_send_timeout 3600s;
+        fastcgi_read_timeout 3600s;
+        fastcgi_pass $php_upstream;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    access_log /var/log/nginx/csgoj_access.log;
+    error_log /var/log/nginx/csgoj_error.log;
+}
+
+
