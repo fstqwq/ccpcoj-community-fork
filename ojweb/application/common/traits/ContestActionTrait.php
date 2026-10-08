@@ -326,6 +326,23 @@ trait ContestActionTrait
             $problem['submit'] = 0;
         if ($problem['accepted'] === null)
             $problem['accepted'] = 0;
+
+        // CCPC 2026 reveal rule: hide per-problem submit/accepted stats from
+        // non-referee viewers while the problem is below the reveal threshold,
+        // so the problem page cannot leak scoreboard-hidden progress.
+        if (CcpcRulesEnabled($this->contest) && !$this->IsContestAdmin() && $this->contestStatus != 2) {
+            $ccpcTeams = db('cpc_team')->where('contest_id', $this->contest['contest_id'])->count();
+            $ccpcThreshold = CcpcRulesThreshold((int)$ccpcTeams, (string)($this->contest['ccpc_reveal_policy'] ?? 'min_50_20'));
+            $ccpcAcTeams = db('solution')->where([
+                'contest_id' => $this->contest['contest_id'],
+                'problem_id' => $problem_id,
+                'result'     => 4,
+            ])->group('user_id')->count();
+            if ($ccpcAcTeams < $ccpcThreshold) {
+                $problem['submit'] = 0;
+                $problem['accepted'] = 0;
+            }
+        }
         $problem['problem_id_show'] = $apid;
         if ($this->contestStatus == 2 || $this->IsContestAdmin())
             $problem['show_real_id'] = true;
@@ -2003,5 +2020,16 @@ trait ContestActionTrait
         $this->assign('contest_live_hud_title_value', isset($ldCfg['hud_title']) ? (string) $ldCfg['hud_title'] : '');
         $this->assign('contest_live_ticker_fixed_value', isset($ldCfg['ticker_fixed']) ? (string) $ldCfg['ticker_fixed'] : '');
         return $this->fetch('admin/contest_live');
+    }
+}
+
+if (!function_exists('CcpcRulesEnabled')) {
+    function CcpcRulesEnabled(array $contest): bool
+    {
+        return \app\common\funcs\CcpcRules::enabled($contest);
+    }
+    function CcpcRulesThreshold(int $teams, string $policy = 'min_50_20'): int
+    {
+        return \app\common\funcs\CcpcRules::threshold($teams, $policy);
     }
 }
